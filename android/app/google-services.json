@@ -29,6 +29,13 @@
             {
               "client_id": "103251286025-ms52enj6jjjttp2q67v4g31hr7l8t4k7.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "103251286025-qlao04f4jmisgvnaf58qohrbmokipeqq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kull.chatApp"
+              }
             }
           ]
         }

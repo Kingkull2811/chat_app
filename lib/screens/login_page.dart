@@ -11,10 +11,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(
-          'Home',
-          style: TextStyle(fontSize: 50),
+      body: InkWell(
+        onTap: (){
+          Navigator.pop(context);
+        },
+        child: Center(
+          child: Text(
+            'Login',
+            style: TextStyle(fontSize: 50),
+          ),
         ),
       ),
     );
