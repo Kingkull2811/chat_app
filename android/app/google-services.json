@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "103251286025",
+    "project_id": "chatapp-97dbc",
+    "storage_bucket": "chatapp-97dbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103251286025:android:a85cdc90c8e4298af840d8",
+        "android_client_info": {
+          "package_name": "com.kull.chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "103251286025-ms52enj6jjjttp2q67v4g31hr7l8t4k7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYIXozmdWTfSFb1kZSyvn6rCi_CIablz0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "103251286025-ms52enj6jjjttp2q67v4g31hr7l8t4k7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
