@@ -1,5 +1,5 @@
 import 'package:chat_app/screens/home_page.dart';
-import 'package:chat_app/screens/login_page.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -21,11 +21,19 @@ void main() async {
     await Firebase.initializeApp();
   }
 
-  runApp(const MyApp());
+  runApp(
+    MyApp(
+      appTheme: AppTheme(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final AppTheme appTheme;
+  const MyApp({
+    Key? key,
+    required this.appTheme,
+  }) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -53,13 +61,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-          primaryColor: AppConstants().primaryColor,
-          scaffoldBackgroundColor: Colors.white),
-      debugShowCheckedModeBanner: false,
-      home: //_isSignedIn ?
-      const HomePage()
-          //: const LoginPage(),
-    );
+        theme: AppTheme().light,
+        darkTheme: AppTheme().dark,
+        debugShowCheckedModeBanner: false,
+        themeMode: ThemeMode.dark,
+        //debugShowCheckedModeBanner: false,
+        home: //_isSignedIn ?
+            const HomePage()
+        //: const LoginPage(),
+        );
   }
 }

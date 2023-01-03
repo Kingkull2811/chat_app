@@ -12,10 +12,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: InkWell(
-        onTap: (){
+        onTap: () {
           Navigator.pop(context);
         },
-        child: Center(
+        child: const Center(
           child: Text(
             'Login',
             style: TextStyle(fontSize: 50),
