@@ -1,4 +1,5 @@
-import 'package:chat_app/screens/home_page.dart';
+import 'package:chat_app/screens/home/home_page.dart';
+import 'package:chat_app/screens/login/login_page.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,6 +31,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final AppTheme appTheme;
+
   const MyApp({
     Key? key,
     required this.appTheme,
@@ -61,14 +63,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: AppTheme().light,
-        darkTheme: AppTheme().dark,
-        debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.dark,
-        //debugShowCheckedModeBanner: false,
-        home: //_isSignedIn ?
-            const HomePage()
-        //: const LoginPage(),
-        );
+      theme: AppTheme().light,
+      darkTheme: AppTheme().dark,
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.dark,
+      //debugShowCheckedModeBanner: false,
+      home: _isSignedIn ? const HomePage() : const LoginPage(),
+    );
   }
 }
