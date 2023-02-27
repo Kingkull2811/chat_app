@@ -1,0 +1,28 @@
+import 'package:flutter/material.dart';
+
+class SplashScreenPage extends StatelessWidget {
+  const SplashScreenPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final padding = MediaQuery.of(context).padding;
+    return Center(
+      child: Column(
+        children: [
+          Image.asset('assets/images/app_logo_light.png'),
+          const Padding(
+            padding:  EdgeInsets.only(top: 50.0),
+            child: Text(
+              'App Name',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 22,
+                color: Colors.black,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}

@@ -1,6 +1,4 @@
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/screens/home/home_page.dart';
-import 'package:chat_app/screens/login/login_page.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/theme.dart';
