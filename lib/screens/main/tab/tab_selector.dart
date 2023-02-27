@@ -6,17 +6,17 @@ import 'tab_event.dart';
 class TabSelector extends StatefulWidget {
   final AppTab activeTab;
   final Function(AppTab) onTabSelected;
-  final int badgeNumber;
-  final int newModelBadgeNumber;
-  final int newFeedbackBadgeNumber;
+  final int newChatsBadgeNumber;
+  final int newsBadgeNumber;
+  final int newTranscriptBadgeNumber;
 
   const TabSelector({
     Key? key,
     required this.activeTab,
-    required this.badgeNumber,
     required this.onTabSelected,
-    required this.newModelBadgeNumber,
-    required this.newFeedbackBadgeNumber,
+    required this.newChatsBadgeNumber,
+    required this.newsBadgeNumber,
+    required this.newTranscriptBadgeNumber,
   }) : super(key: key);
 
   @override
@@ -39,8 +39,8 @@ class TabSelectorState extends State<TabSelector> {
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Badge(
-            showBadge: (widget.newFeedbackBadgeNumber > 0),
-            badgeContent: Text((widget.newFeedbackBadgeNumber.toString()),
+            showBadge: (widget.newChatsBadgeNumber > 0),
+            badgeContent: Text((widget.newChatsBadgeNumber.toString()),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                     fontSize: 10,
@@ -52,15 +52,15 @@ class TabSelectorState extends State<TabSelector> {
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
             child: Image.asset(
-              'images/ic_chat.png',
+              'assets/images/ic_chat.png',
               width: 30,
               height: 30,
             ),
           ),
           activeIcon: Badge(
-            showBadge: (widget.newFeedbackBadgeNumber > 0),
+            showBadge: (widget.newChatsBadgeNumber > 0),
             badgeContent: Text(
-              (widget.newFeedbackBadgeNumber.toString()),
+              (widget.newChatsBadgeNumber.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 10,
@@ -74,7 +74,7 @@ class TabSelectorState extends State<TabSelector> {
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
             child: Image.asset(
-              'images/ic_chat.png',
+              'assets/images/ic_chat.png',
               width: 30,
               height: 30,
               color: Theme.of(context).primaryColor,
@@ -84,9 +84,9 @@ class TabSelectorState extends State<TabSelector> {
         ),
         BottomNavigationBarItem(
           icon: Badge(
-            showBadge: (widget.badgeNumber > 0),
+            showBadge: (widget.newsBadgeNumber > 0),
             badgeContent: Text(
-              (widget.badgeNumber.toString()),
+              (widget.newsBadgeNumber.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 10,
@@ -98,12 +98,12 @@ class TabSelectorState extends State<TabSelector> {
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
-            child: Image.asset('images/ic_news.png', width: 30, height: 30),
+            child: Image.asset('assets/images/ic_news.png', width: 30, height: 30),
           ),
           activeIcon: Badge(
-            showBadge: (widget.badgeNumber > 0),
+            showBadge: (widget.newsBadgeNumber > 0),
             badgeContent: Text(
-              (widget.badgeNumber.toString()),
+              (widget.newsBadgeNumber.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 10,
@@ -116,7 +116,7 @@ class TabSelectorState extends State<TabSelector> {
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
             child: Image.asset(
-              'images/ic_news.png',
+              'assets/images/ic_news.png',
               width: 30,
               height: 30,
               color: Theme.of(context).primaryColor,
@@ -126,9 +126,9 @@ class TabSelectorState extends State<TabSelector> {
         ),
         BottomNavigationBarItem(
           icon: Badge(
-            showBadge: (widget.newModelBadgeNumber > 0),
+            showBadge: (widget.newTranscriptBadgeNumber > 0),
             badgeContent: Text(
-              (widget.newModelBadgeNumber.toString()),
+              (widget.newTranscriptBadgeNumber.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 10,
@@ -141,12 +141,12 @@ class TabSelectorState extends State<TabSelector> {
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
             child:
-                Image.asset('images/ic_transcript.png', width: 30, height: 30),
+                Image.asset('assets/images/ic_transcript.png', width: 30, height: 30),
           ),
           activeIcon: Badge(
-            showBadge: (widget.newModelBadgeNumber > 0),
+            showBadge: (widget.newTranscriptBadgeNumber > 0),
             badgeContent: Text(
-              (widget.newModelBadgeNumber.toString()),
+              (widget.newTranscriptBadgeNumber.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 10,
@@ -159,7 +159,7 @@ class TabSelectorState extends State<TabSelector> {
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
             child: Image.asset(
-              'images/ic_transcript.png',
+              'assets/images/ic_transcript.png',
               width: 30,
               height: 30,
               color: Theme.of(context).primaryColor,
@@ -168,9 +168,9 @@ class TabSelectorState extends State<TabSelector> {
           label: 'Transcript',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset('images/ic_profile.png', width: 30, height: 30),
+          icon: Image.asset('assets/images/ic_profile.png', width: 30, height: 30),
           activeIcon: Image.asset(
-            'images/ic_profile.png',
+            'assets/images/ic_profile.png',
             width: 30,
             height: 30,
             color: Theme.of(context).primaryColor,
