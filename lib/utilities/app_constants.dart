@@ -8,4 +8,8 @@ class AppConstants {
   static const projectId = 'chatapp-97dbc';
 
   final primaryColor = const Color(0xFFee7b64);
+
+  static const String rememberInfo = 'REMEMBER_INFO';
+  static const String isLoggedOut = 'IS_LOGGED_OUT';
+  static const String passwordExpireTimeKey = 'PASSWORD_EXPIRE_TIME';
 }

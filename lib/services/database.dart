@@ -7,6 +7,7 @@ class DatabaseService{
   GlobalKey? newsKey;
   GlobalKey? transcriptKey;
   GlobalKey? profileKey;
+  bool isShowingTerm = false;
 
 
 

@@ -1,4 +1,6 @@
 import 'package:chat_app/routes.dart';
+import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
+import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/theme.dart';
@@ -79,31 +81,40 @@ class _MyAppState extends State<MyApp> {
     );
 
     return MaterialApp(
-        theme: AppTheme().light,
-        darkTheme: AppTheme().dark,
-        debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.system,
-        //debugShowCheckedModeBanner: false,
-        navigatorKey: widget.navigatorKey,
-        localizationsDelegates: const [
-          //AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          DefaultCupertinoLocalizations.delegate
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('vi')
-        ],
-        //home: _isSignedIn ? const HomePage() : const LoginPage(),
-        routes: {
-          AppRoutes.main: (context) => BlocProvider<TabBloc>(
-                create: (BuildContext context) => TabBloc(),
-                child: MainApp(
-                  navFromStart: true,
-                ),
-              ),
-        });
+      theme: AppTheme().light,
+      darkTheme: AppTheme().dark,
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
+      //debugShowCheckedModeBanner: false,
+      navigatorKey: widget.navigatorKey,
+      localizationsDelegates: const [
+        //AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate
+      ],
+      supportedLocales: const [Locale('en'), Locale('vi')],
+      //home: home: _isSignedIn ? const HomePage() : const LoginPage(),
+      routes: {
+        // AppRoutes.main: (context) => BlocProvider<TabBloc>(
+        //       create: (BuildContext context) => TabBloc(),
+        //       child: MainApp(
+        //         navFromStart: true,
+        //       ),
+        //     ),
+        AppRoutes.main: (context) {
+          return _isSignedIn
+              ? BlocProvider<TabBloc>(
+                  create: (BuildContext context) => TabBloc(),
+                  child: MainApp(navFromStart: true),
+                )
+              : BlocProvider<LoginBloc>(
+                  create: (BuildContext context) => LoginBloc(),
+                  child: const LoginPage(),
+                );
+        }
+      },
+    );
   }
 }
