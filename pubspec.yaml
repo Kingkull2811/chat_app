@@ -34,7 +34,13 @@ dependencies:
   flutter_local_notifications: ^13.0.0
 
   #Flutter plugin for discovering the state of the network (WiFi & mobile/cellular) connectivity on Android and iOS.
-  connectivity_plus: ^2.3.9
+  connectivity_plus: ^3.0.3
+
+  #A powerful HTTP package for Dart/Flutter, which supports Global settings, Interceptors, FormData, Aborting and canceling a request, Files uploading and downloading, Requests timeout, Custom adapters, etc.
+  dio: ^5.0.1
+
+  #A cookie manager for Dio, which supports persistent cookies in RAM and file.
+  dio_cookie_manager: ^2.1.1
 
   #A package for creating badges. Badges can be used for an additional marker for any widget, e.g. show a number of items in a shopping cart.
   badges: ^3.0.2

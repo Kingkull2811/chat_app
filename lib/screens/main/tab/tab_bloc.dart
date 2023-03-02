@@ -1,5 +1,5 @@
-import 'package:bloc/bloc.dart';
 import 'package:chat_app/screens/main/tab/tab_event.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TabBloc extends Bloc<TabEvent, AppTab> {
   final AppTab initTab;

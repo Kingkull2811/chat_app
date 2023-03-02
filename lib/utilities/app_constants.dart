@@ -8,8 +8,18 @@ class AppConstants {
   static const projectId = 'chatapp-97dbc';
 
   final primaryColor = const Color(0xFFee7b64);
+  final greyLight = const Color(0xFF7b7b7b);
+
+  static const int maxConnectionPerHost = 16;
 
   static const String rememberInfo = 'REMEMBER_INFO';
   static const String isLoggedOut = 'IS_LOGGED_OUT';
   static const String passwordExpireTimeKey = 'PASSWORD_EXPIRE_TIME';
+
+  static const String firstTimeOpenKey = 'FIRST_TIME_OPEN';
+  static const String agreedWithTermsKey = 'AGREED_WITH_TERMS';
+
+
+  static const String noInternetTitle = 'No Internet Connection';
+  static const String noInternetContent = 'Please check your internet connection again or connect to Wi-fi';
 }

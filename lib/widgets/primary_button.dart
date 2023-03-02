@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 
-
 class PrimaryButton extends StatelessWidget {
   final String? text;
-  final Function() onTap;
-  final bool nonOverflow;
+  final onTap;
+  final bool isActive;
 
   const PrimaryButton({
     Key? key,
     this.text,
-    required this.onTap,
-    this.nonOverflow = false,
+    this.onTap,
+    this.isActive = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width - 16 * 2 - 16 * 2;
+    final width = MediaQuery.of(context).size.width - 16 * 4;
     return ButtonTheme(
       child: ElevatedButton(
         onPressed: onTap,
         style: ButtonStyle(
           elevation: const MaterialStatePropertyAll(0),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+          ),
           overlayColor: MaterialStatePropertyAll(
             Theme.of(context).primaryColor,
           ),
@@ -31,46 +35,30 @@ class PrimaryButton extends StatelessWidget {
             TextStyle(color: Colors.white),
           ),
         ),
-        child: nonOverflow
-            ? Container(
-                constraints: const BoxConstraints(
-                  minHeight: 50,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      text ?? '',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : Container(
-                width: width,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                ),
-                constraints: const BoxConstraints(minHeight: 50, maxHeight: 100),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  physics: const ClampingScrollPhysics(),
-                  child: Text(
-                    text ?? '',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      height: 1.3,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+        child: Container(
+          width: width / 2,
+          padding: const EdgeInsets.symmetric(
+            vertical: 12,
+          ),
+          constraints: const BoxConstraints(
+            minHeight: 50,
+            maxHeight: 50,
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            physics: const ClampingScrollPhysics(),
+            child: Text(
+              text ?? '',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                height: 1.3,
               ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       ),
     );
   }

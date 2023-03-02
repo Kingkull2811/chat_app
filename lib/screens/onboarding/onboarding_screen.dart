@@ -1,9 +1,7 @@
 import 'package:chat_app/screens/onboarding/onboarding_1.dart';
 import 'package:chat_app/screens/onboarding/onboarding_3.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../main/tab/tab_bloc.dart';
 import 'onboarding_2.dart';
 
 class OnBoardingPage extends StatefulWidget {

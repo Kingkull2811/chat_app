@@ -136,4 +136,24 @@ class MainAppState extends State<MainApp>
     int chatNumber = 2;
     return chatNumber;
   }
+
+  // Update badge for bottom tab
+  void reloadPage() {
+    setState(() {});
+  }
+  void changeTabToChat() {
+    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.chat));
+  }
+
+  void changeTabToNews() {
+    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.news));
+  }
+
+  void changeTabToTranscript() {
+    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.transcript));
+  }
+
+  void changeTabToProfile() {
+    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.profile));
+  }
 }
