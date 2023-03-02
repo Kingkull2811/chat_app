@@ -17,6 +17,7 @@ class Input extends StatelessWidget {
   final TextInputType? keyboardType;
   final String? initText;
   //final String? suffixIconPath;
+  final Icon? prefixIcon;
   final String? prefixIconPath;
   //final Function()? onShowPassword;
 
@@ -35,6 +36,7 @@ class Input extends StatelessWidget {
     this.obscureText = false,
     this.initText,
     //this.suffixIconPath,
+    this.prefixIcon,
     this.prefixIconPath,
     //this.onShowPassword,
   }) : super(key: key);
@@ -78,14 +80,7 @@ class Input extends StatelessWidget {
                     height: 24,
                     width: 24,
                   )
-                : null,
-            // suffix: (suffixIconPath != null)
-            //     ? Image.asset(
-            //         (suffixIconPath!),
-            //         height: 24,
-            //         width: 24,
-            //       )
-            //     : null,
+                : prefixIcon,
             placeholder: hint,
             maxLines: 1,
           )
@@ -112,19 +107,8 @@ class Input extends StatelessWidget {
                       height: 24,
                       width: 24,
                     )
-                  : null,
+                  : prefixIcon,
               prefixIconColor: AppConstants().greyLight,
-              // suffixIcon: (suffixIconPath != null)
-              //     ? GestureDetector(
-              //       onTap: onShowPassword,
-              //       child: Image.asset(
-              //           (suffixIconPath!),
-              //           height: 24,
-              //           width: 24,
-              //         ),
-              //     )
-              //     : null,
-              // suffixIconColor: const Color.fromARGB(100, 123, 123, 123),
               contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
               filled: true,
               fillColor: const Color.fromARGB(102, 230, 230, 230),
