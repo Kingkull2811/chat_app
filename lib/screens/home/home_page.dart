@@ -14,22 +14,23 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: InkWell(
-          onTap: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BlocProvider<TabBloc>(
-                          create: (BuildContext context) => TabBloc(),
-                          child: MainApp(navFromStart: true),
-                        )));
-          },
-          child: const Center(
-            child: Text(
-              'Home',
-              style: TextStyle(fontSize: 50),
+      body: InkWell(
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider<TabBloc>(
+                create: (BuildContext context) => TabBloc(),
+                child: MainApp(navFromStart: true),
+              ),
             ),
+          );
+        },
+        child: Center(
+          child: Image.asset(
+            'assets/images/app_logo_light.png',
+            width: 200,
+            height: 200,
           ),
         ),
       ),

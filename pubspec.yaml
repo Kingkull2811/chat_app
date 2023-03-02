@@ -54,6 +54,9 @@ dependencies:
   #the framework will help localize Flutter application without the headache
   l10n_flutter: ^1.0.6
 
+  #A package that simplifies the access most of used properties/fuctions right in the BuildContext.
+  #build_context: ^3.0.0
+
   flutter:
     sdk: flutter
   flutter_localizations:

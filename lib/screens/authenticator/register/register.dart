@@ -2,6 +2,7 @@ import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/authenticator/register/register_bloc.dart';
 import 'package:chat_app/screens/authenticator/register/register_state.dart';
+import 'package:chat_app/screens/authenticator/verify_otp/verify_otp.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +136,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     prefixIconPath: 'assets/images/ic_phone.png'),
               ]),
             ),
-            _buttonSendOTP(currentState),
+            _buttonSendOTP(
+              currentState,
+              _inputPhoneController.text,
+            )
           ],
         ),
       );
@@ -182,7 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buttonSendOTP(RegisterState currentState) {
+  Widget _buttonSendOTP(RegisterState currentState, String phoneNumber) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: PrimaryButton(
@@ -198,7 +202,18 @@ class _RegisterPageState extends State<RegisterPage> {
                   // _registerBloc?.add(DisplayLoading());
                 }
               }
-            : null,
+            //: null,
+            //todo: remove
+            : () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VerifyOTP(
+                      phoneNumber: phoneNumber,
+                    ),
+                  ),
+                );
+              },
       ),
     );
   }
