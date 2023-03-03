@@ -9,6 +9,7 @@ class AppConstants {
 
   final primaryColor = const Color(0xFFee7b64);
   final greyLight = const Color(0xFF7b7b7b);
+  final grey630= const Color(0xFF737373);
 
   static const int maxConnectionPerHost = 16;
 

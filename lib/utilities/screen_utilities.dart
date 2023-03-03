@@ -9,6 +9,7 @@ import '../screens/chats/chat_state.dart';
 import '../screens/main/main_app.dart';
 import '../services/database.dart';
 import '../widgets/message_dialog.dart';
+import '../widgets/primary_button.dart';
 
 void showLoading(BuildContext context) {
   showDialog(
@@ -77,7 +78,9 @@ Future<void> showMessageNoInternetDialog(
 
 Future<void> showCupertinoMessageDialog(
     BuildContext context, String? title, String? content,
-    {Function()? onClose, String? buttonLabel,bool barrierDismiss = false}) async {
+    {Function()? onClose,
+    String? buttonLabel,
+    bool barrierDismiss = false}) async {
   await showDialog(
       barrierDismissible: barrierDismiss,
       context: context,
@@ -89,6 +92,88 @@ Future<void> showCupertinoMessageDialog(
           onClose: onClose,
         );
       });
+}
+
+Future<void> showSuccessBottomSheet(
+  BuildContext context, {
+  required bool isDismissible,
+  required bool enableDrag,
+  String? titleMessage,
+  String? contentMessage,
+  String? buttonLabel,
+  Function? onTap,
+}) async {
+  await showModalBottomSheet(
+    context: context,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    builder: (context) => WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Container(
+        height: 350,
+        color: AppConstants().grey630,
+        child: Container(
+          decoration:  const BoxDecoration(
+            color: Colors.white,
+            borderRadius:  BorderRadius.only(
+              topLeft: Radius.circular(35),
+              topRight: Radius.circular(35),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Image.asset(
+                        'assets/images/ic_verified.png',
+                        width: 150,
+                        height: 150,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: Text(
+                        (titleMessage ?? ''),
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      width: 300,
+                      child: Text(
+                        (contentMessage ?? ''),
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: PrimaryButton(
+                  text: buttonLabel,
+                  onTap: onTap,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 void backToChat(BuildContext context) {

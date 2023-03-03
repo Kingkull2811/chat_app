@@ -11,7 +11,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../utilities/app_constants.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/input_field.dart';
-import '../login/login_event.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);

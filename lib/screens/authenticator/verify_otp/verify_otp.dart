@@ -7,6 +7,9 @@ import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../utilities/screen_utilities.dart';
+import '../set_new_password/set_new_password.dart';
+
 class VerifyOTP extends StatefulWidget {
   final String? phoneNumber;
 
@@ -200,14 +203,21 @@ class _VerifyOTPState extends State<VerifyOTP> {
       child: PrimaryButton(
         text: 'Verify',
         onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isDismissible: false,
+          showSuccessBottomSheet(
+            context,
             enableDrag: false,
-            builder: (context) => Container(
-              height: 350,
-              color: Colors.greenAccent,
-            ),
+            isDismissible: false,
+            titleMessage: 'Verified!',
+            contentMessage: 'You have successfully verified the account.',
+            buttonLabel: 'Set a new password',
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SetNewPassword(),
+                ),
+              );
+            },
           );
         },
       ),
