@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class OnBoarding3Page extends StatelessWidget {
-  final Function()? onLeftTap;
-
-  const OnBoarding3Page({Key? key, this.onLeftTap}) : super(key: key);
+  const OnBoarding3Page({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +22,13 @@ class OnBoarding3Page extends StatelessWidget {
         children: [
           Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Image.asset('assets/images/image_onboarding_3.png'),
+                Image.asset(
+                  'assets/images/image_onboarding_3.png',
+                  height: 200,
+                  width: 350,
+                ),
                 const Padding(
                   padding: EdgeInsets.only(top: 50.0),
                   child: Text(
@@ -39,7 +44,7 @@ class OnBoarding3Page extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: 60 + padding.bottom),
+            padding: EdgeInsets.only(bottom: 100 + padding.bottom),
             child: PrimaryButton(
               text: 'Next',
               onTap: () async {
@@ -48,9 +53,7 @@ class OnBoarding3Page extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => BlocProvider<TabBloc>(
                       create: (context) => TabBloc(),
-                      child: MainApp(
-                        navFromStart: true,
-                      ),
+                      child: MainApp(navFromStart: true),
                     ),
                   ),
                 );

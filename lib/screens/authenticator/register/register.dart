@@ -154,34 +154,40 @@ class _RegisterPageState extends State<RegisterPage> {
     String? prefixIconPath,
     int? maxText,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 24),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              height: 1.2,
-              color: Colors.black,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 24, bottom: 6),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.2,
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
-        Input(
-          keyboardType: keyboardType,
-          maxText: maxText,
-          controller: controller,
-          onChanged: (text) {
-            //_validateForm();
-          },
-          textInputAction: TextInputAction.next,
-          onSubmit: (_) => focusNode.requestFocus(),
-          hint: hintText,
-          prefixIconPath: prefixIconPath,
-          prefixIcon: iconLeading,
-        ),
-      ],
+          SizedBox(
+            height: 50,
+            child: Input(
+              keyboardType: keyboardType,
+              maxText: maxText,
+              controller: controller,
+              onChanged: (text) {
+                //_validateForm();
+              },
+              textInputAction: TextInputAction.next,
+              onSubmit: (_) => focusNode.requestFocus(),
+              hint: hintText,
+              prefixIconPath: prefixIconPath,
+              prefixIcon: iconLeading,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

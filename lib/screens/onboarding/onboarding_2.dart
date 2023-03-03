@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class OnBoarding2Page extends StatelessWidget {
-  final Function()? onLeftTap;
-  final Function()? onRightTap;
-  const OnBoarding2Page({Key? key, this.onLeftTap, this.onRightTap}) : super(key: key);
+  const OnBoarding2Page({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +15,15 @@ class OnBoarding2Page extends StatelessWidget {
         top: padding.top,
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset('assets/images/image_onboarding_2.png'),
+          Image.asset(
+            'assets/images/image_onboarding_2.png',
+            width: 350,
+            height: 200,
+          ),
           const Padding(
-            padding:  EdgeInsets.only(top: 50.0),
+            padding: EdgeInsets.only(top: 50.0),
             child: Text(
               'title of onboarding 2',
               textAlign: TextAlign.center,

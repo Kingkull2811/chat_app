@@ -23,6 +23,8 @@ class _VerifyOTPState extends State<VerifyOTP> {
   final focusNode = FocusNode();
   final _otpController = List.generate(6, (index) => TextEditingController());
   bool isOtpSent = false;
+  String? _otpCode;
+  bool isEnableButton = true;
 
   int _timerCounter = 60;
   Timer? _timer;
@@ -42,6 +44,10 @@ class _VerifyOTPState extends State<VerifyOTP> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
 
+    // if (kDebugMode) {
+    //   print("otpcCode: $_otpCode");
+    // }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -54,7 +60,7 @@ class _VerifyOTPState extends State<VerifyOTP> {
               child: GestureDetector(
                 onTap: () {
                   //Navigator.pop(context);
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => BlocProvider<RegisterBloc>(
@@ -164,6 +170,12 @@ class _VerifyOTPState extends State<VerifyOTP> {
                   if (value.isEmpty && index > 0) {
                     FocusScope.of(context).previousFocus();
                   }
+
+                  //enable button when user input 6/6 otp code
+                  //todo: using sms_autofill: ^2.3.0 https://pub.dev/packages/sms_autofill
+                  // setState(() {
+                  //   _otpCode = '$_otpCode$value';
+                  // });
                 },
                 showCursor: false,
                 readOnly: false,
@@ -202,24 +214,27 @@ class _VerifyOTPState extends State<VerifyOTP> {
       alignment: Alignment.bottomCenter,
       child: PrimaryButton(
         text: 'Verify',
-        onTap: () {
-          showSuccessBottomSheet(
-            context,
-            enableDrag: false,
-            isDismissible: false,
-            titleMessage: 'Verified!',
-            contentMessage: 'You have successfully verified the account.',
-            buttonLabel: 'Set a new password',
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SetNewPassword(),
-                ),
-              );
-            },
-          );
-        },
+        isDisable: !isEnableButton,
+        onTap: isEnableButton
+            ? () {
+                showSuccessBottomSheet(
+                  context,
+                  enableDrag: false,
+                  isDismissible: false,
+                  titleMessage: 'Verified!',
+                  contentMessage: 'You have successfully verified the account.',
+                  buttonLabel: 'Set a new password',
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SetNewPassword(),
+                      ),
+                    );
+                  },
+                );
+              }
+            : null,
       ),
     );
   }

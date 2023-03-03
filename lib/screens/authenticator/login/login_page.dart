@@ -1,3 +1,4 @@
+import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_event.dart';
 import 'package:chat_app/screens/authenticator/login/login_state.dart';
@@ -19,6 +20,7 @@ import '../../../utilities/enum/highlight_status.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/custom_check_box.dart';
 import '../../../widgets/input_field.dart';
+import '../../../widgets/input_password_field.dart';
 import '../register/register.dart';
 
 class LoginPage extends StatefulWidget {
@@ -142,6 +144,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
   final _inputPhoneController = TextEditingController();
   final _inputPasswordController = TextEditingController();
   bool _rememberInfo = false;
+  bool _isShowPassword = false;
 
   LoginFormBloc? _loginFormBloc;
 
@@ -286,19 +289,8 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                         ],
                       ),
                     ),
-                    _inputTextField(
-                        title: 'Phone Number',
-                        hintText: 'Enter your phone number',
-                        controller: _inputPhoneController,
-                        keyboardType: TextInputType.phone,
-                        maxText: 10,
-                        prefixIconPath: 'assets/images/ic_phone.png'),
-                    _inputTextField(
-                        title: 'Password',
-                        hintText: 'Enter your password',
-                        controller: _inputPasswordController,
-                        keyboardType: TextInputType.text,
-                        prefixIconPath: 'assets/images/ic_lock.png'),
+                    _inputPhoneField(),
+                    _inputPasswordField(),
                     _rememberOrForgot(),
                   ],
                 ),
@@ -315,39 +307,44 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
       text: 'Login',
-      onTap: currentState.isEnable
-          ? () async {
-              ConnectivityResult connectivityResult =
-                  await Connectivity().checkConnectivity();
-              if (connectivityResult == ConnectivityResult.none && mounted) {
-                showMessageNoInternetDialog(context);
-              } else {
-                _loginFormBloc?.add(DisplayLoading());
-                LoginResult loginResult = await _loginRepository.login(
-                  phone: _inputPhoneController.text.trim(),
-                  password: _inputPasswordController.text.trim(),
-                );
-                if (loginResult.isSuccess && mounted) {
-                  SharedPreferences preferences =
-                      await SharedPreferences.getInstance();
-                  await preferences.setBool(
-                      AppConstants.rememberInfo, _rememberInfo);
-                  await _goToTermPolicy();
-                } else if (loginResult.error == LoginError.incorrectLogin &&
-                    mounted) {
-                  _loginFormBloc?.add(ValidateForm(isValidate: true));
-                  showCupertinoMessageDialog(context, 'Error',
-                      'Incorrect account registration phone number or password.',
-                      barrierDismiss: false);
-                } else {
-                  _loginFormBloc?.add(ValidateForm(isValidate: true));
-                  showCupertinoMessageDialog(
-                      context, 'Error', 'Internal server error',
-                      barrierDismiss: false);
-                }
-              }
-            }
-          : null,
+      onTap: () async {
+        await _goToTermPolicy(); // todo: remove test
+      },
+      // currentState.isEnable
+      //     ? () async {
+      //         ConnectivityResult connectivityResult =
+      //             await Connectivity().checkConnectivity();
+      //         if (connectivityResult == ConnectivityResult.none && mounted) {
+      //           showMessageNoInternetDialog(context);
+      //         } else {
+      //           _loginFormBloc?.add(DisplayLoading());
+      //           LoginResult loginResult = await _loginRepository.login(
+      //             phone: _inputPhoneController.text.trim(),
+      //             password: _inputPasswordController.text.trim(),
+      //           );
+      //           if (loginResult.isSuccess && mounted) {
+      //             SharedPreferences preferences =
+      //                 await SharedPreferences.getInstance();
+      //             await preferences.setBool(
+      //                 AppConstants.rememberInfo, _rememberInfo);
+      //             //login
+      //             await _goToTermPolicy();
+      //
+      //           } else if (loginResult.error == LoginError.incorrectLogin &&
+      //               mounted) {
+      //             _loginFormBloc?.add(ValidateForm(isValidate: true));
+      //             showCupertinoMessageDialog(context, 'Error',
+      //                 'Incorrect account registration phone number or password.',
+      //                 barrierDismiss: false);
+      //           } else {
+      //             _loginFormBloc?.add(ValidateForm(isValidate: true));
+      //             showCupertinoMessageDialog(
+      //                 context, 'Error', 'Internal server error',
+      //                 barrierDismiss: false);
+      //           }
+      //         }
+      //       }
+      //     : null,
     );
   }
 
@@ -389,49 +386,91 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
     );
   }
 
-  Widget _inputTextField({
-    required String title,
-    required String hintText,
-    required TextEditingController controller,
-    required TextInputType keyboardType,
-    Icon? iconLeading,
-    String? prefixIconPath,
-    int? maxText,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 24),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              height: 1.2,
-              color: Colors.black,
+  Widget _inputPhoneField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 24, bottom: 6),
+            child: Text(
+              'Phone Number',
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.2,
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
-        Input(
-          keyboardType: keyboardType,
-          maxText: maxText,
-          controller: controller,
-          onChanged: (text) {
-            _validateForm();
-          },
-          textInputAction: TextInputAction.next,
-          onSubmit: (_) => focusNode.requestFocus(),
-          hint: hintText,
-          prefixIconPath: prefixIconPath,
-          prefixIcon: iconLeading,
-        ),
-      ],
+          SizedBox(
+            height: 50,
+            child: Input(
+              keyboardType: TextInputType.phone,
+              maxText: 10,
+              controller: _inputPhoneController,
+              onChanged: (text) {
+                _validateForm();
+              },
+              textInputAction: TextInputAction.next,
+              onSubmit: (_) => focusNode.requestFocus(),
+              hint: 'Enter your phone number',
+              prefixIconPath: 'assets/images/ic_phone.png',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _inputPasswordField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 24, bottom: 6),
+            child: Text(
+              'Password',
+              style: TextStyle(
+                fontSize: 12,
+                height: 1.2,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            child: InputPasswordField(
+              isInputError: false,
+              obscureText: !_isShowPassword,
+              onTapSuffixIcon: () {
+                setState(() {
+                  _isShowPassword = !_isShowPassword;
+                });
+              },
+              keyboardType: TextInputType.text,
+              controller: _inputPasswordController,
+              onChanged: (text) {},
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => focusNode.requestFocus(),
+              hint: 'Enter your password',
+              prefixIconPath: 'assets/images/ic_lock.png',
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _rememberOrForgot() {
     return Padding(
-      padding: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.only(
+        left: 16,
+        top: 20,
+        right: 16,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -476,7 +515,16 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           Padding(
             padding: const EdgeInsets.only(left: 10, right: 5),
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ForgotPasswordPage(
+                      phoneNumber: _inputPhoneController.text,
+                    ),
+                  ),
+                );
+              },
               child: const Text(
                 'Forgot password?',
                 style: TextStyle(

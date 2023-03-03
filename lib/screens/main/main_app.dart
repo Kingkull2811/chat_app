@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import '../../utilities/app_constants.dart';
 import '../main/tab/tab_bloc.dart';
 import '../main/tab/tab_event.dart';
 import '../main/tab/tab_selector.dart';
@@ -20,7 +21,8 @@ import '../../services/database.dart';
 class MainApp extends StatefulWidget {
   final bool navFromStart;
 
-  MainApp({key, this.navFromStart = false}) : super(key: GlobalKey<MainAppState>());
+  MainApp({key, this.navFromStart = false})
+      : super(key: GlobalKey<MainAppState>());
 
   @override
   MainAppState createState() {
@@ -141,6 +143,7 @@ class MainAppState extends State<MainApp>
   void reloadPage() {
     setState(() {});
   }
+
   void changeTabToChat() {
     BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.chat));
   }
@@ -155,5 +158,41 @@ class MainAppState extends State<MainApp>
 
   void changeTabToProfile() {
     BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.profile));
+  }
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text(
+              'Are you sure exit app?',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: const Text(
+              'Do you want to exit an App',
+              style: TextStyle(fontSize: 16),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Exits',
+                  style: TextStyle(color: AppConstants().red700),
+                ),
+              ),
+            ],
+          ),
+        )) ??
+        false;
   }
 }

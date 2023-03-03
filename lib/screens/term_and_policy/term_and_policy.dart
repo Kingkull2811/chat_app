@@ -40,7 +40,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
               ),
             ),
             Container(
-              height: 330,
+              height: 450,
               padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
               decoration: BoxDecoration(
                 border: Border.all(
@@ -52,7 +52,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
               ),
               child: const SingleChildScrollView(
                 child: Text(
-                  'term and policy of use content',
+                  AppConstants.longText,
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.5,
@@ -62,7 +62,11 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 15),
+              padding: const EdgeInsets.only(
+                left: 16,
+                top: 16,
+                right: 16,
+              ),
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -83,15 +87,17 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 10.0),
                     const Expanded(
-                        child: Text(
-                      'Agree. I have read and understood',
-                      overflow: TextOverflow.visible,
-                      softWrap: true,
-                      style: TextStyle(
-                        fontSize: 18,
-                        height: 1.2,
+                        child: Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        'Agree. I have read and understood',
+                        overflow: TextOverflow.visible,
+                        softWrap: true,
+                        style: TextStyle(
+                          fontSize: 18,
+                          height: 1.2,
+                        ),
                       ),
                     ))
                   ],
@@ -125,15 +131,19 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
           }
         } else {
           if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlocProvider<TabBloc>(
-                  create: (BuildContext context) => TabBloc(),
-                  child: MainApp(navFromStart: true),
-                ),
-              ),
-            );
+            //todo: remove test
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => OnBoardingPage()));
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => BlocProvider<TabBloc>(
+            //       create: (BuildContext context) => TabBloc(),
+            //       child: MainApp(navFromStart: true),
+            //     ),
+            //   ),
+            // );
+
           }
         }
       }
@@ -142,6 +152,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
 
     return PrimaryButton(
       text: 'Next',
+      isDisable: !_isRead,
       onTap: _isRead ? handleTap : null,
     );
   }

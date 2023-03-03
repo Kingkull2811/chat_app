@@ -101,7 +101,7 @@ Future<void> showSuccessBottomSheet(
   String? titleMessage,
   String? contentMessage,
   String? buttonLabel,
-  Function? onTap,
+  Function()? onTap,
 }) async {
   await showModalBottomSheet(
     context: context,
@@ -151,7 +151,7 @@ Future<void> showSuccessBottomSheet(
                       width: 300,
                       child: Text(
                         (contentMessage ?? ''),
-                        maxLines: 2,
+                        //maxLines: 3,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 14,
@@ -162,7 +162,7 @@ Future<void> showSuccessBottomSheet(
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
+                padding: const EdgeInsets.only(bottom: 32),
                 child: PrimaryButton(
                   text: buttonLabel,
                   onTap: onTap,

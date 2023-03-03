@@ -54,6 +54,9 @@ dependencies:
   #the framework will help localize Flutter application without the headache
   l10n_flutter: ^1.0.6
 
+  #Customizable animated page indicator with a set of built-in effects.
+  smooth_page_indicator: ^1.0.1
+
   #A package that simplifies the access most of used properties/fuctions right in the BuildContext.
   #build_context: ^3.0.0
 
