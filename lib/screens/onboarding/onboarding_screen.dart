@@ -1,10 +1,10 @@
-import 'package:chat_app/screens/onboarding/onboarding_1.dart';
-import 'package:chat_app/screens/onboarding/onboarding_3.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import 'onboarding_2.dart';
+import './onboarding_2.dart';
+import './onboarding_1.dart';
+import './onboarding_3.dart';
 
 class OnBoardingPage extends StatefulWidget {
   const OnBoardingPage({super.key});

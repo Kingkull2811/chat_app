@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
@@ -5,10 +6,12 @@ import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -16,6 +19,17 @@ import 'helper/helper_functions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _removeBadgeWhenOpenApp();
+
+  //init global key for tabs
+  // DatabaseService().homeKey = GlobalKey<HomePageState>();
+  // DatabaseService().myWalletKey = GlobalKey<MyWalletPageState>();
+  // DatabaseService().newCollectionKey = GlobalKey<NewCollectionPageState>();
+  // DatabaseService().reportKey = GlobalKey<ReportPageState>();
+  // DatabaseService().otherKey = GlobalKey<OtherPageState>();
+
+  // Init SharedPreferences storage
+  await SharedPreferencesStorage.inti();
 
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -31,6 +45,13 @@ void main() async {
   runApp(MyApp(
       //appTheme: AppTheme(),
       ));
+}
+
+_removeBadgeWhenOpenApp() async {
+  bool osSupportBadge = await FlutterAppBadger.isAppBadgeSupported();
+  if (osSupportBadge && Platform.isIOS) {
+    FlutterAppBadger.removeBadge();
+  }
 }
 
 class MyApp extends StatefulWidget {

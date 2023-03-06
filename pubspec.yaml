@@ -45,6 +45,9 @@ dependencies:
   #A package for creating badges. Badges can be used for an additional marker for any widget, e.g. show a number of items in a shopping cart.
   badges: ^3.0.2
 
+  #Plugin to update the app badge on the launcher (both for Android, iOS and macOS)
+  flutter_app_badger: ^1.5.0
+
   #Flutter Widgets that make it easy to implement the BLoC (Business Logic Component) design pattern. Built to be used with the bloc state management package.
   flutter_bloc: ^8.1.2
 
