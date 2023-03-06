@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class InputPasswordField extends StatelessWidget {
-  final bool useCupertinoTextField;
   final FocusNode? focusNode;
   final onFieldSubmitted;
   final TextInputAction? textInputAction;
@@ -24,7 +23,6 @@ class InputPasswordField extends StatelessWidget {
 
   const InputPasswordField({
     Key? key,
-    this.useCupertinoTextField = false,
     this.focusNode,
     this.onFieldSubmitted,
     this.textInputAction,
@@ -53,52 +51,7 @@ class InputPasswordField extends StatelessWidget {
       );
     }
 
-    return useCupertinoTextField
-        ? CupertinoTextField(
-            focusNode: focusNode,
-            textInputAction: textInputAction,
-            onSubmitted: onFieldSubmitted,
-            controller: controller,
-            onChanged: onChanged,
-            keyboardType: keyboardType,
-            obscureText: obscureText,
-            inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color.fromARGB(255, 26, 26, 26),
-              height: 1.35,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: isInputError
-                    ? AppConstants().red700
-                    : AppConstants().greyLight,
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            prefix: (prefixIconPath != null)
-                ? Image.asset(
-                    (prefixIconPath!),
-                    height: 24,
-                    width: 24,
-                  )
-                : prefixIcon,
-            suffix: InkWell(
-              onTap: onTapSuffixIcon,
-              child: Image.asset(
-                obscureText
-                    ? 'assets/images/ic_eye_close.png'
-                    : 'assets/images/ic_eye_open.png',
-                height: 24,
-                width: 24,
-              ),
-            ),
-            placeholder: hint,
-            maxLines: 1,
-          )
-        : TextFormField(
+    return TextFormField(
             focusNode: focusNode,
             textInputAction: textInputAction,
             onFieldSubmitted: onFieldSubmitted,

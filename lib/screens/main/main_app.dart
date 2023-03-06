@@ -61,28 +61,20 @@ class MainAppState extends State<MainApp>
         builder: (context, snapshot) {
           return BlocBuilder<TabBloc, AppTab>(builder: (context, activeTab) {
             _tabController?.index = AppTab.values.indexOf(activeTab);
-            return Scaffold(
-              body: _handleScreen(activeTab),
-              bottomNavigationBar: TabSelector(
-                  activeTab: activeTab,
-                  newChatsBadgeNumber: 1,
-                  newsBadgeNumber: 2,
-                  newTranscriptBadgeNumber: 1,
-                  onTabSelected: (tab) async {
-                    // if (activeTab == AppTab.chat && tab != AppTab.chat) {
-                    //   //todo:
-                    //   if (kDebugMode) {
-                    //     print('tab # chat');
-                    //   }
-                    // }
-                    // if (tab == AppTab.chat) {
-                    //   if (kDebugMode) {
-                    //     print('tab chat');
-                    //   }
-                    // }
-                    BlocProvider.of<TabBloc>(context).add(TabUpdated(tab));
-                    setState(() {});
-                  }),
+            return WillPopScope(
+              onWillPop: _onWillPop,
+              child: Scaffold(
+                body: _handleScreen(activeTab),
+                bottomNavigationBar: TabSelector(
+                    activeTab: activeTab,
+                    newChatsBadgeNumber: 1,
+                    newsBadgeNumber: 2,
+                    newTranscriptBadgeNumber: 1,
+                    onTabSelected: (tab) async {
+                      BlocProvider.of<TabBloc>(context).add(TabUpdated(tab));
+                      setState(() {});
+                    }),
+              ),
             );
           });
         });

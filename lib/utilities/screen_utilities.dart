@@ -1,10 +1,14 @@
+import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth_android/types/auth_messages_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
+import '../screens/authenticator/login/login_bloc.dart';
 import '../screens/chats/chat_state.dart';
 import '../screens/main/main_app.dart';
 import '../services/database.dart';
@@ -24,6 +28,45 @@ void showLoading(BuildContext context) {
         );
       });
 }
+
+void logout(BuildContext? context) async {
+
+    // FirebaseMessagingUtilities.unsubscribeTopicForCurrentUser(
+    //   distributorId: SharedPreferencesStorage().getSelectedDistributor(),
+    // );
+
+  SharedPreferencesStorage().resetDataWhenLogout();
+  if (context != null) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider<LoginBloc>(
+          create: (BuildContext context) => LoginBloc(),
+          child: const LoginPage(),
+        ),
+      ),
+          (route) => false,
+    );
+  }
+}
+
+void logoutIfNeed(BuildContext? context) async {
+  final passwordExpiredTime =
+  SharedPreferencesStorage().getPasswordExpireTime();
+  if (passwordExpiredTime.isEmpty) {
+    logout(context);
+  } else {
+    try {
+      DateTime expiredDate = DateTime.parse(passwordExpiredTime);
+      if (expiredDate.isBefore(DateTime.now())) {
+        logout(context);
+      }
+    } catch (error) {
+      logout(context);
+    }
+  }
+}
+
 
 Future<void> showMessageNoInternetDialog(
   BuildContext context, {
@@ -96,12 +139,12 @@ Future<void> showCupertinoMessageDialog(
 
 Future<void> showSuccessBottomSheet(
   BuildContext context, {
-  required bool isDismissible,
-  required bool enableDrag,
-  String? titleMessage,
-  String? contentMessage,
-  String? buttonLabel,
-  Function()? onTap,
+  bool isDismissible = false,
+  bool enableDrag = false,
+  required String titleMessage,
+  required String contentMessage,
+  required String buttonLabel,
+  required Function() onTap,
 }) async {
   await showModalBottomSheet(
     context: context,
@@ -115,9 +158,9 @@ Future<void> showSuccessBottomSheet(
         height: 350,
         color: AppConstants().grey630,
         child: Container(
-          decoration:  const BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius:  BorderRadius.only(
+            borderRadius: BorderRadius.only(
               topLeft: Radius.circular(35),
               topRight: Radius.circular(35),
             ),
@@ -139,7 +182,7 @@ Future<void> showSuccessBottomSheet(
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0),
                       child: Text(
-                        (titleMessage ?? ''),
+                        (titleMessage),
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -150,7 +193,7 @@ Future<void> showSuccessBottomSheet(
                       padding: const EdgeInsets.only(top: 10.0),
                       width: 300,
                       child: Text(
-                        (contentMessage ?? ''),
+                        (contentMessage),
                         //maxLines: 3,
                         textAlign: TextAlign.center,
                         style: const TextStyle(

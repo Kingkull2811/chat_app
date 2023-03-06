@@ -1,7 +1,4 @@
 import 'dart:async';
-
-import 'package:chat_app/screens/authenticator/register/register.dart';
-import 'package:chat_app/screens/authenticator/register/register_bloc.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
@@ -60,15 +57,7 @@ class _VerifyOTPState extends State<VerifyOTP> {
               child: GestureDetector(
                 onTap: () {
                   //Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider<RegisterBloc>(
-                        create: (context) => RegisterBloc(context),
-                        child: RegisterPage(),
-                      ),
-                    ),
-                  );
+
                 },
                 child: Image.asset(
                   'assets/images/ic_back.png',

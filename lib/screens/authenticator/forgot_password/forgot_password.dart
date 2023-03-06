@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../widgets/input_field.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  final String? phoneNumber;
-  const ForgotPasswordPage({Key? key, this.phoneNumber}) : super(key: key);
+  final String? username;
+  const ForgotPasswordPage({Key? key, this.username}) : super(key: key);
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();

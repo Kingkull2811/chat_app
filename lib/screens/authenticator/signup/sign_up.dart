@@ -1,8 +1,7 @@
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
-import 'package:chat_app/screens/authenticator/register/register_bloc.dart';
-import 'package:chat_app/screens/authenticator/register/register_state.dart';
-import 'package:chat_app/screens/authenticator/verify_otp/verify_otp.dart';
+import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
+import 'package:chat_app/screens/authenticator/signup/sign_up_state.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -11,34 +10,39 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../utilities/app_constants.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/input_field.dart';
+import '../../../widgets/input_password_field.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final focusNode = FocusNode();
-  final _inputPhoneController = TextEditingController();
-  final _inputFirstNameController = TextEditingController();
-  final _inputLastNameController = TextEditingController();
+  final _userNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isShowPassword = false;
+  bool _isShowConfirmPassword = false;
 
-  RegisterBloc? _registerBloc;
+  late SignUpBloc _signUpBloc;
 
   @override
   void initState() {
-    _registerBloc = BlocProvider.of<RegisterBloc>(context);
+    _signUpBloc = BlocProvider.of<SignUpBloc>(context);
     super.initState();
   }
 
   @override
   void dispose() {
-    _inputPhoneController.dispose();
-    _inputFirstNameController.dispose();
-    _inputLastNameController.dispose();
-    _registerBloc?.close();
+    _userNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _signUpBloc.close();
     super.dispose();
   }
 
@@ -61,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _registerForm(EdgeInsets padding, double height) {
-    return BlocConsumer<RegisterBloc, RegisterState>(
+    return BlocConsumer<SignUpBloc, SignUpState>(
         // listenWhen: (previousState, currentState){
         //   //return currentState;
         // },
@@ -82,7 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: height - 120,
               child: Column(children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 40, bottom: 20),
+                  padding: const EdgeInsets.only(top: 40, bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -92,9 +96,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         width: 150,
                       ),
                       const Padding(
-                        padding: EdgeInsets.only(top: 16),
+                        padding: EdgeInsets.only(top: 10),
                         child: Text(
-                          'Welcome register to \'app name\'',
+                          'Welcome sign up to \'app name\'',
                           style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
@@ -105,44 +109,91 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 _inputTextField(
-                  title: 'First Name',
-                  hintText: 'Enter your first name',
-                  controller: _inputFirstNameController,
+                  title: 'Username',
+                  hintText: 'Enter your username',
+                  controller: _userNameController,
                   keyboardType: TextInputType.text,
                   iconLeading: Icon(
-                    Icons.person,
+                    Icons.person_outline,
                     color: AppConstants().greyLight,
                     size: 24,
                   ),
                 ),
                 _inputTextField(
-                  title: 'Last Name',
-                  hintText: 'Enter your last name',
-                  controller: _inputLastNameController,
+                  title: 'Email',
+                  hintText: 'Enter your email',
+                  controller: _emailController,
                   keyboardType: TextInputType.text,
                   iconLeading: Icon(
-                    Icons.person,
+                    Icons.mail_outline,
                     color: AppConstants().greyLight,
                     size: 24,
                   ),
                 ),
-                _inputTextField(
-                    title: 'Phone Number',
-                    hintText: 'Enter your phone number',
-                    controller: _inputLastNameController,
-                    keyboardType: TextInputType.number,
-                    maxText: 10,
-                    prefixIconPath: 'assets/images/ic_phone.png'),
+                _inputPasswordField(
+                  title: 'Password',
+                  hintText: 'Enter your password',
+                  controller: _passwordController,
+                  obscureText: !_isShowPassword,
+                  onTapSuffixIcon: (){
+                    setState(() {
+                      _isShowPassword = !_isShowPassword;
+                    });
+                  },
+                ),
+                _inputPasswordField(
+                  title: 'Confirm password',
+                  hintText: 'Re-enter your password',
+                  controller: _confirmPasswordController,
+                  obscureText: !_isShowConfirmPassword,
+                  onTapSuffixIcon: (){
+                    setState(() {
+                      _isShowConfirmPassword = !_isShowConfirmPassword;
+                    });
+                  },
+                ),
               ]),
             ),
-            _buttonSendOTP(
-              currentState,
-              _inputPhoneController.text,
-            )
+            _buttonSendOTP(currentState)
           ],
         ),
       );
     });
+  }
+  Widget _buttonSendOTP(SignUpState currentState) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: PrimaryButton(
+        text: 'Sign Up',
+        onTap: () async {
+          ConnectivityResult connectivityResult =
+          await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.none && mounted) {
+            showMessageNoInternetDialog(context);
+          } else {
+            // _registerBloc?.add(DisplayLoading());
+            showSuccessBottomSheet(
+              context,
+              titleMessage: 'Sign Up Successfully!',
+              contentMessage:
+              'You have successfully sign up an account, please login',
+              buttonLabel: 'Login',
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider<LoginFormBloc>(
+                      create: (context) => LoginFormBloc(context),
+                      child: IDPassLoginForm(),
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
   }
 
   Widget _inputTextField({
@@ -191,34 +242,45 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buttonSendOTP(RegisterState currentState, String phoneNumber) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: PrimaryButton(
-        text: 'Send OTP',
-        onTap: currentState.isEnable
-            ? () async {
-                ConnectivityResult connectivityResult =
-                    await Connectivity().checkConnectivity();
-                if (connectivityResult == ConnectivityResult.none && mounted) {
-                  showMessageNoInternetDialog(context);
-                } else {
-                  //todo: send otp to phone number
-                  // _registerBloc?.add(DisplayLoading());
-                }
-              }
-            //: null,
-            //todo: remove
-            : () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => VerifyOTP(
-                      phoneNumber: phoneNumber,
-                    ),
-                  ),
-                );
-              },
+  Widget _inputPasswordField({
+    required String title,
+    required String hintText,
+    required TextEditingController controller,
+    bool obscureText = false,
+    Function? onTapSuffixIcon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 24, bottom: 6),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.2,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            child: InputPasswordField(
+              isInputError: false,
+              obscureText: obscureText,
+              onTapSuffixIcon: onTapSuffixIcon,
+              keyboardType: TextInputType.text,
+              controller: controller,
+              onChanged: (text) {},
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) => focusNode.requestFocus(),
+              hint: hintText,
+              prefixIconPath: 'assets/images/ic_lock.png',
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -250,7 +312,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Text(
               'Login',
               style: TextStyle(
-                color: AppConstants().greyLight,
+                color: Theme.of(context).primaryColor,
                 fontSize: 14,
                 fontStyle: FontStyle.italic,
               ),

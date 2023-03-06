@@ -2,7 +2,8 @@ import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.d
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_event.dart';
 import 'package:chat_app/screens/authenticator/login/login_state.dart';
-import 'package:chat_app/screens/authenticator/register/register_bloc.dart';
+import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
+import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
@@ -21,7 +22,6 @@ import '../../../utilities/utils.dart';
 import '../../../widgets/custom_check_box.dart';
 import '../../../widgets/input_field.dart';
 import '../../../widgets/input_password_field.dart';
-import '../register/register.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -31,7 +31,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  LoginBloc? _loginBloc;
+  late LoginBloc _loginBloc;
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     super.dispose();
-    _loginBloc?.close();
+    _loginBloc.close();
   }
 
   @override
@@ -93,15 +93,15 @@ class _LoginPageState extends State<LoginPage> {
     if (rememberInfo) {
       if (isLoggedOut) {
         if (isExpired) {
-          _loginBloc?.add(CheckAuthenticationFailed());
+          _loginBloc.add(CheckAuthenticationFailed());
         } else {
-          _loginBloc?.add(
+          _loginBloc.add(
             CheckAuthenticationFailed(isShowBiometrics: true),
           );
         }
       } else {
         if (isExpired) {
-          _loginBloc?.add(CheckAuthenticationFailed());
+          _loginBloc.add(CheckAuthenticationFailed());
         } else {
           preferences.setBool(AppConstants.isLoggedOut, false);
           if (mounted) {
@@ -117,9 +117,9 @@ class _LoginPageState extends State<LoginPage> {
       }
     } else {
       if (isExpired) {
-        _loginBloc?.add(CheckAuthenticationFailed());
+        _loginBloc.add(CheckAuthenticationFailed());
       } else {
-        _loginBloc?.add(
+        _loginBloc.add(
           CheckAuthenticationFailed(isShowBiometrics: true),
         );
       }
@@ -141,7 +141,7 @@ class IDPassLoginForm extends StatefulWidget {
 
 class _IDPassLoginFormState extends State<IDPassLoginForm> {
   final focusNode = FocusNode();
-  final _inputPhoneController = TextEditingController();
+  final _inputUsernameController = TextEditingController();
   final _inputPasswordController = TextEditingController();
   bool _rememberInfo = false;
   bool _isShowPassword = false;
@@ -164,7 +164,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
   @override
   void dispose() {
     super.dispose();
-    _inputPhoneController.dispose();
+    _inputUsernameController.dispose();
     _inputPasswordController.dispose();
     _loginFormBloc?.close();
   }
@@ -227,7 +227,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
 
   _validateForm() {
     _loginFormBloc?.add(ValidateForm(
-      isValidate: (_inputPhoneController.text.isNotEmpty &&
+      isValidate: (_inputUsernameController.text.isNotEmpty &&
           _inputPasswordController.text.isNotEmpty),
     ));
   }
@@ -289,7 +289,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                         ],
                       ),
                     ),
-                    _inputPhoneField(),
+                    _inputUsernameField(),
                     _inputPasswordField(),
                     _rememberOrForgot(),
                   ],
@@ -307,44 +307,45 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
       text: 'Login',
-      onTap: () async {
-        await _goToTermPolicy(); // todo: remove test
-      },
-      // currentState.isEnable
-      //     ? () async {
-      //         ConnectivityResult connectivityResult =
-      //             await Connectivity().checkConnectivity();
-      //         if (connectivityResult == ConnectivityResult.none && mounted) {
-      //           showMessageNoInternetDialog(context);
-      //         } else {
-      //           _loginFormBloc?.add(DisplayLoading());
-      //           LoginResult loginResult = await _loginRepository.login(
-      //             phone: _inputPhoneController.text.trim(),
-      //             password: _inputPasswordController.text.trim(),
-      //           );
-      //           if (loginResult.isSuccess && mounted) {
-      //             SharedPreferences preferences =
-      //                 await SharedPreferences.getInstance();
-      //             await preferences.setBool(
-      //                 AppConstants.rememberInfo, _rememberInfo);
-      //             //login
-      //             await _goToTermPolicy();
-      //
-      //           } else if (loginResult.error == LoginError.incorrectLogin &&
-      //               mounted) {
-      //             _loginFormBloc?.add(ValidateForm(isValidate: true));
-      //             showCupertinoMessageDialog(context, 'Error',
-      //                 'Incorrect account registration phone number or password.',
-      //                 barrierDismiss: false);
-      //           } else {
-      //             _loginFormBloc?.add(ValidateForm(isValidate: true));
-      //             showCupertinoMessageDialog(
-      //                 context, 'Error', 'Internal server error',
-      //                 barrierDismiss: false);
-      //           }
-      //         }
-      //       }
-      //     : null,
+      onTap:
+      //     () async {
+      //   await _goToTermPolicy(); // todo: remove test
+      // },
+      currentState.isEnable
+          ? () async {
+              ConnectivityResult connectivityResult =
+                  await Connectivity().checkConnectivity();
+              if (connectivityResult == ConnectivityResult.none && mounted) {
+                showMessageNoInternetDialog(context);
+              } else {
+                _loginFormBloc?.add(DisplayLoading());
+                LoginResult loginResult = await _loginRepository.login(
+                  username: _inputUsernameController.text.trim(),
+                  password: _inputPasswordController.text.trim(),
+                );
+                if (loginResult.isSuccess && mounted) {
+                  SharedPreferences preferences =
+                      await SharedPreferences.getInstance();
+                  await preferences.setBool(
+                      AppConstants.rememberInfo, _rememberInfo);
+                  //login
+                  await _goToTermPolicy();
+
+                } else if (loginResult.error == LoginError.incorrectLogin &&
+                    mounted) {
+                  _loginFormBloc?.add(ValidateForm(isValidate: true));
+                  showCupertinoMessageDialog(context, 'Error',
+                      'Incorrect account registration phone number or password.',
+                      barrierDismiss: false);
+                } else {
+                  _loginFormBloc?.add(ValidateForm(isValidate: true));
+                  showCupertinoMessageDialog(
+                      context, 'Error', 'Internal server error',
+                      barrierDismiss: false);
+                }
+              }
+            }
+          : null,
     );
   }
 
@@ -365,17 +366,17 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BlocProvider<RegisterBloc>(
-                    create: (context) => RegisterBloc(context),
-                    child: RegisterPage(),
+                  builder: (context) => BlocProvider<SignUpBloc>(
+                    create: (context) => SignUpBloc(context),
+                    child: SignUpPage(),
                   ),
                 ),
               );
             },
             child: Text(
-              'Register',
+              'Sign up',
               style: TextStyle(
-                color: AppConstants().greyLight,
+                color: Theme.of(context).primaryColor,
                 fontSize: 14,
                 fontStyle: FontStyle.italic,
               ),
@@ -386,7 +387,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
     );
   }
 
-  Widget _inputPhoneField() {
+  Widget _inputUsernameField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -395,7 +396,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           const Padding(
             padding: EdgeInsets.only(top: 24, bottom: 6),
             child: Text(
-              'Phone Number',
+              'Username',
               style: TextStyle(
                 fontSize: 12,
                 height: 1.2,
@@ -408,14 +409,14 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
             child: Input(
               keyboardType: TextInputType.phone,
               maxText: 10,
-              controller: _inputPhoneController,
+              controller: _inputUsernameController,
               onChanged: (text) {
                 _validateForm();
               },
               textInputAction: TextInputAction.next,
               onSubmit: (_) => focusNode.requestFocus(),
-              hint: 'Enter your phone number',
-              prefixIconPath: 'assets/images/ic_phone.png',
+              hint: 'Enter your username',
+              prefixIcon: const Icon(Icons.person_outline, size: 24),
             ),
           ),
         ],
@@ -520,7 +521,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ForgotPasswordPage(
-                      phoneNumber: _inputPhoneController.text,
+                      username: _inputUsernameController.text,
                     ),
                   ),
                 );
