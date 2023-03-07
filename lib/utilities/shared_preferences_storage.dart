@@ -1,16 +1,36 @@
+import 'package:chat_app/utilities/secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../network/response/login_response.dart';
 import 'app_constants.dart';
 
 class SharedPreferencesStorage {
-  static SharedPreferences? _prefs;
+  static late SharedPreferences _prefs;
 
-  static Future<void> inti() async{
+  static Future<void> inti() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<void> setSaveUserInfo()async{
+  Future<void> setSaveUserInfo(LoginData? loginData) async {
+    if (loginData != null) {
+      var token = loginData.accessToken?.split(' ')[1];
+      final SecureStorage secureStorage = SecureStorage();
 
+      //write accessToken, refreshToken to secureStorage
+      await secureStorage.writeSecureData(AppConstants.accessTokenKey, token);
+      await secureStorage.writeSecureData(
+          AppConstants.refreshTokenKey, loginData.refreshToken);
+      await _prefs.setString(AppConstants.emailKey, loginData.email.toString());
+      await _prefs.setString(
+          AppConstants.usernameKey, loginData.username.toString());
+
+      //Decode token and get expiration time
+      if (token != null) {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        bool hasExpired = JwtDecoder.isExpired(token);
+        DateTime expirationDate = JwtDecoder.getExpirationDate(token);
+      }
+    }
   }
 
   void resetDataWhenLogout() {

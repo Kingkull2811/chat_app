@@ -45,6 +45,9 @@ dependencies:
   #A cookie manager for Dio, which supports persistent cookies in RAM and file.
   dio_cookie_manager: ^2.1.1
 
+  #This small library helps you to decode Json Web Tokens, you can also know if a JWT is a
+  jwt_decoder: ^2.0.1
+
   #A package for creating badges. Badges can be used for an additional marker for any widget, e.g. show a number of items in a shopping cart.
   badges: ^3.0.2
 

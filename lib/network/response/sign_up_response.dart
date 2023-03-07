@@ -1,48 +1,47 @@
 import 'package:chat_app/network/response/base_response.dart';
 
 class SignUpResponse extends BaseResponse {
+
   final String? message;
-  final int? id;
-  final dynamic type;
-  final String? accessToken;
-  final String? refreshToken;
-  final String? username;
-  final String? email;
-  final String? roles;
+  final List<SignUpError>? error;
 
   SignUpResponse({
-    status,
-    errors,
-    this.id,
-    this.type,
-    this.accessToken,
-    this.refreshToken,
-    this.username,
-    this.email,
-    this.roles,
+    httpStatus,
     this.message,
-  }) : super(status: status, errors: errors);
+    this.error,
+  }) : super(httpStatus: httpStatus, errors: message);
 
-  factory SignUpResponse.fromJson(Map<String, dynamic> json) => SignUpResponse(
-        status: json["status"],
-        errors: json["errors"],
-        id: json["id"],
-        type: json["type"],
-        accessToken: json["accessToken"],
-        refreshToken: json["refreshToken"],
-        email: json["email"],
-        username: json["username"],
-        roles: json["roles"],
-        message: json["message"],
-      );
+  factory SignUpResponse.fromJson(Map<String, dynamic> json) {
+    List<dynamic>? errorsJson = json['errors'];
+    List<SignUpError>? error;
+    if (errorsJson != null) {
+      error = [];
+      for (var errorJson in errorsJson) {
+        error.add(SignUpError.fromJson(errorJson));
+      }
+    }
+    return SignUpResponse(
+      httpStatus: json['httpStatus'],
+      message: json['message'],
+      error: error,
+    );
+  }
 }
 
-// {
-// "accessToken": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjpbeyJhdXRob3JpdHkiOiJST0xFX1VTRVIifV0sImV4cCI6MTY3ODA5NDIyMywidXNlcklkIjoxLCJpYXQiOjE2NzgwOTM2MjMsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJ1c2VybmFtZSI6InRlc3QxIn0.APbKOWdztb6wnuGB15_w9_92rylN3ZA1dTucn3UHcyz1KAWzroK1D0UxgOJuq8fx3XraJxro5T_iDil_FIhBtw",
-// "refreshToken": "0de8246a-9e82-4bed-8747-a151000a825e",
-// "type": null,
-// "id": 1,
-// "username": "test1",
-// "email": "test@gmail.com",
-// "roles": null
-// }
+class SignUpError {
+  final String? errorCode;
+  final String? errorMessage;
+  final dynamic stackFrames;
+
+  SignUpError({
+    this.errorCode,
+    this.errorMessage,
+    this.stackFrames,
+  });
+
+  factory SignUpError.fromJson(Map<String, dynamic> json) => SignUpError(
+        errorCode: json['errorCode'],
+        errorMessage: json['errorMessage'],
+        stackFrames: json['stackFrames'],
+      );
+}

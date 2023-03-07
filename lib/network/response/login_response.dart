@@ -1,54 +1,53 @@
 import 'base_response.dart';
 
 class LoginResponse extends BaseResponse {
-  final String? path;
   final String? message;
+  final LoginData? data;
 
   LoginResponse({
-    status,
-    error,
-    this.path,
+    int? httpStatus,
     this.message,
-  }) : super(status: status, errors: error);
+    this.data,
+  }) : super(httpStatus: httpStatus, errors: message);
 
-  factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
-        path: json["path"],
-        error: json["path"],
-        message: json["path"],
-        status: json["path"],
+  factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    List<LoginData> data = [];
+    if (json['data'] != null) {
+      json['data'].forEach((v) {
+        data.add(LoginData.fromJson(v));
+      });
+    }
+    return LoginResponse(
+      httpStatus: json['httpStatus'],
+      message: json['message'],
+      data: json["data"] == null ? null : LoginData.fromJson(json["data"]),
+    );
+  }
+}
+
+class LoginData {
+  final String? accessToken;
+  final String? refreshToken;
+  final int? id;
+  final String? username;
+  final String? email;
+  final String? roles;
+
+  LoginData({
+    this.accessToken,
+    this.refreshToken,
+    this.id,
+    this.username,
+    this.email,
+    this.roles,
+  });
+
+  factory LoginData.fromJson(Map<String, dynamic> json) => LoginData(
+        accessToken: json['accessToken'],
+        refreshToken: json['refreshToken'],
+        id: json['id'],
+        username: json['username'],
+        email: json['email'],
+        roles: json['roles'],
       );
 }
-
-class ErrorResponse {
-  final int httpStatus;
-  final List<Error> errors;
-
-  ErrorResponse({required this.httpStatus, required this.errors});
-
-  factory ErrorResponse.fromJson(Map<String, dynamic> json) {
-    final errorsList = json['errors'] as List<dynamic>;
-    final errors = errorsList.map((e) => Error.fromJson(e)).toList();
-
-    return ErrorResponse(
-      httpStatus: json['httpStatus'] as int,
-      errors: errors,
-    );
-  }
-}
-
-class Error {
-  final String errorCode;
-  final String errorMessage;
-  final dynamic stackFrames;
-
-  Error({required this.errorCode, required this.errorMessage, required this.stackFrames});
-
-  factory Error.fromJson(Map<String, dynamic> json) {
-    return Error(
-      errorCode: json['errorCode'] as String,
-      errorMessage: json['errorMessage'] as String,
-      stackFrames: json['stackFrames'],
-    );
-  }
-}
-

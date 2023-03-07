@@ -23,3 +23,10 @@ bool validateStructure(String value) {
       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
   return regExp.hasMatch(value);
 }
+
+bool isNotNullOrEmpty(dynamic obj) => !isNullOrEmpty(obj);
+
+/// For String, List, Map
+bool isNullOrEmpty(dynamic obj) =>
+    obj == null ||
+        ((obj is String || obj is List || obj is Map) && obj.isEmpty);

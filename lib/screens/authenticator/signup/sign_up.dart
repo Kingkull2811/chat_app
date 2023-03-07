@@ -1,6 +1,8 @@
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
+import 'package:chat_app/screens/authenticator/login/login_event.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
+import 'package:chat_app/screens/authenticator/signup/sign_up_event.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_state.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -135,7 +137,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   hintText: 'Enter your password',
                   controller: _passwordController,
                   obscureText: !_isShowPassword,
-                  onTapSuffixIcon: (){
+                  onTapSuffixIcon: () {
                     setState(() {
                       _isShowPassword = !_isShowPassword;
                     });
@@ -146,7 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   hintText: 'Re-enter your password',
                   controller: _confirmPasswordController,
                   obscureText: !_isShowConfirmPassword,
-                  onTapSuffixIcon: (){
+                  onTapSuffixIcon: () {
                     setState(() {
                       _isShowConfirmPassword = !_isShowConfirmPassword;
                     });
@@ -160,6 +162,7 @@ class _SignUpPageState extends State<SignUpPage> {
       );
     });
   }
+
   Widget _buttonSendOTP(SignUpState currentState) {
     return Align(
       alignment: Alignment.bottomCenter,
@@ -167,16 +170,21 @@ class _SignUpPageState extends State<SignUpPage> {
         text: 'Sign Up',
         onTap: () async {
           ConnectivityResult connectivityResult =
-          await Connectivity().checkConnectivity();
+              await Connectivity().checkConnectivity();
           if (connectivityResult == ConnectivityResult.none && mounted) {
             showMessageNoInternetDialog(context);
           } else {
-            // _registerBloc?.add(DisplayLoading());
+            _signUpBloc.add(SubmitButton(
+              username: _userNameController.text.trim(),
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim(),
+            ));
+
             showSuccessBottomSheet(
               context,
               titleMessage: 'Sign Up Successfully!',
               contentMessage:
-              'You have successfully sign up an account, please login',
+                  'You have successfully sign up an account, please login',
               buttonLabel: 'Login',
               onTap: () {
                 Navigator.pushReplacement(

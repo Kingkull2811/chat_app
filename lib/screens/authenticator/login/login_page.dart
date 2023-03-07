@@ -12,6 +12,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../network/model/login_result.dart';
@@ -181,7 +182,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           alignment: Alignment.bottomCenter,
           children: [
             _loginForm(padding, height),
-            _goToRegisterPage(),
+            _goToSignUpPage(),
           ],
         ),
       ),
@@ -349,7 +350,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
     );
   }
 
-  Widget _goToRegisterPage() {
+  Widget _goToSignUpPage() {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Row(

@@ -1,34 +1,34 @@
 import 'dart:io';
 
 class BaseResponse {
-  int? status;
+  int? httpStatus;
   dynamic errors;
 
-  BaseResponse({this.status, this.errors});
+  BaseResponse({this.httpStatus, this.errors});
 
   BaseResponse.withHttpError({
     this.errors,
-    this.status,
+    this.httpStatus,
   });
 
   factory BaseResponse.fromJson(Map<String, dynamic> json) => BaseResponse(
-        status: json["status"],
+        httpStatus: json["httpStatus"],
         errors: json["errors"],
       );
 
   bool isOK() {
-    return status == HttpStatus.ok;
+    return httpStatus == HttpStatus.ok;
   }
 
   bool isFailure() {
-    return status != HttpStatus.ok;
+    return httpStatus != HttpStatus.ok;
   }
 }
 
 class ExpiredTokenResponse extends BaseResponse {
   ExpiredTokenResponse()
       : super(
-          status: HttpStatus.unauthorized,
+          httpStatus: HttpStatus.unauthorized,
           errors: 'Token Expired !',
         );
 }

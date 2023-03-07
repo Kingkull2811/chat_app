@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../response/base_response.dart';
+import 'api_authentication_provider.dart';
 
 mixin ProviderMixin {
   late Dio _dio;
+  ApiAuthenticationProvider? _apiAuthenticationProvider;
 
   Dio get dio {
     _dio = Dio()..httpClientAdapter = HttpClientAdapter();
@@ -30,7 +32,13 @@ mixin ProviderMixin {
 
     return BaseResponse.withHttpError(
       errors: error,
-      status: (error is DioError) ? error.response?.statusCode : null,
+      httpStatus: (error is DioError) ? error.response?.statusCode : null,
     );
+  }
+
+  Future<bool> isExpiredToken() async {
+    _apiAuthenticationProvider ??= ApiAuthenticationProvider();
+    return !(await _apiAuthenticationProvider?.checkAuthenticationStatus() ??
+        false);
   }
 }

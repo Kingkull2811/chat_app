@@ -7,8 +7,9 @@ import '../response/login_response.dart';
 class LoginRepository {
   final LoginProvider _loginProvider = LoginProvider();
 
-  Future<void> _saveUserInfo( )async{
-    await SharedPreferencesStorage().setSaveUserInfo();
+  Future<void> _saveUserInfo(LoginData? loginData)async{
+
+    await SharedPreferencesStorage().setSaveUserInfo(loginData);
 }
 
   Future<LoginResult> login({
@@ -19,8 +20,8 @@ class LoginRepository {
       username : username,
       password: password,
     );
-    if(loginResponse.status == 200){
-      _saveUserInfo(loginResponse.);
+    if(loginResponse.httpStatus == 200){
+     _saveUserInfo(loginResponse.data);
     }
 
     return LoginResult();
