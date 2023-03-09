@@ -40,19 +40,18 @@ class OnChattingPageState extends State<OnChattingPage> {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: CustomAppBarChat(
-        title: widget.item.title,
-        image: widget.item.imageUrl,
+        title: widget.item.name,
+        image: widget.item.imageUrlAvt,
         onTapLeadingIcon: () {
           Navigator.pop(context);
         },
       ),
       backgroundColor: Colors.white,
-      body: Stack(
-        alignment: Alignment.topCenter,
+      body: Column(
         children: [
-          //chatting
-          _bodyChat(),
-          //bottom input text
+          Expanded(
+            child: _bodyChat(),
+          ),
           _bottomChatField(),
         ],
       ),
@@ -65,78 +64,46 @@ class OnChattingPageState extends State<OnChattingPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            _headerInfo(),
+            Container(
+              padding: const EdgeInsets.only(top: 30),
+              height: 150,
+              width: 150,
+              child: CircleAvatar(
+                radius: 75,
+                child: Image.asset(widget.item.imageUrlAvt ?? ''),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Text(
+                widget.item.name ?? '',
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: Colors.black),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, bottom: 50),
+              child: Text(
+                'Say hi to start chat, ${widget.item.name}',
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 12,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemBuilder: (context, index) =>
+                    _buildMessageItem(itemMessage[index]),
+                itemCount: itemMessage.length,
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _headerInfo() {
-    return SizedBox(
-      height: 500,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.only(top: 30),
-            height: 150,
-            width: 150,
-            child: CircleAvatar(
-              radius: 75,
-              child: Image.asset(widget.item.imageUrl ?? ''),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Text(
-              widget.item.title ?? '',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28,
-                  color: Colors.black),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 50),
-            child: Text(
-              'Say hi to start chat, ${widget.item.title}',
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 12,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-          // ListView.separated(
-          //   itemBuilder: (context, index) => _message(itemMessage[index]),
-          //   separatorBuilder: (context, index) => SizedBox(
-          //     height: 20,
-          //     child: Center(
-          //       child: Text(
-          //         itemMessage[index].timestamp,
-          //         style: TextStyle(
-          //           fontSize: 14,
-          //           fontWeight: FontWeight.w300,
-          //           color: Theme.of(context).primaryColor,
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          //   itemCount: itemMessage.length,
-          // ),
-        ],
-      ),
-    );
-  }
-
-  Widget _message(MessageListItem item){
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Column(
-        children: [
-
-        ],
-    ),
     );
   }
 
@@ -157,13 +124,13 @@ class OnChattingPageState extends State<OnChattingPage> {
           trailing: isMe ? null : Icon(Icons.person),
         );
       case TypeMessage.video:
-      // Implement video message
+        // Implement video message
         return Container();
       case TypeMessage.audio:
-      // Implement audio message
+        // Implement audio message
         return Container();
       default:
-      // Default message
+        // Default message
         return ListTile(
           title: Text('Unsupported message type'),
         );
@@ -260,6 +227,8 @@ class OnChattingPageState extends State<OnChattingPage> {
 
 enum TypeMessage { text, image, video, audio }
 
+enum MessageStatus { notSent, notView, viewed }
+
 List<MessageListItem> itemMessage = [
   MessageListItem(
     sender: 'Martha',
@@ -276,17 +245,17 @@ List<MessageListItem> itemMessage = [
     timestamp: '2023-3-09T10:05:00.000Z',
   ),
   MessageListItem(
-    sender: 'Martha',
-    receiver: 'You',
+    sender: 'You',
+    receiver: 'Martha',
     message: 'Hello',
     typeMessage: TypeMessage.text,
     timestamp: '2023-3-09T10:00:00.000Z',
   ),
   MessageListItem(
-    sender: 'Martha',
-    receiver: 'You',
+    sender: 'You',
+    receiver: 'Martha',
     message: 'Hello',
-    typeMessage: TypeMessage.text,
+    typeMessage: TypeMessage.video,
     timestamp: '2023-3-09T10:00:00.000Z',
   ),
 ];

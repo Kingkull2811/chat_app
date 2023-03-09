@@ -16,7 +16,8 @@ class LoginProvider with ProviderMixin {
     };
     Options options = Options(headers: body);
     try {
-      Response response = await dio.get(ApiPath.login, options: options);
+      Response response = await dio.post(ApiPath.login, data: options);
+      //Response response = await dio.get(ApiPath.login, options: options);
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);

@@ -1,8 +1,8 @@
 class ApiPath{
   static const String apiDomain = 'http://localhost:8080';
 
-  //static const String signup = '$apiDomain/api/auth/sign-up';
-  static const String signup = 'http://localhost:8080/api/auth/sign-in';
+  static const String signup = '$apiDomain/api/auth/sign-up';
+  static const String signin = 'http://localhost:8080/api/auth/sign-in';
 
   static const String login = '$apiDomain/api/auth/sign-in';
 

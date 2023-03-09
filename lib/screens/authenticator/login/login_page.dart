@@ -330,8 +330,9 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
       text: 'Login',
-      onTap: currentState.isEnable
-          ? () async {
+      onTap:
+      currentState.isEnable ?
+          () async {
               ConnectivityResult connectivityResult =
                   await Connectivity().checkConnectivity();
               if (connectivityResult == ConnectivityResult.none && mounted) {
@@ -363,7 +364,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                 }
               }
             }
-          : () async {
+           : () async {
               _goToTermPolicy();
             },
     );

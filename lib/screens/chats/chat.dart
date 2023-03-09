@@ -12,7 +12,6 @@ class ChatsPage extends StatefulWidget {
 }
 
 class ChatsPageState extends State<ChatsPage> {
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -42,7 +41,7 @@ class ChatsPageState extends State<ChatsPage> {
 }
 
 _cardChat(CustomListItem item, double width, BuildContext context) {
-  return GestureDetector(
+  return InkWell(
     onTap: () {
       Navigator.push(
           context,
@@ -76,18 +75,19 @@ _cardChat(CustomListItem item, double width, BuildContext context) {
                   child: CircleAvatar(
                     radius: 50,
                     child: Image.asset(
-                      item.imageUrl ?? '',
+                      item.imageUrlAvt ?? '',
                     ),
                   ),
                 ),
                 Padding(
-                    padding: EdgeInsets.only(left: 16, top: 10, bottom: 10),
+                    padding:
+                        const EdgeInsets.only(left: 16, top: 10, bottom: 10),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.title ?? '',
+                          item.name ?? '',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -95,7 +95,7 @@ _cardChat(CustomListItem item, double width, BuildContext context) {
                           ),
                         ),
                         Text(
-                          '${item.title} ${item.time}',
+                          '${item.name} ${item.time}',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -126,102 +126,105 @@ _cardChat(CustomListItem item, double width, BuildContext context) {
 
 List<CustomListItem> itemList = [
   CustomListItem(
-    title: 'Item 1',
-    subtitle: 'Subtitle 1',
+    name: 'Item 1',
+    lastMessage: 'Subtitle 1',
     time: '12:00 PM',
-    imageUrl: 'assets/images/image_profile_1.png',
+    imageUrlAvt: 'assets/images/image_profile_1.png',
     isRead: false,
   ),
   CustomListItem(
-    title: 'Item 2',
-    subtitle: 'Subtitle 2',
+    name: 'Item 2',
+    lastMessage: 'Subtitle 2',
     time: '1:00 PM',
-    imageUrl: 'assets/images/image_profile_2.png',
+    imageUrlAvt: 'assets/images/image_profile_2.png',
     isRead: true,
   ),
   CustomListItem(
-    title: 'Item 3',
-    subtitle: 'Subtitle 3',
+    name: 'Item 3',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_3.png',
+    imageUrlAvt: 'assets/images/image_profile_3.png',
     isRead: false,
   ),
   CustomListItem(
-    title: 'Item 4',
-    subtitle: 'Subtitle 3',
+    name: 'Item 4',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_4.png',
+    imageUrlAvt: 'assets/images/image_profile_4.png',
     isRead: true,
   ),
   CustomListItem(
-    title: 'Item 5',
-    subtitle: 'Subtitle 3',
+    name: 'Item 5',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_5.png',
+    imageUrlAvt: 'assets/images/image_profile_5.png',
     isRead: false,
   ),
   CustomListItem(
-    title: 'Item 6',
-    subtitle: 'Subtitle 3',
+    name: 'Item 6',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_6.png',
+    imageUrlAvt: 'assets/images/image_profile_6.png',
     isRead: true,
   ),
   CustomListItem(
-    title: 'Item 7',
-    subtitle: 'Subtitle 1',
+    name: 'Item 7',
+    lastMessage: 'Subtitle 1',
     time: '12:00 PM',
-    imageUrl: 'assets/images/image_profile_1.png',
+    imageUrlAvt: 'assets/images/image_profile_1.png',
     isRead: false,
   ),
   CustomListItem(
-    title: 'Item 8',
-    subtitle: 'Subtitle 2',
+    name: 'Item 8',
+    lastMessage: 'Subtitle 2',
     time: '1:00 PM',
-    imageUrl: 'assets/images/image_profile_2.png',
+    imageUrlAvt: 'assets/images/image_profile_2.png',
     isRead: true,
   ),
   CustomListItem(
-    title: 'Item 9',
-    subtitle: 'Subtitle 3',
+    name: 'Item 9',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_3.png',
+    imageUrlAvt: 'assets/images/image_profile_3.png',
     isRead: false,
   ),
   CustomListItem(
-    title: 'Item 10',
-    subtitle: 'Subtitle 3',
+    name: 'Item 10',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_4.png',
+    imageUrlAvt: 'assets/images/image_profile_4.png',
     isRead: true,
   ),
   CustomListItem(
-    title: 'Item 11',
-    subtitle: 'Subtitle 3',
+    name: 'Item 11',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_5.png',
+    imageUrlAvt: 'assets/images/image_profile_5.png',
     isRead: false,
   ),
   CustomListItem(
-    title: 'Item 12',
-    subtitle: 'Subtitle 3',
+    name: 'Item 12',
+    lastMessage: 'Subtitle 3',
     time: '2:00 PM',
-    imageUrl: 'assets/images/image_profile_6.png',
+    imageUrlAvt: 'assets/images/image_profile_6.png',
     isRead: true,
   ),
 ];
 
 class CustomListItem {
-  final String? title;
-  final String? subtitle;
+  final String? name;
+  final String? lastMessage;
   final String? time;
-  final String? imageUrl;
+  final String? imageUrlAvt;
   final bool isRead;
+  final bool isActive;
 
-  CustomListItem(
-      {this.title,
-      this.subtitle,
-      this.time,
-      this.imageUrl,
-      this.isRead = false});
+  CustomListItem({
+    this.name,
+    this.lastMessage,
+    this.time,
+    this.imageUrlAvt,
+    this.isRead = false,
+    this.isActive = false,
+  });
 }
