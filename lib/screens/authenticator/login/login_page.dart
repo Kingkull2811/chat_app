@@ -178,13 +178,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
 
     return Scaffold(
       body: SingleChildScrollView(
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            _loginForm(padding, height),
-            _goToSignUpPage(),
-          ],
-        ),
+        child: _loginForm(padding, height),
       ),
     );
   }
@@ -234,25 +228,50 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
   }
 
   Widget _loginForm(EdgeInsets padding, double height) {
-    return BlocConsumer<LoginFormBloc, LoginFormState>(
-      listenWhen: (previousState, currentState) {
-        return currentState.isSuccessAuthenticateBiometric;
-      },
-      listener: (context, currentState) async {
-        //await _goToTermAndPolicy();
-      },
-      builder: (context, currentState) {
-        if (currentState.isAuthenticating) {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
-          );
-        }
+//     return BlocConsumer<LoginFormBloc, LoginFormState>(
+//       listenWhen: (previousState, currentState) {
+//         return currentState.isSuccessAuthenticateBiometric;
+//       },
+//       listener: (context, currentState) async {
+//         //await _goToTermAndPolicy();
+//         if (currentState is AuthenticationSuccess) {
+// // Navigate to the next screen after successful login
+//         } else if (currentState is AuthenticationFailure) {
+// // Show error message to the user
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(
+//               content: Text(currentState.errorMessage ??''),
+//             ),
+//           );}
+//       },
+//       builder: (context, currentState) {
+//         if (currentState.isAuthenticating) {
+//           return Scaffold(
+//             body: Center(
+//               child: CircularProgressIndicator(
+//                 valueColor: AlwaysStoppedAnimation<Color>(
+//                   Theme.of(context).primaryColor,
+//                 ),
+//               ),
+//             ),
+//           );
+//         }
+    return BlocListener<LoginFormBloc, LoginFormState>(
+        listener: (context, state) {
+      if (state is AuthenticationFailure) {
+        showDialog(
+            context: context,
+            builder: (context) => Container(
+                  height: 300,
+                  width: 300,
+                  color: Colors.blue,
+                ));
+      }
+      if (state is AuthenticationSuccess) {
+        _goToTermPolicy();
+      }
+    }, child: BlocBuilder<LoginFormBloc, LoginFormState>(
+      builder: (context, state) {
         return Padding(
           padding: EdgeInsets.only(
             left: 16,
@@ -296,23 +315,22 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                   ],
                 ),
               ),
-              _buildBiometricsButton(currentState),
-              _buttonLogin(currentState),
+              _buildBiometricsButton(state),
+              _buttonLogin(state),
+              _goToSignUpPage(),
             ],
           ),
         );
       },
-    );
+    ));
+    //
+    // );
   }
 
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
       text: 'Login',
-      onTap:
-      //     () async {
-      //   await _goToTermPolicy(); // todo: remove test
-      // },
-      currentState.isEnable
+      onTap: currentState.isEnable
           ? () async {
               ConnectivityResult connectivityResult =
                   await Connectivity().checkConnectivity();
@@ -331,7 +349,6 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                       AppConstants.rememberInfo, _rememberInfo);
                   //login
                   await _goToTermPolicy();
-
                 } else if (loginResult.error == LoginError.incorrectLogin &&
                     mounted) {
                   _loginFormBloc?.add(ValidateForm(isValidate: true));
@@ -346,7 +363,9 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                 }
               }
             }
-          : null,
+          : () async {
+              _goToTermPolicy();
+            },
     );
   }
 
@@ -408,7 +427,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           SizedBox(
             height: 50,
             child: Input(
-              keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.text,
               maxText: 10,
               controller: _inputUsernameController,
               onChanged: (text) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/database.dart';
@@ -7,8 +6,6 @@ import '../../utilities/app_constants.dart';
 import '../../utilities/screen_utilities.dart';
 import '../../widgets/custom_check_box.dart';
 import '../../widgets/primary_button.dart';
-import '../main/main_app.dart';
-import '../main/tab/tab_bloc.dart';
 import '../onboarding/onboarding_screen.dart';
 
 class TermPolicyPage extends StatefulWidget {

@@ -1,14 +1,11 @@
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
-import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_bloc.dart';
-import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_state.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../utilities/screen_utilities.dart';
-import '../../../widgets/input_field.dart';
 import '../../../widgets/primary_button.dart';
 
 class SetNewPassword extends StatefulWidget {
@@ -171,15 +168,15 @@ class _SetNewPasswordState extends State<SetNewPassword> {
 
   _buttonVerify() {
     return PrimaryButton(
-      text: 'Register',
+      text: 'Set a password',
       onTap: () {
         showSuccessBottomSheet(
           context,
           enableDrag: false,
           isDismissible: false,
-          titleMessage: 'Register Successfully!',
+          titleMessage: 'Successfully!',
           contentMessage:
-              'You have successfully register an account, please login.',
+              'You have successfully set a new password, please login.',
           buttonLabel: 'Login',
           onTap: () {
             Navigator.pushReplacement(

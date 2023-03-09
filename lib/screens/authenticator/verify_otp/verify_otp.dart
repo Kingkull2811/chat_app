@@ -8,9 +8,9 @@ import '../../../utilities/screen_utilities.dart';
 import '../set_new_password/set_new_password.dart';
 
 class VerifyOTP extends StatefulWidget {
-  final String? phoneNumber;
+  final String? email;
 
-  const VerifyOTP({Key? key, this.phoneNumber}) : super(key: key);
+  const VerifyOTP({Key? key, this.email}) : super(key: key);
 
   @override
   State<VerifyOTP> createState() => _VerifyOTPState();
@@ -41,10 +41,6 @@ class _VerifyOTPState extends State<VerifyOTP> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
 
-    // if (kDebugMode) {
-    //   print("otpcCode: $_otpCode");
-    // }
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -57,7 +53,6 @@ class _VerifyOTPState extends State<VerifyOTP> {
               child: GestureDetector(
                 onTap: () {
                   //Navigator.pop(context);
-
                 },
                 child: Image.asset(
                   'assets/images/ic_back.png',
@@ -94,30 +89,14 @@ class _VerifyOTPState extends State<VerifyOTP> {
                         Container(
                           padding: const EdgeInsets.only(top: 20),
                           width: 300,
-                          child: Column(
-                            children: const [
-                              Text(
-                                'We will send you an onetime OTP code on the phone number:',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                              ),
-                              SizedBox(
-                                height: 5,
-                              ),
-                              Text(
-                                '0123456789',
-                                //widget.phoneNumber.toString(),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                          child: Text(
+                            'We will send you an onetime OTP code on the email: ${widget.email}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
                           ),
                         ),
                         _otpTextField(),

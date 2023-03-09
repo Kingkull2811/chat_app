@@ -1,6 +1,8 @@
+import 'package:chat_app/screens/authenticator/verify_otp/verify_otp.dart';
 import 'package:flutter/material.dart';
 
 import '../../../widgets/input_field.dart';
+import '../../../widgets/primary_button.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   final String? username;
@@ -11,7 +13,7 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  final _inputPhoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final focusNode = FocusNode();
 
   @override
@@ -21,13 +23,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   void dispose() {
-    _inputPhoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final padding = MediaQuery.of(context).padding;
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -38,7 +39,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         title: const Text(
           'Forgot Password',
           style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         leading: IconButton(
           icon: Image.asset('assets/images/ic_back.png'),
@@ -51,34 +55,42 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Image.asset(
-                'assets/images/image_wrong.png',
-                width: 150,
-                height: 150,
-              ),
-              const Padding(
-                padding: EdgeInsets.only(top: 20),
-                child: Text(
-                  'Reset your password',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+              SizedBox(
+                height: height - 180,
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/images/image_wrong.png',
+                      width: 150,
+                      height: 150,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text(
+                        'Reset your password',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 300,
+                      padding: const EdgeInsets.only(top: 20),
+                      child: const Text(
+                        'Please enter your email. We will send a code to your email to reset your password.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    _inputPhoneField(),
+                  ],
                 ),
               ),
-               Container(
-                width: 300,
-                padding: const EdgeInsets.only(top: 20),
-                child: const Text(
-                  'Please enter your phone number. We will send a code to your phone to reset your password.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              _inputPhoneField()
+              _buttonSendCode(),
             ],
           ),
         ),
@@ -88,37 +100,43 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Widget _inputPhoneField() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 24, bottom: 6),
-            child: Text(
-              'Phone Number',
-              style: TextStyle(
-                fontSize: 12,
-                height: 1.2,
-                color: Colors.black,
-              ),
-            ),
+      padding: const EdgeInsets.only(left: 16, top: 50, right: 16),
+      child: SizedBox(
+        height: 50,
+        child: Input(
+          keyboardType: TextInputType.phone,
+          maxText: 10,
+          controller: _emailController,
+          onChanged: (text) {},
+          textInputAction: TextInputAction.next,
+          onSubmit: (_) => focusNode.requestFocus(),
+          hint: 'Enter your email',
+          //prefixIconPath: 'assets/images/ic_phone.png',
+          prefixIcon: const Icon(
+            Icons.mail_outline,
+            size: 24,
           ),
-          SizedBox(
-            height: 50,
-            child: Input(
-              keyboardType: TextInputType.phone,
-              maxText: 10,
-              controller: _inputPhoneController,
-              onChanged: (text) {
-              },
-              textInputAction: TextInputAction.next,
-              onSubmit: (_) => focusNode.requestFocus(),
-              hint: 'Enter your phone number',
-              prefixIconPath: 'assets/images/ic_phone.png',
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buttonSendCode() {
+    return PrimaryButton(
+      text: "Send me Code",
+      isDisable: _emailController.text.isEmpty,
+      onTap: _emailController.text.isEmpty
+          ? null
+          : () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VerifyOTP(
+                    email: _emailController.text.trim(),
+                  ),
+                ),
+              );
+            },
     );
   }
 }

@@ -55,6 +55,7 @@ class TabSelectorState extends State<TabSelector> {
               'assets/images/ic_chat.png',
               width: 30,
               height: 30,
+              color: Theme.of(context).primaryColor,
             ),
           ),
           activeIcon: Badge(
@@ -77,30 +78,13 @@ class TabSelectorState extends State<TabSelector> {
               'assets/images/ic_chat.png',
               width: 30,
               height: 30,
-              color: Theme.of(context).primaryColor,
+              color: Colors.black,
             ),
           ),
           label: 'Chat',
         ),
         BottomNavigationBarItem(
           icon: Badge(
-            showBadge: (widget.newsBadgeNumber > 0),
-            badgeContent: Text(
-              (widget.newsBadgeNumber.toString()),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-            badgeStyle: const BadgeStyle(
-              badgeColor: Colors.red,
-              padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
-            ),
-            position: BadgePosition.topStart(top: -3, start: -8),
-            child: Image.asset('assets/images/ic_news.png', width: 30, height: 30),
-          ),
-          activeIcon: Badge(
             showBadge: (widget.newsBadgeNumber > 0),
             badgeContent: Text(
               (widget.newsBadgeNumber.toString()),
@@ -122,13 +106,10 @@ class TabSelectorState extends State<TabSelector> {
               color: Theme.of(context).primaryColor,
             ),
           ),
-          label: 'News',
-        ),
-        BottomNavigationBarItem(
-          icon: Badge(
-            showBadge: (widget.newTranscriptBadgeNumber > 0),
+          activeIcon: Badge(
+            showBadge: (widget.newsBadgeNumber > 0),
             badgeContent: Text(
-              (widget.newTranscriptBadgeNumber.toString()),
+              (widget.newsBadgeNumber.toString()),
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontSize: 10,
@@ -140,8 +121,38 @@ class TabSelectorState extends State<TabSelector> {
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
-            child:
-                Image.asset('assets/images/ic_transcript.png', width: 30, height: 30),
+            child: Image.asset(
+              'assets/images/ic_news.png',
+              width: 30,
+              height: 30,
+              color: Colors.black,
+            ),
+          ),
+          label: 'News',
+        ),
+        BottomNavigationBarItem(
+          icon: Badge(
+            showBadge: (widget.newTranscriptBadgeNumber > 0),
+            badgeContent: Text(
+              (widget.newTranscriptBadgeNumber.toString()),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            badgeStyle: const BadgeStyle(
+              badgeColor: Colors.red,
+              padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
+            ),
+            position: BadgePosition.topStart(top: -3, start: -8),
+            child: Image.asset(
+              'assets/images/ic_transcript.png',
+              width: 30,
+              height: 30,
+              color: Theme.of(context).primaryColor,
+            ),
           ),
           activeIcon: Badge(
             showBadge: (widget.newTranscriptBadgeNumber > 0),
@@ -162,32 +173,36 @@ class TabSelectorState extends State<TabSelector> {
               'assets/images/ic_transcript.png',
               width: 30,
               height: 30,
-              color: Theme.of(context).primaryColor,
+              color: Colors.black,
             ),
           ),
           label: 'Transcript',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset('assets/images/ic_profile.png', width: 30, height: 30),
-          activeIcon: Image.asset(
+          icon: Image.asset(
             'assets/images/ic_profile.png',
             width: 30,
             height: 30,
             color: Theme.of(context).primaryColor,
           ),
+          activeIcon: Image.asset(
+            'assets/images/ic_profile.png',
+            width: 30,
+            height: 30,
+            color: Colors.black,
+          ),
           label: 'Profile',
         ),
       ],
       selectedLabelStyle: const TextStyle(
+          fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black),
+      unselectedLabelStyle: TextStyle(
         fontSize: 10,
         fontWeight: FontWeight.bold,
+        color: Theme.of(context).primaryColor,
       ),
-      unselectedLabelStyle: const TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.bold,
-      ),
-      unselectedItemColor: Colors.black,
-      selectedItemColor: Theme.of(context).primaryColor,
+      unselectedItemColor: Theme.of(context).primaryColor,
+      selectedItemColor: Colors.black,
       showUnselectedLabels: true,
       type: BottomNavigationBarType.fixed,
       selectedFontSize: 12,

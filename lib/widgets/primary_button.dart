@@ -1,4 +1,3 @@
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {

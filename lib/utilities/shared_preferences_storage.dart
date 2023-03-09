@@ -36,10 +36,10 @@ class SharedPreferencesStorage {
   void resetDataWhenLogout() {
     // _prefs?.remove(AppConstants.onlyUsingWifiToDownloadKey);
     // _prefs?.remove(AppConstants.usingOnlineModeKey);
-    _prefs?.setBool(AppConstants.isLoggedOut, true);
+    _prefs.setBool(AppConstants.isLoggedOut, true);
   }
 
   String getPasswordExpireTime() {
-    return _prefs?.getString(AppConstants.passwordExpireTimeKey) ?? '';
+    return _prefs.getString(AppConstants.passwordExpireTimeKey) ?? '';
   }
 }
