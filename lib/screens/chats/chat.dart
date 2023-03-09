@@ -12,6 +12,7 @@ class ChatsPage extends StatefulWidget {
 }
 
 class ChatsPageState extends State<ChatsPage> {
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -94,7 +95,7 @@ _cardChat(CustomListItem item, double width, BuildContext context) {
                           ),
                         ),
                         Text(
-                          (item.subtitle ?? '') + (item.time ?? ''),
+                          '${item.title} ${item.time}',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
@@ -109,11 +110,11 @@ _cardChat(CustomListItem item, double width, BuildContext context) {
             ),
           ),
           SizedBox(
-            width: 20,
+            width: 16,
             child: Image.asset(
               'assets/images/ic_v_green.png',
-              width: 20,
-              height: 20,
+              width: 16,
+              height: 16,
               color: Colors.grey,
             ),
           )
