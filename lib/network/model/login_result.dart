@@ -6,6 +6,11 @@ class LoginResult {
     this.isSuccess =false,
     this.error = LoginError.unknown,
 });
+
+  @override
+  String toString() {
+    return 'LoginResult{isSuccess: $isSuccess, error: $error}';
+  }
 }
 
 enum LoginError {

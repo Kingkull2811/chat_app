@@ -13,12 +13,12 @@ class ValidateForm extends SignUpEvent {
   });
 }
 
-class SubmitButton extends SignUpEvent {
+class SignupButtonPressed extends SignUpEvent {
   final String username;
   final String email;
   final String password;
 
-  SubmitButton(
+  SignupButtonPressed(
       {required this.username, required this.email, required this.password});
 
   @override
@@ -28,3 +28,4 @@ class SubmitButton extends SignUpEvent {
   String toString() =>
       'SignUpInfo: { username: $username, email: $email, password: $password }';
 }
+

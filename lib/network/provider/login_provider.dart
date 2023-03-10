@@ -6,18 +6,23 @@ import 'package:dio/dio.dart';
 import '../response/login_response.dart';
 
 class LoginProvider with ProviderMixin {
+
   Future<LoginResponse> login({
     required String username,
     required String password,
   }) async {
-    Map<String, dynamic> body = {
-      "password": password,
-      "username": username,
-    };
-    Options options = Options(headers: body);
     try {
-      Response response = await dio.post(ApiPath.login, data: options);
-      //Response response = await dio.get(ApiPath.login, options: options);
+      final response = await dio.post(
+        ApiPath.login,
+        //data: {"password": password, "username": username},
+         data: {"password": "123456", "username": "truongtran"},
+        options: Options(
+          sendTimeout: const Duration(seconds: 3),
+          receiveTimeout: const Duration(seconds: 3),
+          receiveDataWhenStatusError: true,
+        ),
+      );
+
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);
@@ -28,14 +33,14 @@ class LoginProvider with ProviderMixin {
   Future<AuthTokens> getTokenByRefreshToken({
     required String refreshToken,
   }) async {
-    try {
-      Map<String, dynamic> body = {'refreshToken': 'Bearer $refreshToken'};
-      Options options = Options(headers: body);
-      Response response = await dio.get(ApiPath.refreshToken, options: options);
-      return AuthTokens.fromJson(response.data);
-    } catch (error, stacktrace) {
-      showErrorLog(error, stacktrace, ApiPath.refreshToken);
-      return AuthTokens();
-    }
+    // try {
+    //   Map<String, dynamic> body = {'refreshToken': 'Bearer $refreshToken'};
+    //   Options options = Options(headers: body);
+    //   Response response = await _dio.get(ApiPath.refreshToken, options: options);
+    //   return AuthTokens.fromJson(response.data);
+    // } catch (error, stacktrace) {
+    //  // showErrorLog(error, stacktrace, ApiPath.refreshToken);
+    return AuthTokens();
+    // }
   }
 }

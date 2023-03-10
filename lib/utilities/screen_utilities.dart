@@ -81,16 +81,19 @@ Future<void> showMessageNoInternetDialog(
           title: const Text(
             AppConstants.noInternetTitle,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
           content: Column(
             children: [
-              Image.asset(
-                'assets/images/ic_no_internet.png',
-                height: 150,
-                width: 150,
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Image.asset(
+                  'assets/images/ic_no_internet.png',
+                  height: 150,
+                  width: 150,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.only(top: 16),

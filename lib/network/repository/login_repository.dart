@@ -5,7 +5,7 @@ import '../model/login_result.dart';
 import '../response/login_response.dart';
 
 class LoginRepository {
-  final LoginProvider _loginProvider = LoginProvider();
+   final _loginProvider = LoginProvider();
 
   Future<void> _saveUserInfo(LoginData? loginData)async{
 
@@ -22,6 +22,8 @@ class LoginRepository {
     );
     if(loginResponse.httpStatus == 200){
      _saveUserInfo(loginResponse.data);
+     return LoginResult(isSuccess: true);
+
     }
 
     return LoginResult();

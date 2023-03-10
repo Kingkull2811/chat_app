@@ -331,7 +331,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
     return PrimaryButton(
       text: 'Login',
       onTap:
-      currentState.isEnable ?
+      //currentState.isEnable ?
           () async {
               ConnectivityResult connectivityResult =
                   await Connectivity().checkConnectivity();
@@ -343,6 +343,8 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                   username: _inputUsernameController.text.trim(),
                   password: _inputPasswordController.text.trim(),
                 );
+                //todo
+                print(loginResult);
                 if (loginResult.isSuccess && mounted) {
                   SharedPreferences preferences =
                       await SharedPreferences.getInstance();
@@ -364,9 +366,9 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                 }
               }
             }
-           : () async {
-              _goToTermPolicy();
-            },
+           // : () async {
+           //    _goToTermPolicy();
+           //  },
     );
   }
 
@@ -388,7 +390,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<SignUpBloc>(
-                    create: (context) => SignUpBloc(context),
+                    create: (context) => SignUpBloc(context: context),
                     child: SignUpPage(),
                   ),
                 ),

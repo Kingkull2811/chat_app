@@ -11,16 +11,10 @@ class LoginResponse extends BaseResponse {
   }) : super(httpStatus: httpStatus, errors: message);
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
-    List<LoginData> data = [];
-    if (json['data'] != null) {
-      json['data'].forEach((v) {
-        data.add(LoginData.fromJson(v));
-      });
-    }
     return LoginResponse(
       httpStatus: json['httpStatus'],
       message: json['message'],
-      data: json["data"] == null ? null : LoginData.fromJson(json["data"]),
+      data: LoginData.fromJson(json["data"]),
     );
   }
 }
@@ -50,4 +44,9 @@ class LoginData {
         email: json['email'],
         roles: json['roles'],
       );
+
+  @override
+  String toString() {
+    return 'LoginData{accessToken: $accessToken, refreshToken: $refreshToken, id: $id, username: $username, email: $email, roles: $roles}';
+  }
 }
