@@ -35,9 +35,6 @@ class LoginFormState {
 
   final String? errorMessage;
 
-  @override
-  List<Object> get props => [];
-
   LoginFormState({
     this.buttonStatus = HighlightStatus.notAvailable,
     this.biometricButtonType,
@@ -78,7 +75,4 @@ class AuthenticationFailure extends LoginFormState {
   final String error;
 
   AuthenticationFailure(this.error);
-
-  @override
-  List<Object> get props => [error];
 }

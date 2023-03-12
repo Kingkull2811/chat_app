@@ -1,12 +1,21 @@
+import 'package:chat_app/network/model/forgot_password_result.dart';
+import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
+import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_event.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp.dart';
+import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_bloc.dart';
+import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../network/repository/forgot_password_repository.dart';
 import '../../../widgets/input_field.dart';
 import '../../../widgets/primary_button.dart';
+import 'forgot_password_state.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
-  final String? username;
-  const ForgotPasswordPage({Key? key, this.username}) : super(key: key);
+  const ForgotPasswordPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
@@ -16,21 +25,41 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _emailController = TextEditingController();
   final focusNode = FocusNode();
 
+  late ForgotPasswordBloc _forgotPasswordBloc;
+  final _forgotPasswordRepository = ForgotPasswordRepository();
+
   @override
   void initState() {
+    _forgotPasswordBloc = BlocProvider.of<ForgotPasswordBloc>(context);
     super.initState();
   }
 
   @override
   void dispose() {
     _emailController.dispose();
+    _forgotPasswordBloc.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
+    return BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
+      listener: (BuildContext context, Object? state) {},
+      builder: (BuildContext context, state) {
+        if (state.isLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
 
+        return _body();
+      },
+    );
+  }
+
+  Widget _body() {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -49,14 +78,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                height: height - 180,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
                     Image.asset(
@@ -74,10 +102,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                     ),
-                    Container(
-                      width: 300,
-                      padding: const EdgeInsets.only(top: 20),
-                      child: const Text(
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
                         'Please enter your email. We will send a code to your email to reset your password.',
                         style: TextStyle(
                           fontSize: 14,
@@ -90,9 +117,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ],
                 ),
               ),
-              _buttonSendCode(),
-            ],
-          ),
+            ),
+            _buttonSendCode(),
+          ],
         ),
       ),
     );
@@ -100,14 +127,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   Widget _inputPhoneField() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, top: 50, right: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
       child: SizedBox(
         height: 50,
         child: Input(
-          keyboardType: TextInputType.phone,
-          maxText: 10,
+          keyboardType: TextInputType.text,
           controller: _emailController,
-          onChanged: (text) {},
+          onChanged: (text) {
+            setState(() {
+
+            });
+          },
           textInputAction: TextInputAction.next,
           onSubmit: (_) => focusNode.requestFocus(),
           hint: 'Enter your email',
@@ -122,21 +152,53 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   Widget _buttonSendCode() {
-    return PrimaryButton(
-      text: "Send me Code",
-      isDisable: _emailController.text.isEmpty,
-      onTap: _emailController.text.isEmpty
-          ? null
-          : () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => VerifyOTP(
-                    email: _emailController.text.trim(),
-                  ),
-                ),
-              );
-            },
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: PrimaryButton(
+        text: "Send me Code",
+        isDisable: _emailController.text.isEmpty,
+        onTap: _emailController.text.isEmpty
+            ? null
+            : () async {
+                _forgotPasswordBloc.add(DisplayLoading());
+                ForgotPasswordResult forgotPasswordResult =
+                    await _forgotPasswordRepository.forgotPassword(
+                  email: _emailController.text.trim(),
+                );
+                if (forgotPasswordResult.isSuccess && mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider<VerifyOtpBloc>(
+                        create: (context) => VerifyOtpBloc(context),
+                        child: VerifyOtp(
+                          email: _emailController.text.trim(),
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  print(forgotPasswordResult.errors);
+                  // showCupertinoMessageDialog(
+                  //   context,
+                  //   forgotPasswordResult.errors,
+                  //   buttonLabel: 'OK',
+                  //   onCloseDialog: () {
+                  //     Navigator.pop(context);
+                  //   },
+                  //   barrierDismiss: false,
+                  // );
+                }
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => VerifyOtp(
+                //       email: _emailController.text.trim(),
+                //     ),
+                //   ),
+                // );
+              },
+      ),
     );
   }
 }

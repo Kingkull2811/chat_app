@@ -1,12 +1,13 @@
+import 'dart:developer';
+
 import 'package:chat_app/network/provider/provider_mixin.dart';
-import 'package:chat_app/network/response/base_response.dart';
 import 'package:dio/dio.dart';
 
 import '../api/api_path.dart';
 import '../response/sign_up_response.dart';
 
 class SignUpProvider with ProviderMixin {
-  Future<BaseResponse> signUp({
+  Future<SignUpResponse> signUp({
     required String username,
     required String email,
     required String password,
@@ -26,10 +27,11 @@ class SignUpProvider with ProviderMixin {
           receiveDataWhenStatusError: true,
         ),
       );
-
+      log(response.toString());
       return SignUpResponse.fromJson(response.data);
     } catch (error, stacktrace) {
-      return errorResponse(error, stacktrace, ApiPath.signup);
+      showErrorLog(error, stacktrace, ApiPath.signup);
+      return SignUpResponse();
     }
   }
 }

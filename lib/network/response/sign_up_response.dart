@@ -1,9 +1,11 @@
 import 'package:chat_app/network/response/base_response.dart';
 
+import 'error_response.dart';
+
 class SignUpResponse extends BaseResponse {
 
   final String? message;
-  final List<SignUpError>? error;
+  final List<Errors>? error;
 
   SignUpResponse({
     httpStatus,
@@ -13,11 +15,11 @@ class SignUpResponse extends BaseResponse {
 
   factory SignUpResponse.fromJson(Map<String, dynamic> json) {
     List<dynamic>? errorsJson = json['errors'];
-    List<SignUpError>? error;
+    List<Errors>? error;
     if (errorsJson != null) {
       error = [];
       for (var errorJson in errorsJson) {
-        error.add(SignUpError.fromJson(errorJson));
+        error.add(Errors.fromJson(errorJson));
       }
     }
     return SignUpResponse(
@@ -28,20 +30,3 @@ class SignUpResponse extends BaseResponse {
   }
 }
 
-class SignUpError {
-  final String? errorCode;
-  final String? errorMessage;
-  final dynamic stackFrames;
-
-  SignUpError({
-    this.errorCode,
-    this.errorMessage,
-    this.stackFrames,
-  });
-
-  factory SignUpError.fromJson(Map<String, dynamic> json) => SignUpError(
-        errorCode: json['errorCode'],
-        errorMessage: json['errorMessage'],
-        stackFrames: json['stackFrames'],
-      );
-}

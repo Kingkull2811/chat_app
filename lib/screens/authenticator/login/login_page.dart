@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
+import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_event.dart';
 import 'package:chat_app/screens/authenticator/login/login_state.dart';
@@ -329,47 +330,54 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
 
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
-      text: 'Login',
-      onTap:
-      //currentState.isEnable ?
-          () async {
-              ConnectivityResult connectivityResult =
-                  await Connectivity().checkConnectivity();
-              if (connectivityResult == ConnectivityResult.none && mounted) {
-                showMessageNoInternetDialog(context);
-              } else {
-                _loginFormBloc?.add(DisplayLoading());
-                LoginResult loginResult = await _loginRepository.login(
-                  username: _inputUsernameController.text.trim(),
-                  password: _inputPasswordController.text.trim(),
-                );
-                //todo
-                print(loginResult);
-                if (loginResult.isSuccess && mounted) {
-                  SharedPreferences preferences =
-                      await SharedPreferences.getInstance();
-                  await preferences.setBool(
-                      AppConstants.rememberInfo, _rememberInfo);
-                  //login
-                  await _goToTermPolicy();
-                } else if (loginResult.error == LoginError.incorrectLogin &&
-                    mounted) {
-                  _loginFormBloc?.add(ValidateForm(isValidate: true));
-                  showCupertinoMessageDialog(context, 'Error',
-                      'Incorrect account registration phone number or password.',
-                      barrierDismiss: false);
-                } else {
-                  _loginFormBloc?.add(ValidateForm(isValidate: true));
-                  showCupertinoMessageDialog(
-                      context, 'Error', 'Internal server error',
-                      barrierDismiss: false);
-                }
-              }
+        text: 'Login',
+        onTap:
+            //currentState.isEnable ?
+            () async {
+          ConnectivityResult connectivityResult =
+              await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.none && mounted) {
+            showMessageNoInternetDialog(context);
+          } else {
+            _loginFormBloc?.add(DisplayLoading());
+            LoginResult loginResult = await _loginRepository.login(
+              username: _inputUsernameController.text.trim(),
+              password: _inputPasswordController.text.trim(),
+            );
+            //todo
+            print(loginResult);
+            if (loginResult.isSuccess && mounted) {
+              SharedPreferences preferences =
+                  await SharedPreferences.getInstance();
+              await preferences.setBool(
+                  AppConstants.rememberInfo, _rememberInfo);
+              //login
+              await _goToTermPolicy();
+            } else if (loginResult.error == LoginError.incorrectLogin &&
+                mounted) {
+              _loginFormBloc?.add(ValidateForm(isValidate: true));
+              showCupertinoMessageDialog(
+                context,
+                'Error',
+                content:
+                    'Incorrect account registration phone number or password.',
+                barrierDismiss: false,
+              );
+            } else {
+              _loginFormBloc?.add(ValidateForm(isValidate: true));
+              showCupertinoMessageDialog(
+                context,
+                'Error',
+                content: 'Internal server error',
+                barrierDismiss: false,
+              );
             }
-           // : () async {
-           //    _goToTermPolicy();
-           //  },
-    );
+          }
+        }
+        // : () async {
+        //    _goToTermPolicy();
+        //  },
+        );
   }
 
   Widget _goToSignUpPage() {
@@ -540,14 +548,13 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
             padding: const EdgeInsets.only(left: 10, right: 5),
             child: GestureDetector(
               onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ForgotPasswordPage(
-                      username: _inputUsernameController.text,
-                    ),
-                  ),
-                );
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BlocProvider<ForgotPasswordBloc>(
+                              create: (context) => ForgotPasswordBloc(),
+                              child: const ForgotPasswordPage(),
+                            )));
               },
               child: const Text(
                 'Forgot password?',

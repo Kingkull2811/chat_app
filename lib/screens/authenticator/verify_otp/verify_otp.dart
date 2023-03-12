@@ -7,16 +7,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../set_new_password/set_new_password.dart';
 
-class VerifyOTP extends StatefulWidget {
+class VerifyOtp extends StatefulWidget {
   final String? email;
 
-  const VerifyOTP({Key? key, this.email}) : super(key: key);
+  const VerifyOtp({Key? key, this.email}) : super(key: key);
 
   @override
-  State<VerifyOTP> createState() => _VerifyOTPState();
+  State<VerifyOtp> createState() => _VerifyOtpState();
 }
 
-class _VerifyOTPState extends State<VerifyOTP> {
+class _VerifyOtpState extends State<VerifyOtp> {
   final focusNode = FocusNode();
   final _otpController = List.generate(6, (index) => TextEditingController());
   bool isOtpSent = false;

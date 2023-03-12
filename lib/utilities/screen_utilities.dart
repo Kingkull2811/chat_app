@@ -30,10 +30,9 @@ void showLoading(BuildContext context) {
 }
 
 void logout(BuildContext? context) async {
-
-    // FirebaseMessagingUtilities.unsubscribeTopicForCurrentUser(
-    //   distributorId: SharedPreferencesStorage().getSelectedDistributor(),
-    // );
+  // FirebaseMessagingUtilities.unsubscribeTopicForCurrentUser(
+  //   distributorId: SharedPreferencesStorage().getSelectedDistributor(),
+  // );
 
   SharedPreferencesStorage().resetDataWhenLogout();
   if (context != null) {
@@ -45,14 +44,14 @@ void logout(BuildContext? context) async {
           child: const LoginPage(),
         ),
       ),
-          (route) => false,
+      (route) => false,
     );
   }
 }
 
 void logoutIfNeed(BuildContext? context) async {
   final passwordExpiredTime =
-  SharedPreferencesStorage().getPasswordExpireTime();
+      SharedPreferencesStorage().getPasswordExpireTime();
   if (passwordExpiredTime.isEmpty) {
     logout(context);
   } else {
@@ -66,7 +65,6 @@ void logoutIfNeed(BuildContext? context) async {
     }
   }
 }
-
 
 Future<void> showMessageNoInternetDialog(
   BuildContext context, {
@@ -123,10 +121,13 @@ Future<void> showMessageNoInternetDialog(
 }
 
 Future<void> showCupertinoMessageDialog(
-    BuildContext context, String? title, String? content,
-    {Function()? onClose,
-    String? buttonLabel,
-    bool barrierDismiss = false}) async {
+  BuildContext context,
+  String? title, {
+  String? content,
+  Function()? onCloseDialog,
+  String? buttonLabel,
+  bool barrierDismiss = false, /// false = user must tap button, true = tap outside dialog
+}) async {
   await showDialog(
       barrierDismissible: barrierDismiss,
       context: context,
@@ -135,7 +136,7 @@ Future<void> showCupertinoMessageDialog(
           title: title,
           content: content,
           buttonLabel: buttonLabel,
-          onClose: onClose,
+          onClose: onCloseDialog,
         );
       });
 }

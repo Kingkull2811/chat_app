@@ -74,6 +74,31 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _registerForm(EdgeInsets padding, double height) {
     return BlocBuilder<SignUpBloc, SignUpState>(builder: (context, state) {
+      if (state is SignupLoading) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+      if (state is SignupSuccess) {
+        showSuccessBottomSheet(
+          context,
+          titleMessage: state.message ?? '',
+          contentMessage:
+              'You have successfully sign up an account, please login',
+          buttonLabel: 'Login',
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider<LoginFormBloc>(
+                  create: (context) => LoginFormBloc(context),
+                  child: IDPassLoginForm(),
+                ),
+              ),
+            );
+          },
+        );
+      }
       return Padding(
         padding: EdgeInsets.only(
           left: 16,
@@ -155,14 +180,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 ],
               ),
             ),
-            _buttonSendOTP(state)
+            _buttonSignUp(state)
           ],
         ),
       );
     });
   }
 
-  Widget _buttonSendOTP(SignUpState currentState) {
+  Widget _buttonSignUp(SignUpState currentState) {
     return Align(
       alignment: Alignment.bottomCenter,
       child: PrimaryButton(
@@ -175,29 +200,13 @@ class _SignUpPageState extends State<SignUpPage> {
           } else {
             _signUpBloc.add(
               SignupButtonPressed(
-                username: _userNameController.text.trim(),
-                email: _emailController.text.trim(),
-                password: _passwordController.text.trim(),
+                // username: _userNameController.text.trim(),
+                // email: _emailController.text.trim(),
+                // password: _passwordController.text.trim(),
+                email: 'truong@gmail.com',
+                username: 'truong1',
+                password: '123456'
               ),
-            );
-
-           await showSuccessBottomSheet(
-              context,
-              titleMessage: 'Sign Up Successfully!',
-              contentMessage:
-                  'You have successfully sign up an account, please login',
-              buttonLabel: 'Login',
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider<LoginFormBloc>(
-                      create: (context) => LoginFormBloc(context),
-                      child: IDPassLoginForm(),
-                    ),
-                  ),
-                );
-              },
             );
           }
         },
@@ -207,7 +216,28 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _passwordNotMatch() {
     return Padding(
-      padding: EdgeInsets.only(left: 16, top: 16),
+      padding: const EdgeInsets.only(left: 16, top: 10),
+      child: Row(
+        children: [
+          Image.asset(
+            'assets/images/ic_x_red.png',
+            height: 20,
+            width: 20,
+            color: const Color(0xffCA0000),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Text(
+              'error',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xffCA0000),
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 

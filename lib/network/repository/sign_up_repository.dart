@@ -1,10 +1,10 @@
 import '../provider/sign_up_provider.dart';
-import '../response/base_response.dart';
+import '../response/sign_up_response.dart';
 
 class SignUpRepository {
   late SignUpProvider _signUpProvider;
 
-  Future<BaseResponse> signUp({
+  Future<SignUpResponse> signUp({
     required String username,
     required String email,
     required String password,

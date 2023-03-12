@@ -13,6 +13,7 @@ class ValidateForm extends SignUpEvent {
   });
 }
 
+
 class SignupButtonPressed extends SignUpEvent {
   final String username;
   final String email;
