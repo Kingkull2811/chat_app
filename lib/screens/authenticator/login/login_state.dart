@@ -23,6 +23,7 @@ class CheckAuthenticateInProgress extends AuthenticationState {}
 class LoginFormState {
   final HighlightStatus? buttonStatus;
   final BiometricButtonType? biometricButtonType;
+  final bool isLoading;
 
   ///[isEnable] false = Disable, true = Enable for enable button Login
   final bool isEnable;
@@ -39,6 +40,7 @@ class LoginFormState {
     this.buttonStatus = HighlightStatus.notAvailable,
     this.biometricButtonType,
     this.isEnable = false,
+    this.isLoading =false,
     this.isSuccessAuthenticateBiometric = false,
     this.isAuthenticating = false,
     this.errorMessage,
@@ -52,12 +54,13 @@ extension LoginFormStateExtension on LoginFormState {
     bool? isEnable,
     bool? isSuccessAuthenticateBiometric,
     bool? isAuthenticating,
-    String? errorMessage,
+    String? errorMessage, bool? isLoading,
   }) =>
       LoginFormState(
         buttonStatus: buttonStatus ?? this.buttonStatus,
         biometricButtonType: biometricButtonType ?? this.biometricButtonType,
         isEnable: isEnable ?? this.isEnable,
+        isLoading: isLoading ?? this.isLoading,
         isSuccessAuthenticateBiometric: isSuccessAuthenticateBiometric ??
             this.isSuccessAuthenticateBiometric,
         isAuthenticating: isAuthenticating ?? this.isAuthenticating,

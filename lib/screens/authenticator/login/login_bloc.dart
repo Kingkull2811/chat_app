@@ -38,6 +38,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       if (event is ValidateForm) {
         emit(
           state.copyWith(
+            isLoading: false,
             isEnable: event.isValidate,
             isAuthenticating: false,
           ),
@@ -47,6 +48,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       if (event is DisplayLoading) {
         emit(
           state.copyWith(
+            isLoading: true,
             isAuthenticating: true,
           ),
         );

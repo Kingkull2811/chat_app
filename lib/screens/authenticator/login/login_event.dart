@@ -32,6 +32,11 @@ class ValidateForm extends LoginFormEvent {
   });
 }
 
-class DisplayLoading extends LoginFormEvent {}
+class DisplayLoading extends LoginFormEvent {
+  final bool isLoading;
+
+  DisplayLoading({this.isLoading = false,});
+
+}
 
 class LoginWithBiometrics extends LoginFormEvent {}

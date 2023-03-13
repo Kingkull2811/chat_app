@@ -7,7 +7,7 @@ import 'on_chatting_state.dart';
 class OnChattingBloc extends Bloc<OnChattingEvent, OnChattingState>{
   OnChattingBloc(BuildContext context): super(OnChattingState()){
     on((event, emit) async{
-
+      //emit(state.copyWith(isLoading:  true));
     });
   }
 }

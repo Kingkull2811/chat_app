@@ -14,7 +14,7 @@ class CustomAppBarChat extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0.5,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       leadingWidth: 30,
       leading: IconButton(
         icon:  Icon(Icons.arrow_back_ios_new, size: 24,color: Theme.of(context).primaryColor,),

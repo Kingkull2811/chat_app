@@ -21,6 +21,7 @@ import '../../../network/repository/login_repository.dart';
 import '../../../utilities/app_constants.dart';
 import '../../../utilities/enum/highlight_status.dart';
 import '../../../utilities/utils.dart';
+import '../../../widgets/animation_loading.dart';
 import '../../../widgets/custom_check_box.dart';
 import '../../../widgets/input_field.dart';
 import '../../../widgets/input_password_field.dart';
@@ -177,9 +178,88 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
     final height = MediaQuery.of(context).size.height;
     //bool _isShowPassword = false;
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: _loginForm(padding, height),
+    return BlocListener<LoginFormBloc, LoginFormState>(
+      listener: (context, state) {
+        if (state is AuthenticationFailure) {
+          showDialog(
+              context: context,
+              builder: (context) => Container(
+                    height: 300,
+                    width: 300,
+                    color: Colors.blue,
+                  ));
+        }
+        if (state is AuthenticationSuccess) {
+          _goToTermPolicy();
+        }
+      },
+      child: BlocBuilder<LoginFormBloc, LoginFormState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            );
+          }
+          return Scaffold(
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 16,
+                  top: padding.top,
+                  right: 16,
+                  bottom: 32,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: height - 120,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 40, bottom: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Image.asset(
+                                  'assets/images/app_logo_light.png',
+                                  height: 150,
+                                  width: 150,
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 20),
+                                  child: Text(
+                                    'Welcome to \'app name\'',
+                                    style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _inputUsernameField(),
+                          _inputPasswordField(),
+                          _rememberOrForgot(),
+                        ],
+                      ),
+                    ),
+                    _buildBiometricsButton(state),
+                    _buttonLogin(state),
+                    _goToSignUpPage(),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -228,106 +308,6 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
     ));
   }
 
-  Widget _loginForm(EdgeInsets padding, double height) {
-//     return BlocConsumer<LoginFormBloc, LoginFormState>(
-//       listenWhen: (previousState, currentState) {
-//         return currentState.isSuccessAuthenticateBiometric;
-//       },
-//       listener: (context, currentState) async {
-//         //await _goToTermAndPolicy();
-//         if (currentState is AuthenticationSuccess) {
-// // Navigate to the next screen after successful login
-//         } else if (currentState is AuthenticationFailure) {
-// // Show error message to the user
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             SnackBar(
-//               content: Text(currentState.errorMessage ??''),
-//             ),
-//           );}
-//       },
-//       builder: (context, currentState) {
-//         if (currentState.isAuthenticating) {
-//           return Scaffold(
-//             body: Center(
-//               child: CircularProgressIndicator(
-//                 valueColor: AlwaysStoppedAnimation<Color>(
-//                   Theme.of(context).primaryColor,
-//                 ),
-//               ),
-//             ),
-//           );
-//         }
-    return BlocListener<LoginFormBloc, LoginFormState>(
-        listener: (context, state) {
-      if (state is AuthenticationFailure) {
-        showDialog(
-            context: context,
-            builder: (context) => Container(
-                  height: 300,
-                  width: 300,
-                  color: Colors.blue,
-                ));
-      }
-      if (state is AuthenticationSuccess) {
-        _goToTermPolicy();
-      }
-    }, child: BlocBuilder<LoginFormBloc, LoginFormState>(
-      builder: (context, state) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            top: padding.top,
-            right: 16,
-            bottom: 32,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                height: height - 120,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40, bottom: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset(
-                            'assets/images/app_logo_light.png',
-                            height: 150,
-                            width: 150,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 20),
-                            child: Text(
-                              'Welcome to \'app name\'',
-                              style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _inputUsernameField(),
-                    _inputPasswordField(),
-                    _rememberOrForgot(),
-                  ],
-                ),
-              ),
-              _buildBiometricsButton(state),
-              _buttonLogin(state),
-              _goToSignUpPage(),
-            ],
-          ),
-        );
-      },
-    ));
-    //
-    // );
-  }
-
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
         text: 'Login',
@@ -339,7 +319,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           if (connectivityResult == ConnectivityResult.none && mounted) {
             showMessageNoInternetDialog(context);
           } else {
-            _loginFormBloc?.add(DisplayLoading());
+            _loginFormBloc?.add(DisplayLoading(isLoading: true));
             LoginResult loginResult = await _loginRepository.login(
               username: _inputUsernameController.text.trim(),
               password: _inputPasswordController.text.trim(),
@@ -352,6 +332,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
               await preferences.setBool(
                   AppConstants.rememberInfo, _rememberInfo);
               //login
+              //_loginFormBloc?.add(DisplayLoading());
               await _goToTermPolicy();
             } else if (loginResult.error == LoginError.incorrectLogin &&
                 mounted) {

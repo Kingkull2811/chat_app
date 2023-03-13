@@ -1,0 +1,1 @@
+enum AppLoading { loading, idle }
