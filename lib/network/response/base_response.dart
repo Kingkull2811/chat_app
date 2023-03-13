@@ -3,11 +3,14 @@ import 'error_response.dart';
 
 class BaseResponse {
   int? httpStatus;
-  dynamic errors;
+  List<Errors>? errors;
   // Errors? errors;
   // String? message;
 
-  BaseResponse({this.httpStatus, this.errors,});
+  BaseResponse({
+    this.httpStatus,
+    this.errors,
+  });
 
   BaseResponse.withHttpError({
     this.errors,
@@ -20,6 +23,11 @@ class BaseResponse {
         errors: json["errors"],
 //        message: json["message"],
       );
+
+  @override
+  String toString() {
+    return 'BaseResponse{httpStatus: $httpStatus, errors: $errors}';
+  }
 
   bool isOK() {
     return httpStatus == HttpStatus.ok;
@@ -34,6 +42,6 @@ class ExpiredTokenResponse extends BaseResponse {
   ExpiredTokenResponse()
       : super(
           httpStatus: HttpStatus.unauthorized,
-          errors: 'Token Expired !',
+          errors: [],
         );
 }

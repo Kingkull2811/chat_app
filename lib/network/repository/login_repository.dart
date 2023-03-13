@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/network/provider/login_provider.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 
@@ -19,11 +21,18 @@ class LoginRepository {
       username: username,
       password: password,
     );
+    log('login response: $loginResponse');
     if (loginResponse.httpStatus == 200) {
       _saveUserInfo(loginResponse.data);
-      return LoginResult(isSuccess: true);
+      return LoginResult(
+        isSuccess: true,
+        errors: null,
+      );
     }
 
-    return LoginResult();
+    return LoginResult(
+      isSuccess: false,
+      errors: loginResponse.errors,
+    );
   }
 }

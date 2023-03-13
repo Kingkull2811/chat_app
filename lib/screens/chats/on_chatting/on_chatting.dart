@@ -1,13 +1,10 @@
-import 'dart:developer';
-
+import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting_bloc.dart';
-import 'package:date_time_format/date_time_format.dart';
+import 'package:chat_app/widgets/animation_loading.dart';
+import 'package:chat_app/widgets/custom_app_bar_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../widgets/animation_loading.dart';
-import '../../../widgets/custom_app_bar_chat.dart';
-import '../chat.dart';
 import 'on_chatting_state.dart';
 
 class OnChattingPage extends StatefulWidget {
@@ -82,6 +79,7 @@ class OnChattingPageState extends State<OnChattingPage> {
       child: Padding(
         padding: const EdgeInsets.all(0),
         child: ListView.builder(
+          reverse: true,
           itemBuilder: (context, index) {
             if (index == 0) {
               return Container(

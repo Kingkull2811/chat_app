@@ -1,6 +1,8 @@
+import 'package:chat_app/network/response/error_response.dart';
+
 class ForgotPasswordResult {
   final bool isSuccess;
-  String? errors;
+  List<Errors>? errors;
 
   ForgotPasswordResult({
     this.isSuccess =false,

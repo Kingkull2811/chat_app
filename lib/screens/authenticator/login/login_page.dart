@@ -1,3 +1,6 @@
+import 'package:chat_app/network/model/login_result.dart';
+import 'package:chat_app/network/repository/login_repository.dart';
+import 'package:chat_app/network/response/error_response.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
@@ -7,24 +10,19 @@ import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
 import 'package:chat_app/services/database.dart';
+import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/utilities/utils.dart';
+import 'package:chat_app/widgets/custom_check_box.dart';
+import 'package:chat_app/widgets/input_field.dart';
+import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../network/model/login_result.dart';
-import '../../../network/repository/login_repository.dart';
-import '../../../utilities/app_constants.dart';
-import '../../../utilities/enum/highlight_status.dart';
-import '../../../utilities/utils.dart';
-import '../../../widgets/animation_loading.dart';
-import '../../../widgets/custom_check_box.dart';
-import '../../../widgets/input_field.dart';
-import '../../../widgets/input_password_field.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -321,10 +319,11 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           } else {
             _loginFormBloc?.add(DisplayLoading(isLoading: true));
             LoginResult loginResult = await _loginRepository.login(
-              username: _inputUsernameController.text.trim(),
-              password: _inputPasswordController.text.trim(),
+              username: 'truong3', password: '123456',
+              // username: _inputUsernameController.text.trim(),
+              // password: _inputPasswordController.text.trim(),
             );
-            //todo
+            //todo:::::
             print(loginResult);
             if (loginResult.isSuccess && mounted) {
               SharedPreferences preferences =
@@ -334,6 +333,22 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
               //login
               //_loginFormBloc?.add(DisplayLoading());
               await _goToTermPolicy();
+              // }else if(!loginResult.isSuccess){
+              //   String? errorMessage = '';
+              //   List<Errors>? errors = loginResult.errors;
+              //   for (var error in errors!) {
+              //     errorMessage =
+              //     '$errorMessage\n${error.errorMessage}';
+              //   }
+              //   showCupertinoMessageDialog(
+              //     context,
+              //     errorMessage,
+              //     buttonLabel: 'OK',
+              //     onCloseDialog: () {
+              //       // Navigator.pop(context);
+              //     },
+              //   );
+
             } else if (loginResult.error == LoginError.incorrectLogin &&
                 mounted) {
               _loginFormBloc?.add(ValidateForm(isValidate: true));

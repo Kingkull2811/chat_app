@@ -126,7 +126,8 @@ Future<void> showCupertinoMessageDialog(
   String? content,
   Function()? onCloseDialog,
   String? buttonLabel,
-  bool barrierDismiss = false, /// false = user must tap button, true = tap outside dialog
+  /// false = user must tap button, true = tap outside dialog
+  bool barrierDismiss = false,
 }) async {
   await showDialog(
       barrierDismissible: barrierDismiss,

@@ -1,26 +1,39 @@
-import '../../../network/response/error_response.dart';
+import 'package:chat_app/bloc/api_result_state.dart';
+import 'package:chat_app/network/response/error_response.dart';
+import 'package:chat_app/utilities/enum/api_error_result.dart';
 
-abstract class SignUpState {}
+class SignUpState implements ApiResultState {
+  final bool isLoading;
+  bool isEnable;
+  final String? message;
+  final List<Errors>? errors;
+  final ApiError _apiError;
 
-class SignupInitial extends SignUpState {}
+  SignUpState({
+    this.isLoading = false,
+    this.isEnable = false,
+    this.message,
+    this.errors,
+    ApiError apiError = ApiError.noError,
+  }): _apiError = apiError;
 
-class SignupLoading extends SignUpState {}
-
-class SignupSuccess extends SignUpState {
-   final int? httpStatus;
-   final String? message;
-
-  SignupSuccess({this.httpStatus, this.message});
+  @override
+  ApiError get apiError => _apiError;
 }
 
-class SignupFailure extends SignUpState {
-  final int? httpStatus;
-  final String? message;
-  final List<Errors>? error;
-
-  SignupFailure({
-    this.httpStatus,
-    this.message,
-    this.error,
-  });
+extension SignUpStateEx on SignUpState {
+  SignUpState copyWith({
+    ApiError? apiError,
+    bool? isLoading,
+    bool? isEnable,
+    String? message,
+    List<Errors>? errors,
+  }) =>
+      SignUpState(
+        apiError: apiError ?? this.apiError,
+        isLoading: isLoading ?? this.isLoading,
+        isEnable: isEnable ?? this.isEnable,
+        message: message ?? this.message,
+        errors: errors ?? this.errors,
+      );
 }

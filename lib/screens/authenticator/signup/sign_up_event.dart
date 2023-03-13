@@ -1,3 +1,4 @@
+import 'package:chat_app/network/response/error_response.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class SignUpEvent extends Equatable {
@@ -13,20 +14,18 @@ class ValidateForm extends SignUpEvent {
   });
 }
 
+class SignUpLoading extends SignUpEvent {}
 
-class SignupButtonPressed extends SignUpEvent {
-  final String username;
-  final String email;
-  final String password;
+class SignUpSuccess extends SignUpEvent {
+  final String? message;
 
-  SignupButtonPressed(
-      {required this.username, required this.email, required this.password});
-
-  @override
-  List<Object> get props => [username, email, password];
-
-  @override
-  String toString() =>
-      'SignUpInfo: { username: $username, email: $email, password: $password }';
+  SignUpSuccess({
+    this.message,
+  });
 }
 
+class SignUpFailure extends SignUpEvent {
+  final List<Errors>? errors;
+
+  SignUpFailure({this.errors});
+}

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:chat_app/network/provider/provider_mixin.dart';
+import 'package:chat_app/utilities/app_constants.dart';
 import 'package:dio/dio.dart';
 
 import '../api/api_path.dart';
@@ -21,16 +22,14 @@ class SignUpProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.signup,
         data: data,
-        options: Options(
-          sendTimeout: const Duration(seconds: 3),
-          receiveTimeout: const Duration(seconds: 3),
-          receiveDataWhenStatusError: true,
-        ),
+        options: AppConstants.options,
       );
-      log(response.toString());
       return SignUpResponse.fromJson(response.data);
     } catch (error, stacktrace) {
-      showErrorLog(error, stacktrace, ApiPath.signup);
+      //showErrorLog(error, stacktrace, ApiPath.signup);
+      if(error is DioError){
+        return SignUpResponse.fromJson(error.response?.data);
+      }
       return SignUpResponse();
     }
   }

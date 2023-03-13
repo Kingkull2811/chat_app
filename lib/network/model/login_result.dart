@@ -1,15 +1,19 @@
+import 'package:chat_app/network/response/error_response.dart';
+
 class LoginResult {
   final bool isSuccess;
-  LoginError error;
+  final LoginError error;
+  final List<Errors>? errors;
 
   LoginResult({
     this.isSuccess =false,
     this.error = LoginError.unknown,
+    this.errors,
 });
 
   @override
   String toString() {
-    return 'LoginResult{isSuccess: $isSuccess, error: $error}';
+    return 'LoginResult{isSuccess: $isSuccess, error: $errors}';
   }
 }
 

@@ -14,4 +14,9 @@ class Errors {
     errorMessage: json['errorMessage'],
     stackFrames: json['stackFrames'],
   );
+
+  @override
+  String toString() {
+    return 'Errors{errorCode: $errorCode, errorMessage: $errorMessage, stackFrames: $stackFrames}';
+  }
 }

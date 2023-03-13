@@ -1,3 +1,5 @@
+import 'package:chat_app/network/response/error_response.dart';
+
 import 'base_response.dart';
 
 class LoginResponse extends BaseResponse {
@@ -6,16 +8,23 @@ class LoginResponse extends BaseResponse {
 
   LoginResponse({
     int? httpStatus,
+    List<Errors>? errors,
     this.message,
     this.data,
-  }) : super(httpStatus: httpStatus, errors: message);
+  }) : super(httpStatus: httpStatus, errors: errors);
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
-      httpStatus: json['httpStatus'],
-      message: json['message'],
+      httpStatus: json["httpStatus"],
+      message: json["message"],
+      errors: json["errors"],
       data: LoginData.fromJson(json["data"]),
     );
+  }
+
+  @override
+  String toString() {
+    return 'LoginResponse{message: $message, data: $data}';
   }
 }
 

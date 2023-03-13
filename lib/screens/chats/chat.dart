@@ -26,9 +26,12 @@ class ChatsPageState extends State<ChatsPage> {
       body: Padding(
         padding: const EdgeInsets.only(left: 16, top: 20, right: 16),
         child: ListView.separated(
+          reverse: false,
           itemBuilder: (context, index) =>
               _cardChat(itemList[index], width, context),
-          separatorBuilder: (context, index) => Divider(),
+          separatorBuilder: (context, index) => Divider(
+            color: Colors.grey[100],
+          ),
           itemCount: itemList.length,
         ),
       ),
