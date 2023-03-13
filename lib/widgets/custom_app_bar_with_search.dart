@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
   final String imageUrl;
-  final VoidCallback? onIconPressed;
-  final Function()? onTap;
+  final Function()? onTapIconNewMessage;
+  final Function()? onTapAppBar;
   final Function()? onTapTextField;
 
   CustomAppBar({
     super.key,
     required this.title,
     required this.imageUrl,
-    this.onIconPressed,
-    this.onTap,
+    this.onTapIconNewMessage,
+    this.onTapAppBar,
     this.onTapTextField,
   });
 
@@ -21,34 +21,47 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
-      leading: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 60,
-          width: 60,
-          padding: const EdgeInsets.only(left: 16, top: 16),
-          child: CircleAvatar(
-            backgroundImage: AssetImage(imageUrl),
-          ),
-        ),
-      ),
-      title: Padding(
-        padding: const EdgeInsets.only(top: 16.0),
-        child: Text(title,style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black,),),
+      automaticallyImplyLeading: false,
+      title: Builder(
+        builder: (context){
+          return GestureDetector(
+            onTap: onTapAppBar,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
+                  padding: const EdgeInsets.only(left: 0),
+                  child: CircleAvatar(
+                    backgroundImage: AssetImage(imageUrl),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 16.0, top: 16),
-          child: Container(
-            height: 40, width: 40,
-            //color: Colors.grey,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.grey[300],
-            ),
-            child: IconButton(
-              icon: Image.asset('assets/images/ic_new_message.png'),
-              onPressed: onIconPressed,
+          padding: const EdgeInsets.only(right: 16.0,),
+          child: GestureDetector(
+            onTap: onTapIconNewMessage,
+            child: ImageIcon(
+                const AssetImage('assets/images/ic_new_message.png'),
+              size: 30,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         ),

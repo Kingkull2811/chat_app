@@ -19,9 +19,12 @@ class ChatsPageState extends State<ChatsPage> {
       appBar: CustomAppBar(
         title: 'Chat',
         imageUrl: 'assets/images/image_profile_1.png',
-        onTap: () {},
+        onTapAppBar: () {
+          print('click');
+          Scaffold.of(context).openDrawer();
+        },
         onTapTextField: () {},
-        onIconPressed: () {},
+        onTapIconNewMessage: () {},
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 16, top: 20, right: 16),
@@ -33,6 +36,29 @@ class ChatsPageState extends State<ChatsPage> {
             color: Colors.grey[100],
           ),
           itemCount: itemList.length,
+        ),
+      ),
+      drawerEnableOpenDragGesture: false,
+      drawer: Drawer(
+        child: Container(
+          color: Colors.blue,
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: ListView(
+            children: [
+              ListTile(
+                leading: Icon(Icons.message),
+                title: Text('Messages'),
+              ),
+              ListTile(
+                leading: Icon(Icons.account_circle),
+                title: Text('Profile'),
+              ),
+              ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Settings'),
+              ),
+            ],
+          ),
         ),
       ),
     );
