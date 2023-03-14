@@ -79,6 +79,7 @@ class OnChattingPageState extends State<OnChattingPage> {
       child: Padding(
         padding: const EdgeInsets.all(0),
         child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
           reverse: true,
           itemBuilder: (context, index) {
             if (index == 0) {
@@ -91,7 +92,7 @@ class OnChattingPageState extends State<OnChattingPage> {
                       width: 150,
                       child: CircleAvatar(
                         radius: 75,
-                        child: Image.asset(widget.item.imageUrlAvt ?? ''),
+                        child: Image.asset(widget.item.imageUrlAvt ?? '',fit: BoxFit.cover,),
                       ),
                     ),
                     Padding(

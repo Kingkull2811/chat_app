@@ -21,8 +21,11 @@ dependencies:
 
   google_fonts: ^3.0.1
 
-  #Utilities for formatting Dart's DateTime object using standard date/time notation or as a relative time offset.
-  date_time_format: ^2.0.1
+  #Rive 2 Flutter Runtime. This package provides runtime functionality for playing back and interacting with animations built with the Rive editor available at https://rive.app.
+  rive: ^0.10.0
+
+#  #Utilities for formatting Dart's DateTime object using standard date/time notation or as a relative time offset.
+#  date_time_format: ^2.0.1
 
   #Flutter Secure Storage provides API to store data in secure storage. Keychain is used in iOS, KeyStore based solution is used in Android.
   flutter_secure_storage: ^8.0.0
@@ -69,6 +72,12 @@ dependencies:
   #Customizable animated page indicator with a set of built-in effects.
   smooth_page_indicator: ^1.0.1
 
+  #A custom switch widget that can have a custom height and width, borders, border radius, colors, toggle size, custom text and icons inside the toggle.
+  flutter_switch: ^0.3.2
+
+  #A do all, highly customizable persistent/static bottom navigation bar for flutter. Includes up-to 20 styles.
+  #persistent_bottom_nav_bar: ^5.0.2
+
   #A package that simplifies the access most of used properties/fuctions right in the BuildContext.
   #build_context: ^3.0.0
 
@@ -92,4 +101,5 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/RiveAssets/
     #- i18n/

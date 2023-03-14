@@ -42,4 +42,11 @@ class SharedPreferencesStorage {
   String getPasswordExpireTime() {
     return _prefs.getString(AppConstants.passwordExpireTimeKey) ?? '';
   }
+
+  Future<bool> setNightMode(bool isNightMode){
+    return _prefs.setBool(AppConstants.nightMode, isNightMode);
+  }
+  bool? getNightMode(){
+    return _prefs.getBool(AppConstants.nightMode);
+  }
 }

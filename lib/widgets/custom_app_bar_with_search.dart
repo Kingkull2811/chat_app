@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;
   final String imageUrl;
+  final TextEditingController searchController;
+  final FocusNode focusNode;
   final Function()? onTapIconNewMessage;
   final Function()? onTapAppBar;
   final Function()? onTapTextField;
@@ -11,6 +13,8 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
     super.key,
     required this.title,
     required this.imageUrl,
+    required this.searchController,
+    required this.focusNode,
     this.onTapIconNewMessage,
     this.onTapAppBar,
     this.onTapTextField,
@@ -21,45 +25,37 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
-      automaticallyImplyLeading: false,
-      title: Builder(
-        builder: (context){
-          return GestureDetector(
-            onTap: onTapAppBar,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  padding: const EdgeInsets.only(left: 0),
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage(imageUrl),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+      // automaticallyImplyLeading: false,
+      leading: Container(
+        height: 40,
+        width: 40,
+        padding: const EdgeInsets.only(left: 16),
+        child: GestureDetector(
+          onTap: () {
+            Scaffold.of(context).openDrawer();
+          },
+          child: CircleAvatar(
+            backgroundImage: AssetImage(imageUrl),
+          ),
+        ),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
       actions: [
         Padding(
-          padding: const EdgeInsets.only(right: 16.0,),
+          padding: const EdgeInsets.only(
+            right: 16.0,
+          ),
           child: GestureDetector(
             onTap: onTapIconNewMessage,
             child: ImageIcon(
-                const AssetImage('assets/images/ic_new_message.png'),
+              const AssetImage('assets/images/ic_new_message.png'),
               size: 30,
               color: Theme.of(context).primaryColor,
             ),
@@ -76,13 +72,33 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
             child: GestureDetector(
               onTap: onTapTextField,
               child: TextField(
+                controller: searchController,
+                focusNode: focusNode,
+                onSubmitted: (_) => focusNode.requestFocus(),
                 decoration: InputDecoration(
                   hintText: 'Search',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24.0),
                   ),
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: const BorderSide(
+                      width: 1,
+                      color: Color.fromARGB(128, 130, 130, 130),
+                    ),
+                  ),
                 ),
               ),
             ),

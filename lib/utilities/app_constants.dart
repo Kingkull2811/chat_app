@@ -27,6 +27,8 @@ class AppConstants {
   static const String usernameKey = 'USERNAME';
   static const String emailKey = 'EMAIL';
 
+  static const String nightMode = 'IS_NIGHT_MODE';
+
   static const String firstTimeOpenKey = 'FIRST_TIME_OPEN';
   static const String agreedWithTermsKey = 'AGREED_WITH_TERMS';
 
