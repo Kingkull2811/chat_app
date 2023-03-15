@@ -395,7 +395,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<SignUpBloc>(
                     create: (context) => SignUpBloc(context: context),
-                    child: SignUpPage(),
+                    child: const SignUpPage(),
                   ),
                 ),
               );
@@ -484,7 +484,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
               textInputAction: TextInputAction.next,
               onFieldSubmitted: (_) => focusNode.requestFocus(),
               hint: 'Enter your password',
-              prefixIconPath: 'assets/images/ic_lock.png',
+              prefixIcon: Icons.lock_outline,
             ),
           ),
         ],

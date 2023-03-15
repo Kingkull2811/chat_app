@@ -54,10 +54,9 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 onTap: () {
                   //Navigator.pop(context);
                 },
-                child: Image.asset(
-                  'assets/images/ic_back.png',
-                  width: 24,
-                  height: 24,
+                child: const Icon(
+                  Icons.arrow_back_ios_outlined,
+                  size: 24,
                   color: Colors.black,
                 ),
               ),

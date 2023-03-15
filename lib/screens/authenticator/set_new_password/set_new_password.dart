@@ -129,11 +129,9 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                     padding: const EdgeInsets.only(top: 24),
                     child: Row(
                       children: [
-                        Image.asset(
-                          'assets/images/ic_x_red.png',
-                          //'assets/image/ic_v_green.png',
-                          width: 24,
-                          height: 24,
+                        Icon(
+                          Icons.cancel_outlined,
+                          size: 24,
                           color: AppConstants().red700,
                           // AppConstants().green600,
                         ),
@@ -184,7 +182,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
               MaterialPageRoute(
                 builder: (context) => BlocProvider<LoginBloc>(
                   create: (context) => LoginBloc(),
-                  child: LoginPage(),
+                  child: const LoginPage(),
                 ),
               ),
             );
@@ -232,7 +230,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
               textInputAction: TextInputAction.next,
               onFieldSubmitted: (_) => focusNode.requestFocus(),
               hint: hintText,
-              prefixIconPath: 'assets/images/ic_lock.png',
+              prefixIcon: Icons.lock_outline,
             ),
           ),
         ],

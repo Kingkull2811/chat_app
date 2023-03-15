@@ -65,6 +65,10 @@ class MainAppState extends State<MainApp>
               onWillPop: _onWillPop,
               child: Scaffold(
                 body: _handleScreen(activeTab),
+                // IndexedStack(
+                //   index:  AppTab.values.indexOf(activeTab),
+                //   children: _handleScreen(activeTab),
+                // ),
                 bottomNavigationBar: TabSelector(
                     activeTab: activeTab,
                     newChatsBadgeNumber: 1,

@@ -20,10 +20,11 @@
         android:fullBackupContent="false"
         tools:replace="android:label, android:allowBackup, android:fullBackupContent"
         android:label="chat_app"
-        android:name="${applicationName}"
+        android:name="android.app.Application"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+       tools:ignore="DataExtractionRules">
         <activity
             android:name=".MainActivity"
             android:exported="true"

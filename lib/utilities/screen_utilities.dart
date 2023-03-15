@@ -176,12 +176,12 @@ Future<void> showSuccessBottomSheet(
               Expanded(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Image.asset(
-                        'assets/images/ic_verified.png',
-                        width: 150,
-                        height: 150,
+                    const Padding(
+                      padding:  EdgeInsets.only(top: 16),
+                      child: Icon(
+                       Icons.verified_outlined,
+                        size: 150,
+
                       ),
                     ),
                     Padding(

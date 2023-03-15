@@ -14,8 +14,7 @@ class InputPasswordField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final String? initText;
-  final Icon? prefixIcon;
-  final String? prefixIconPath;
+  final IconData? prefixIcon;
   final onTapSuffixIcon;
   final bool isInputError;
   final validator;
@@ -34,7 +33,6 @@ class InputPasswordField extends StatelessWidget {
     this.obscureText = false,
     this.initText,
     this.prefixIcon,
-    this.prefixIconPath,
     this.onTapSuffixIcon,
     this.isInputError = false,
     this.validator,
@@ -68,22 +66,15 @@ class InputPasswordField extends StatelessWidget {
                 color: Color.fromARGB(255, 26, 26, 26),
                 height: 1.35),
             decoration: InputDecoration(
-              prefixIcon: (prefixIconPath != null)
-                  ? Image.asset(
-                      (prefixIconPath!),
-                      height: 24,
-                      width: 24,
-                    )
-                  : prefixIcon,
+              prefixIcon: Icon(prefixIcon, size: 24,),
               prefixIconColor: AppConstants().greyLight,
               suffixIcon: InkWell(
                 onTap: onTapSuffixIcon,
-                child: Image.asset(
+                child: Icon(
                   obscureText
-                      ? 'assets/images/ic_eye_close.png'
-                      : 'assets/images/ic_eye_open.png',
-                  height: 24,
-                  width: 24,
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  size: 24,
                 ),
               ),
               suffixIconColor: AppConstants().greyLight,

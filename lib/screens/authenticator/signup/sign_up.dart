@@ -240,7 +240,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   builder: (context) =>
                                       BlocProvider<LoginFormBloc>(
                                         create: (context) => LoginFormBloc(context),
-                                        child: IDPassLoginForm(),
+                                        child: const IDPassLoginForm(),
                                   ),
                                 ),
                               );
@@ -326,7 +326,7 @@ class _SignUpPageState extends State<SignUpPage> {
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (_) => focusNode.requestFocus(),
           hint: hintText,
-          prefixIconPath: 'assets/images/ic_lock.png',
+          prefixIcon: Icons.lock_outline,
           validator: validator,
         ),
       ),
@@ -352,7 +352,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<LoginFormBloc>(
                     create: (context) => LoginFormBloc(context),
-                    child: IDPassLoginForm(),
+                    child: const IDPassLoginForm(),
                   ),
                 ),
               );

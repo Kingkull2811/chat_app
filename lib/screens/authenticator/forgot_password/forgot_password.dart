@@ -74,7 +74,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         ),
         leading: IconButton(
-          icon: Image.asset('assets/images/ic_back.png'),
+          icon: const Icon(Icons.arrow_back_ios_outlined, size: 24,),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -141,7 +141,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           textInputAction: TextInputAction.next,
           onSubmit: (_) => focusNode.requestFocus(),
           hint: 'Enter your email',
-          //prefixIconPath: 'assets/images/ic_phone.png',
           prefixIcon: const Icon(
             Icons.mail_outline,
             size: 24,

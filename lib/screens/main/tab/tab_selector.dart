@@ -51,10 +51,9 @@ class TabSelectorState extends State<TabSelector> {
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
-            child: Image.asset(
-              'assets/images/ic_chat.png',
-              width: 30,
-              height: 30,
+            child: Icon(
+              Icons.message_outlined,
+              size: 24,
               color: Theme.of(context).primaryColor,
             ),
           ),
@@ -74,10 +73,9 @@ class TabSelectorState extends State<TabSelector> {
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
-            child: Image.asset(
-              'assets/images/ic_chat.png',
-              width: 30,
-              height: 30,
+            child: const Icon(
+              Icons.message_outlined,
+              size: 30,
               color: Colors.black,
             ),
           ),
@@ -99,10 +97,9 @@ class TabSelectorState extends State<TabSelector> {
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
-            child: Image.asset(
-              'assets/images/ic_news.png',
-              width: 30,
-              height: 30,
+            child: Icon(
+              Icons.feed_outlined,
+              size: 24,
               color: Theme.of(context).primaryColor,
             ),
           ),
@@ -121,10 +118,9 @@ class TabSelectorState extends State<TabSelector> {
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
             position: BadgePosition.topStart(top: -3, start: -8),
-            child: Image.asset(
-              'assets/images/ic_news.png',
-              width: 30,
-              height: 30,
+            child:const Icon(
+              Icons.feed_outlined,
+              size: 30,
               color: Colors.black,
             ),
           ),
@@ -149,8 +145,8 @@ class TabSelectorState extends State<TabSelector> {
             position: BadgePosition.topStart(top: -3, start: -8),
             child: Image.asset(
               'assets/images/ic_transcript.png',
-              width: 30,
-              height: 30,
+              width: 24,
+              height: 24,
               color: Theme.of(context).primaryColor,
             ),
           ),
@@ -179,16 +175,14 @@ class TabSelectorState extends State<TabSelector> {
           label: 'Transcript',
         ),
         BottomNavigationBarItem(
-          icon: Image.asset(
-            'assets/images/ic_profile.png',
-            width: 30,
-            height: 30,
+          icon: Icon(
+            Icons.person_outline,
+            size: 24,
             color: Theme.of(context).primaryColor,
           ),
-          activeIcon: Image.asset(
-            'assets/images/ic_profile.png',
-            width: 30,
-            height: 30,
+          activeIcon:const Icon(
+            Icons.person_outline,
+            size: 30,
             color: Colors.black,
           ),
           label: 'Profile',

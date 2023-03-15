@@ -54,9 +54,9 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
           ),
           child: GestureDetector(
             onTap: onTapIconNewMessage,
-            child: ImageIcon(
-              const AssetImage('assets/images/ic_new_message.png'),
-              size: 30,
+            child: Icon(
+              Icons.add_comment_outlined,
+              size: 28,
               color: Theme.of(context).primaryColor,
             ),
           ),

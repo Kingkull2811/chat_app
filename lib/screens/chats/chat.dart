@@ -33,15 +33,6 @@ class ChatsPageState extends State<ChatsPage> {
         focusNode: _focusNode,
         onTapTextField: () {},
         onTapIconNewMessage: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => CreateNewMessage(
-          //       searchNewController: _searchNewMessageController,
-          //       focusNode: _focusNode,
-          //     ),
-          //   ),
-          // );
           _createNewMessage(
             context,
             width,
@@ -401,12 +392,11 @@ class ChatsPageState extends State<ChatsPage> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 16,
-              child: Image.asset(
-                'assets/images/ic_v_green.png',
-                width: 16,
-                height: 16,
+              child: Icon(
+                Icons.verified_outlined,
+                size: 16,
                 color: Colors.grey,
               ),
             )

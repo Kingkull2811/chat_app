@@ -75,8 +75,8 @@ dependencies:
   #A custom switch widget that can have a custom height and width, borders, border radius, colors, toggle size, custom text and icons inside the toggle.
   flutter_switch: ^0.3.2
 
-  #A do all, highly customizable persistent/static bottom navigation bar for flutter. Includes up-to 20 styles.
-  #persistent_bottom_nav_bar: ^5.0.2
+  #A custom navigation bar with bubble click effect. Inspired by The Boring Flutter Development Show EP. 35.
+  custom_navigation_bar: ^0.8.2
 
   #A package that simplifies the access most of used properties/fuctions right in the BuildContext.
   #build_context: ^3.0.0
