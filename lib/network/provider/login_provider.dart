@@ -3,7 +3,6 @@ import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/network/response/auth_token.dart';
 import 'package:chat_app/network/response/login_response.dart';
 import 'package:chat_app/utilities/app_constants.dart';
-import 'package:dio/dio.dart';
 
 class LoginProvider with ProviderMixin {
 

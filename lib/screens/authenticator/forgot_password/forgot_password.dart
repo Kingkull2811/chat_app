@@ -1,9 +1,11 @@
 import 'package:chat_app/network/model/forgot_password_result.dart';
+import 'package:chat_app/network/provider/forgot_password_provider.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_event.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_bloc.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -74,7 +76,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_outlined, size: 24,),
+          icon: const Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 24,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -134,9 +139,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           keyboardType: TextInputType.text,
           controller: _emailController,
           onChanged: (text) {
-            setState(() {
-
-            });
+            setState(() {});
           },
           textInputAction: TextInputAction.next,
           onSubmit: (_) => focusNode.requestFocus(),
@@ -155,48 +158,62 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       padding: const EdgeInsets.only(top: 16.0),
       child: PrimaryButton(
         text: "Send me Code",
-        isDisable: _emailController.text.isEmpty,
-        onTap: _emailController.text.isEmpty
-            ? null
-            : () async {
-                _forgotPasswordBloc.add(DisplayLoading());
-                ForgotPasswordResult forgotPasswordResult =
-                    await _forgotPasswordRepository.forgotPassword(
-                  email: _emailController.text.trim(),
-                );
-                if (forgotPasswordResult.isSuccess && mounted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider<VerifyOtpBloc>(
-                        create: (context) => VerifyOtpBloc(context),
-                        child: VerifyOtp(
-                          email: _emailController.text.trim(),
-                        ),
-                      ),
+        //isDisable: _emailController.text.isEmpty,
+        onTap:
+            //_emailController.text.isEmpty ? null :
+            () async {
+          ConnectivityResult connectivityResult =
+              await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.none && mounted) {
+            showMessageNoInternetDialog(context);
+          } else {
+            //_forgotPasswordBloc.add(DisplayLoading());
+            // ForgotPasswordResult forgotPasswordResult =
+            //     await _forgotPasswordRepository.forgotPassword(
+            //         email: 'truong2@gmail.com'
+            //         // email: _emailController.text.trim(),
+            //         );
+            final response = await ForgotPasswordProvider().forgotPassword(email: 'truong2@gmail.com');
+            print('forgot: ${response.toString()}');
+            if(mounted){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider<VerifyOtpBloc>(
+                    create: (context) => VerifyOtpBloc(context),
+                    child: VerifyOtp(
+                      email: _emailController.text.trim(),
                     ),
-                  );
-                } else {
-                  print(forgotPasswordResult.errors);
-                  // showCupertinoMessageDialog(
-                  //   context,
-                  //   forgotPasswordResult.errors,
-                  //   buttonLabel: 'OK',
-                  //   onCloseDialog: () {
-                  //     Navigator.pop(context);
-                  //   },
-                  //   barrierDismiss: false,
-                  // );
-                }
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => VerifyOtp(
-                //       email: _emailController.text.trim(),
-                //     ),
-                //   ),
-                // );
-              },
+                  ),
+                ),
+              );
+            }
+          }
+          // if (forgotPasswordResult.isSuccess && mounted) {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => BlocProvider<VerifyOtpBloc>(
+          //         create: (context) => VerifyOtpBloc(context),
+          //         child: VerifyOtp(
+          //           email: _emailController.text.trim(),
+          //         ),
+          //       ),
+          //     ),
+          //   );
+          // } else {
+          //   print(forgotPasswordResult.errors);
+          //   // showCupertinoMessageDialog(
+          //   //   context,
+          //   //   forgotPasswordResult.errors,
+          //   //   buttonLabel: 'OK',
+          //   //   onCloseDialog: () {
+          //   //     Navigator.pop(context);
+          //   //   },
+          //   //   barrierDismiss: false,
+          //   // );
+          // }
+        },
       ),
     );
   }

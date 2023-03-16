@@ -3,6 +3,7 @@ import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 import '../../../utilities/screen_utilities.dart';
 import '../set_new_password/set_new_password.dart';
@@ -52,7 +53,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
               left: 0,
               child: GestureDetector(
                 onTap: () {
-                  //Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 child: const Icon(
                   Icons.arrow_back_ios_outlined,
@@ -116,63 +117,89 @@ class _VerifyOtpState extends State<VerifyOtp> {
   Widget _otpTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(
-          6,
-          (index) => Container(
-            height: 85,
-            width: 55,
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: AspectRatio(
-              aspectRatio: 1.0,
-              child: TextField(
-                autofocus: false,
-                controller: _otpController[index],
-                onChanged: (value) {
-                  if (value.length == 1 && index < 5) {
-                    FocusScope.of(context).nextFocus();
-                  }
-                  if (value.isEmpty && index > 0) {
-                    FocusScope.of(context).previousFocus();
-                  }
-
-                  //enable button when user input 6/6 otp code
-                  //todo: using sms_autofill: ^2.3.0 https://pub.dev/packages/sms_autofill
-                  // setState(() {
-                  //   _otpCode = '$_otpCode$value';
-                  // });
-                },
-                showCursor: false,
-                readOnly: false,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                keyboardType: TextInputType.number,
-                maxLength: 1,
-                decoration: InputDecoration(
-                  hintText: '_',
-                  counter: const Offstage(),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        BorderSide(width: 1, color: AppConstants().greyLight),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(width: 2, color: AppConstants().greyLight),
-                      borderRadius: BorderRadius.circular(12)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(width: 2, color: Colors.pink),
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
-          ),
+      child: OtpTextField(
+        numberOfFields: 6,
+        fieldWidth: 45,
+        textStyle: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).primaryColor,
         ),
+
+        focusedBorderColor: Theme.of(context).primaryColor,
+        enabledBorderColor: Theme.of(context).primaryColor,
+        disabledBorderColor: Colors.grey,
+        showFieldAsBox: true,
+        borderWidth: 2.0,
+        borderColor: Colors.grey,
+        borderRadius: BorderRadius.circular(10),
+        //runs when a code is typed in
+        onCodeChanged: (String code) {
+          //handle validation or checks here if necessary
+        },
+        //runs when every text field is filled
+        onSubmit: (String verificationCode) {
+          setState(() {
+            _otpCode = verificationCode;
+
+          });
+        },
       ),
+      // Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //   crossAxisAlignment: CrossAxisAlignment.end,
+      //   children: List.generate(
+      //     6,
+      //     (index) => Container(
+      //       height: 85,
+      //       width: 55,
+      //       padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      //       child: AspectRatio(
+      //         aspectRatio: 1.0,
+      //         child: TextField(
+      //           autofocus: false,
+      //           controller: _otpController[index],
+      //           onChanged: (value) {
+      //             if (value.length == 1 && index < 5) {
+      //               FocusScope.of(context).nextFocus();
+      //             }
+      //             if (value.isEmpty && index > 0) {
+      //               FocusScope.of(context).previousFocus();
+      //             }
+      //           },
+      //           onSubmitted: (String value){
+      //
+      //             print('otp:$value');
+      //           },
+      //           showCursor: false,
+      //           readOnly: false,
+      //           textAlign: TextAlign.center,
+      //           style:
+      //               const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      //           keyboardType: TextInputType.number,
+      //           maxLength: 1,
+      //           decoration: InputDecoration(
+      //             hintText: '_',
+      //             counter: const Offstage(),
+      //             border: OutlineInputBorder(
+      //               borderRadius: BorderRadius.circular(12),
+      //               borderSide:
+      //                   BorderSide(width: 1, color: AppConstants().greyLight),
+      //             ),
+      //             enabledBorder: OutlineInputBorder(
+      //                 borderSide:
+      //                     BorderSide(width: 2, color: AppConstants().greyLight),
+      //                 borderRadius: BorderRadius.circular(12)),
+      //             focusedBorder: OutlineInputBorder(
+      //                 borderSide:
+      //                     const BorderSide(width: 2, color: Colors.pink),
+      //                 borderRadius: BorderRadius.circular(12)),
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 

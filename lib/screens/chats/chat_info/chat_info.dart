@@ -1,4 +1,6 @@
 import 'package:chat_app/screens/chats/audio_call/audio_call.dart';
+import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
+import 'package:chat_app/screens/chats/media_shared/media_shared.dart';
 import 'package:chat_app/screens/chats/video_call/video_call.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
@@ -147,7 +149,14 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                         ? _itemInfo(
                             itemTitle: 'Group participants',
                             icon: Icons.groups,
-                            onTapItem: () {},
+                            onTapItem: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => GroupParticipantPage(),
+                                ),
+                              );
+                            },
                           )
                         : const SizedBox.shrink(),
                     _itemInfo(
@@ -241,9 +250,9 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                                       width: double.maxFinite,
                                       padding: const EdgeInsets.only(top: 10),
                                       child: Container(
-                                          color: Colors.grey,
-                                          child:
-                                              const Text('Result of search'),),
+                                        color: Colors.grey,
+                                        child: const Text('Result of search'),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -257,38 +266,48 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                       itemTitle: 'Files, medias, documents & links',
                       // icon: CupertinoIcons.doc,
                       icon: CupertinoIcons.photo_on_rectangle,
-                      onTapItem: () async {},
-                    ),
-                    _itemInfo(
-                      itemTitle: 'Ignore message',
-                      icon: Icons.hide_source_outlined,
-                      onTapItem: () {},
-                    ),
-                    _itemInfo(
-                      itemTitle: 'Block',
-                      icon: Icons.speaker_notes_off_outlined,
                       onTapItem: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => MessageDialog2Action(
-                            title: 'Block ${widget.name}?',
-                            content:
-                                'Do you want block ${widget.name}.\nAfter block, you can send message to ${widget.name} and vice versa.',
-                            buttonLeftLabel: 'Cancel',
-                            onLeftTap: () {
-                              Navigator.pop(context);
-                            },
-                            buttonRightLabel: 'Block',
-                            onRightTap: () {
-                              //todo:::
-                              //back to on chatting and can't send message
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MediaShared(),
                           ),
                         );
                       },
                     ),
+
+                    // _itemInfo(
+                    //   itemTitle: 'Ignore message',
+                    //   icon: Icons.hide_source_outlined,
+                    //   onTapItem: () {},
+                    //),
+                    widget.isGroup
+                        ? const SizedBox.shrink()
+                        : _itemInfo(
+                            itemTitle: 'Block',
+                            icon: Icons.speaker_notes_off_outlined,
+                            onTapItem: () async {
+                              await showDialog(
+                                context: context,
+                                builder: (context) => MessageDialog2Action(
+                                  title: 'Block ${widget.name}?',
+                                  content:
+                                      'Do you want block ${widget.name}.\nAfter block, you can send message to ${widget.name} and vice versa.',
+                                  buttonLeftLabel: 'Cancel',
+                                  onLeftTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  buttonRightLabel: 'Block',
+                                  onRightTap: () {
+                                    //todo:::
+                                    //back to on chatting and can't send message
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
                     _itemInfo(
                       itemTitle: 'Delete chat',
                       icon: CupertinoIcons.delete,

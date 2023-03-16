@@ -8,7 +8,10 @@ class SetNewPasswordBloc extends Bloc<SetNewPasswordEvent, SetNewPasswordState>{
 
   SetNewPasswordBloc({required this.context,}): super(SetNewPasswordState()){
     on((event, emit) async{
-
+      if(event is Validate){emit(state.copyWith(),);}
+      if(event is DisplayLoading){emit(state.copyWith(),);}
+      if(event is OnSuccess){emit(state.copyWith(),);}
+      if(event is OnFailure){emit(state.copyWith(),);}
     });
   }
 

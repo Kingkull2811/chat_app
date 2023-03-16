@@ -390,7 +390,7 @@ class _IDPassLoginFormState extends State<IDPassLoginForm> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<SignUpBloc>(

@@ -6,15 +6,15 @@ class ApiPath{
 
   static const String login = '$apiDomainMac/api/auth/sign-in';
 
-  static const String changePassword = '$apiDomain/api/auth/change-password';
+  static const String changePassword = '$apiDomainMac/api/auth/change-password';
 
-  static const String forgotPassword = '$apiDomain/api/auth/forgot-password';
+  static const String forgotPassword = '$apiDomainMac/api/auth/forgot-password';
 
-  static const String newPassword = '$apiDomain/api/auth/new-password';
+  static const String newPassword = '$apiDomainMac/api/auth/new-password';
 
-  static const String refreshToken = '$apiDomain/api/auth/refresh-token';
+  static const String refreshToken = '$apiDomainMac/api/auth/refresh-token';
 
-  static const String sendOtp = '$apiDomain/api/auth/sign-in';
+  static const String sendOtp = '$apiDomainMac/api/auth/send-otp';
 
 
 

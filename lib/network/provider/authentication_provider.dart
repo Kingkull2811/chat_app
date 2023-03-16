@@ -5,7 +5,7 @@ import 'package:chat_app/utilities/app_constants.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../utilities/secure_storage.dart';
 
-class ApiAuthenticationProvider with ProviderMixin {
+class AuthenticationProvider with ProviderMixin {
   final _loginProvider = LoginProvider();
 
   Future<bool> checkAuthenticationStatus() async {
@@ -53,4 +53,6 @@ class ApiAuthenticationProvider with ProviderMixin {
       refreshToken,
     );
   }
+
+
 }

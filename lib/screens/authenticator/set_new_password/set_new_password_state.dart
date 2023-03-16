@@ -1,8 +1,16 @@
-import 'package:equatable/equatable.dart';
+class SetNewPasswordState {
+  final bool isLoading;
 
-class SetNewPasswordState extends Equatable{
+  SetNewPasswordState({
+    this.isLoading = false,
+  });
+}
 
-  @override
-  List<Object?> get props =>[];
-
+extension SetNewPasswordStateEx on SetNewPasswordState {
+  SetNewPasswordState copyWith({
+    bool? isLoading,
+  }) =>
+      SetNewPasswordState(
+        isLoading: isLoading ?? this.isLoading,
+      );
 }

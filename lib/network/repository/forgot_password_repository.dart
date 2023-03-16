@@ -9,7 +9,7 @@ class ForgotPasswordRepository {
     required String email,
   }) async {
     ForgotPasswordResponse? forgotPasswordResponse =
-        await _forgotPasswordProvider.fogotPassword(email: email);
+        await _forgotPasswordProvider.forgotPassword(email: email);
 
     if (forgotPasswordResponse.httpStatus == 200) {
       return ForgotPasswordResult(isSuccess: true);

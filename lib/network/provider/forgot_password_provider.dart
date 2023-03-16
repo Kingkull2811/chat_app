@@ -1,13 +1,10 @@
+import 'package:chat_app/network/api/api_path.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
-import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/forgot_password_response.dart';
 import 'package:chat_app/utilities/app_constants.dart';
-import 'package:dio/dio.dart';
-
-import '../api/api_path.dart';
 
 class ForgotPasswordProvider with ProviderMixin {
-  Future<ForgotPasswordResponse> fogotPassword({
+  Future<ForgotPasswordResponse> forgotPassword({
     required String? email,
   }) async {
     try {

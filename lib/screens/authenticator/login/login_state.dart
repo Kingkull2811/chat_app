@@ -4,7 +4,6 @@ import '../../../utilities/enum/biometrics_button_type.dart';
 import '../../../utilities/enum/highlight_status.dart';
 
 abstract class AuthenticationState extends Equatable {
-  //const AuthenticationState();
 
   @override
   List<Object> get props => [];
