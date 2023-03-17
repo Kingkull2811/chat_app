@@ -1,9 +1,9 @@
+import 'package:chat_app/screens/chats/chat_bloc.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting_bloc.dart';
 import 'package:chat_app/screens/main/menu/drawer_menu.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
-import 'package:chat_app/widgets/custom_app_bar_with_search.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,47 +22,114 @@ class ChatsPageState extends State<ChatsPage> {
 
   bool isNightMode = SharedPreferencesStorage().getNightMode() ?? false;
 
+  late ChatsBloc _chatsBloc;
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    _chatsBloc = BlocProvider.of<ChatsBloc>(context);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _chatsBloc.close();
+    _searchController.dispose();
+    _searchNewMessageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: 'Chat',
-        imageUrl: 'assets/images/image_profile_1.png',
-        searchController: _searchController,
-        focusNode: _focusNode,
-        onTapTextField: () {},
-        onTapIconNewMessage: () {
-          _createNewMessage(
-            context,
-            width,
-          );
-          //todo:::  RangeError (index): Invalid value: Not in inclusive range 0..11: 12
-        },
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 16, top: 20, right: 16),
-        child: ListView.separated(
-          reverse: false,
-          itemBuilder: (context, index) =>
-              _cardChat(itemList[index], width, context),
-          separatorBuilder: (context, index) => Divider(
-            color: Colors.grey[100],
+    return Builder(
+      builder: (context) {
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            elevation: 0.5,
+            backgroundColor: Colors.grey[50],
+            leading: Container(
+              height: 40,
+              width: 40,
+              padding: const EdgeInsets.only(left: 16),
+              child: GestureDetector(
+                onTap: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                child: const CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/image_profile_1.png'),
+                ),
+              ),
+            ),
+            title: InkWell(
+              onTap: (){
+                _scaffoldKey.currentState?.openDrawer();
+              },
+              child: const Text(
+                'Chat',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    _createNewMessage(context);
+                  },
+                  child: Icon(
+                    Icons.add_comment_outlined,
+                    size: 28,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            ],
           ),
-          itemCount: itemList.length,
-        ),
-      ),
-      //drawerEnableOpenDragGesture: false,
-      drawer: DrawerMenu(
-        imageUrl: 'assets/images/image_profile_1.png',
-        name: 'Martha Craig',
-        onTapNightMode: (value) {
-          setState(() {
-            isNightMode = !isNightMode;
-            SharedPreferencesStorage().setNightMode(isNightMode);
-          });
-        },
-      ),
+          body:  ListView.separated(
+                reverse: false,
+                separatorBuilder: (context, index) {
+                  if(index == 0 ){
+                    return const Divider(
+                      height: 1,
+                      color: Colors.transparent,
+                    );
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16.0),
+                    child: Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: Colors.grey[200],
+                    ),
+                  );
+                },
+                itemCount: itemList.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return _searchBox();
+                  }
+                  return _cardChat(context, itemList[index - 1]);
+                },
+          ),
+          //drawerEnableOpenDragGesture: false,
+          drawer: DrawerMenu(
+            imageUrl: 'assets/images/image_profile_1.png',
+            name: 'Martha Craig',
+            onTapNightMode: (value) {
+              setState(() {
+                isNightMode = !isNightMode;
+                SharedPreferencesStorage().setNightMode(isNightMode);
+              });
+            },
+          ),
+        );
+      }
     );
   }
 
@@ -70,9 +137,50 @@ class ChatsPageState extends State<ChatsPage> {
     //BlocProvider.of<ChatsPageBloc>(context).add();
   }
 
+  Widget _searchBox(){
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      child: GestureDetector(
+        onTap: (){},
+        child: SizedBox(
+          height: 40,
+          child: TextField(
+            controller: _searchController,
+            focusNode: _focusNode,
+            onSubmitted: (_) => _focusNode.requestFocus(),
+            decoration: InputDecoration(
+              hintText: 'Search',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24.0),
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Theme.of(context).primaryColor,
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: BorderSide(
+                  width: 2,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: const BorderSide(
+                  width: 1,
+                  color: Color.fromARGB(128, 130, 130, 130),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   _createNewMessage(
-    BuildContext context,
-    double width,
+    BuildContext context
   ) {
     showModalBottomSheet(
       context: context,
@@ -95,10 +203,11 @@ class ChatsPageState extends State<ChatsPage> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
-                      left: width * 0.45,
-                      top: 6,
-                      right: width * 0.45,
-                      bottom: 5),
+                    left: MediaQuery.of(context).size.width * 0.45,
+                    top: 6,
+                    right: MediaQuery.of(context).size.width * 0.45,
+                    bottom: 10,
+                  ),
                   child: Container(
                     height: 4,
                     decoration: BoxDecoration(
@@ -198,7 +307,7 @@ class ChatsPageState extends State<ChatsPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                   child: InkWell(
                     onTap: () {
                       //todo::::
@@ -246,20 +355,31 @@ class ChatsPageState extends State<ChatsPage> {
                 ),
                 Expanded(
                   child: ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     itemCount: itemList.length + 1,
-                    separatorBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(left: 100, right: 32),
-                      child: Divider(
-                        color: Theme.of(context).primaryColor,
-                        height: 0.5,
-                      ),
-                    ),
+                    separatorBuilder: (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Divider(
+                            color: Theme.of(context).primaryColor,
+                            height: 0.5,
+                          ),
+                        );
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 80, right: 16),
+                        child: Divider(
+                          color: Theme.of(context).primaryColor,
+                          height: 0.5,
+                        ),
+                      );
+                    },
                     itemBuilder: (context, index) {
                       if (index == 0) {
-                        return Container(
-                          height: 30,
-                          padding: const EdgeInsets.only(left: 16, top: 10),
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16, top: 10, bottom: 10),
                           child: Text(
                             'Suggest',
                             style: TextStyle(
@@ -269,47 +389,50 @@ class ChatsPageState extends State<ChatsPage> {
                           ),
                         );
                       }
-                      return Container(
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 5),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: CircleAvatar(
-                                child: Image.asset(
-                                  itemList[index].imageUrlAvt ?? '',
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Text(
-                                  itemList[index].name ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6, bottom: 6),
+                        child: Container(
+                          height: 50,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 5),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20)),
+                                child: CircleAvatar(
+                                  child: Image.asset(
+                                    itemList[index - 1].imageUrlAvt,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                            Text(
-                              'email',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                                color: Theme.of(context).primaryColor,
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    itemList[index - 1].name,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
                               ),
-                            )
-                          ],
+                              Text(
+                                'email',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -323,86 +446,97 @@ class ChatsPageState extends State<ChatsPage> {
     );
   }
 
-  Widget _cardChat(CustomListItem item, double width, BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
+  Widget _cardChat(
+    BuildContext context,
+    CustomListItem item,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0),
+      child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
                 builder: (context) => BlocProvider<OnChattingBloc>(
-                      create: (context) => OnChattingBloc(context),
-                      child: OnChattingPage(item: item),
-                    )));
-      },
-      child: SizedBox(
-        height: 70,
-        width: width - 32,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: width - 52,
-              child: Row(
-                children: [
-                  Container(
-                    height: 60,
-                    width: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 2,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 50,
-                      child: Image.asset(
-                        item.imageUrlAvt ?? '',
-                      ),
-                    ),
+                  create: (context) => OnChattingBloc(context),
+                  child: OnChattingPage(item: item),
+                ),
+              ),
+            );
+          },
+          child: SizedBox(
+            height: 70,
+            child: ListTile(
+              leading: Container(
+                height: 60,
+                width: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 2,
                   ),
-                  Padding(
-                      padding:
-                          const EdgeInsets.only(left: 16, top: 10, bottom: 10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.name ?? '',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            '${item.name} ${item.time}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                              overflow: TextOverflow.ellipsis,
-                              color: Colors.grey,
-                            ),
-                            maxLines: 1,
-                          )
-                        ],
-                      ))
-                ],
+                ),
+                child: CircleAvatar(
+                  radius: 50,
+                  child: Image.asset(
+                    item.imageUrlAvt,
+                  ),
+                ),
+              ),
+              title: Text(
+                item.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              subtitle: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.45,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.45
+                      ),
+                      child: Text(
+                        item.lastMessage,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(
+                        item.time,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              trailing: SizedBox(
+                width: 16,
+                child: Icon(
+                  item.isRead ? Icons.check_circle : Icons.check_circle_outline,
+                  size: 16,
+                  color: Colors.grey,
+                ),
               ),
             ),
-            const SizedBox(
-              width: 16,
-              child: Icon(
-                Icons.verified_outlined,
-                size: 16,
-                color: Colors.grey,
-              ),
-            )
-          ],
-        ),
-      ),
+          )),
     );
   }
 }
@@ -417,7 +551,7 @@ List<CustomListItem> itemList = [
   ),
   CustomListItem(
     name: 'Item 2',
-    lastMessage: 'Subtitle 2',
+    lastMessage: 'Subtitle 2 1as asd ef ca cas c s',
     time: '1:00 PM',
     imageUrlAvt: 'assets/images/image_profile_2.png',
     isRead: true,
@@ -495,18 +629,18 @@ List<CustomListItem> itemList = [
 ];
 
 class CustomListItem {
-  final String? name;
-  final String? lastMessage;
-  final String? time;
-  final String? imageUrlAvt;
+  final String name;
+  final String lastMessage;
+  final String time;
+  final String imageUrlAvt;
   final bool isRead;
   final bool isActive;
 
   CustomListItem({
-    this.name,
-    this.lastMessage,
-    this.time,
-    this.imageUrlAvt,
+    required this.name,
+    required this.lastMessage,
+    required this.time,
+    required this.imageUrlAvt,
     this.isRead = false,
     this.isActive = false,
   });

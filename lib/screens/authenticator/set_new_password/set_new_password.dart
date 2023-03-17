@@ -115,7 +115,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                         });
                       },
                       validator: (value) {
-                        if (value.isEmpty) {
+                        if (value!.isEmpty) {
                           return 'Please re-enter password';
                         }
                         if (_enterPasswordController.text !=
@@ -196,10 +196,10 @@ class _SetNewPasswordState extends State<SetNewPassword> {
     required String title,
     required String hintText,
     required TextEditingController controller,
-    Function? onTapSuffixIcon,
+    Function()? onTapSuffixIcon,
     bool obscureText = false,
     bool isInputError = false,
-    Function? validator,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),

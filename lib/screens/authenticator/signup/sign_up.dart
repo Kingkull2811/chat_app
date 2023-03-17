@@ -309,8 +309,8 @@ class _SignUpPageState extends State<SignUpPage> {
     required String hintText,
     required TextEditingController controller,
     bool obscureText = false,
-    Function? onTapSuffixIcon,
-    Function? validator,
+    Function()? onTapSuffixIcon,
+    String? Function(String?)? validator,
   }) {
     return Padding(
       padding: const EdgeInsets.all(16),

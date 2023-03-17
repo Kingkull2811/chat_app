@@ -92,13 +92,13 @@ class OnChattingPageState extends State<OnChattingPage> {
                       width: 150,
                       child: CircleAvatar(
                         radius: 75,
-                        child: Image.asset(widget.item.imageUrlAvt ?? '',fit: BoxFit.cover,),
+                        child: Image.asset(widget.item.imageUrlAvt ,fit: BoxFit.cover,),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Text(
-                        widget.item.name ?? '',
+                        widget.item.name ,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 28,
@@ -148,27 +148,32 @@ class OnChattingPageState extends State<OnChattingPage> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconButton(
-              onPressed: () {},
-              iconSize: 30,
-              icon: Icon(
-                Icons.grid_view_outlined,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
             SizedBox(
               child: IconButton(
                 onPressed: () {},
                 iconSize: 30,
                 icon: Icon(
-                  Icons.image_outlined,
+                  Icons.grid_view_outlined,
                   color: Theme.of(context).primaryColor,
                 ),
               ),
             ),
+            !_showIconSend ? IconButton(
+              onPressed: () {},
+              iconSize: 30,
+              icon: Icon(
+                Icons.image_outlined,
+                color: Theme.of(context).primaryColor,
+              ),
+            ): const SizedBox.shrink(),
             Expanded(
-              child: SizedBox(
-                height: 35,
+              child: Container(
+                alignment: Alignment.bottomCenter,
+                constraints:const BoxConstraints(
+                  maxHeight: 34,
+                  // maxHeight: 50,
+                  // minHeight: 34,
+                ),
                 child: TextFormField(
                   controller: _inputTextController,
                   focusNode: _focusNode,
@@ -198,14 +203,14 @@ class OnChattingPageState extends State<OnChattingPage> {
                     ),
                     suffixIconColor: Theme.of(context).primaryColor,
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide(
                         width: 1,
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(
                         width: 1,
                         color: Color.fromARGB(128, 130, 130, 130),
@@ -285,7 +290,7 @@ class OnChattingPageState extends State<OnChattingPage> {
                   ),
                   child: CircleAvatar(
                     radius: 12,
-                    child: Image.asset(widget.item.imageUrlAvt ?? ''),
+                    child: Image.asset(widget.item.imageUrlAvt ),
                   ),
                 )
               ],

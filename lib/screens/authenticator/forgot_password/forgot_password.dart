@@ -1,7 +1,5 @@
-import 'package:chat_app/network/model/forgot_password_result.dart';
 import 'package:chat_app/network/provider/forgot_password_provider.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
-import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_event.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_bloc.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';

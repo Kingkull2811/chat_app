@@ -5,7 +5,7 @@ import 'forgot_password_state.dart';
 
 class ForgotPasswordBloc
     extends Bloc<ForgotPasswordEvent, ForgotPasswordState> {
-  ForgotPasswordBloc() : super(ForgotPasswordState()) {
+  ForgotPasswordBloc() : super(const ForgotPasswordState()) {
     on((event, emit) async {
       if (event is ValidateForm){
         emit(

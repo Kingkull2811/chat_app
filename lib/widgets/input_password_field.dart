@@ -4,20 +4,20 @@ import 'package:flutter/services.dart';
 
 class InputPasswordField extends StatelessWidget {
   final FocusNode? focusNode;
-  final onFieldSubmitted;
+  final void Function(String)? onFieldSubmitted;
   final TextInputAction? textInputAction;
   final String? hint;
   final TextEditingController controller;
-  final onChanged;
-  final maxText;
-  final whiteList;
+  final void Function(String)? onChanged;
+  final int? maxText;
+  final Pattern? whiteList;
   final bool obscureText;
   final TextInputType? keyboardType;
   final String? initText;
   final IconData? prefixIcon;
-  final onTapSuffixIcon;
+  final void Function()? onTapSuffixIcon;
   final bool isInputError;
-  final validator;
+  final String? Function(String?)? validator;
 
   const InputPasswordField({
     Key? key,

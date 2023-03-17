@@ -1,6 +1,5 @@
 import 'package:chat_app/network/model/login_result.dart';
 import 'package:chat_app/network/repository/login_repository.dart';
-import 'package:chat_app/network/response/error_response.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';

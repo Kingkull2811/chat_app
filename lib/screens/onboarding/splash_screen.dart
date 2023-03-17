@@ -5,7 +5,6 @@ class SplashScreenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final padding = MediaQuery.of(context).padding;
     return Center(
       child: Column(
         children: [

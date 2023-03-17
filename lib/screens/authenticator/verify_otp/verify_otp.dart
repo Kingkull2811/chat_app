@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 import '../../../utilities/screen_utilities.dart';
@@ -222,7 +221,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SetNewPassword(),
+                        builder: (context) =>const SetNewPassword(),
                       ),
                     );
                   },

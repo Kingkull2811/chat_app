@@ -6,20 +6,18 @@ import 'package:flutter/services.dart';
 class Input extends StatelessWidget {
   final bool useCupertinoTextField;
   final FocusNode? focusNode;
-  final onSubmit;
+  final void Function(String)? onSubmit;
   final TextInputAction textInputAction;
   final String? hint;
   final TextEditingController controller;
-  final onChanged;
-  final maxText;
-  final whiteList;
+  final void Function(String)? onChanged;
+  final int? maxText;
+  final Pattern? whiteList;
   final bool obscureText;
   final TextInputType? keyboardType;
   final String? initText;
-  //final String? suffixIconPath;
   final Icon? prefixIcon;
   final String? prefixIconPath;
-  //final Function()? onShowPassword;
 
   const Input({
     Key? key,
@@ -35,10 +33,8 @@ class Input extends StatelessWidget {
     this.whiteList,
     this.obscureText = false,
     this.initText,
-    //this.suffixIconPath,
     this.prefixIcon,
     this.prefixIconPath,
-    //this.onShowPassword,
   }) : super(key: key);
 
   @override

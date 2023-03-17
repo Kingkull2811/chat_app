@@ -7,7 +7,7 @@ class ForgotPasswordState extends Equatable {
   final bool isEnable;
   final Errors? errors;
 
-  ForgotPasswordState({
+  const ForgotPasswordState({
     this.isLoading = false,
     this.isEnable = false,
     this.errors,

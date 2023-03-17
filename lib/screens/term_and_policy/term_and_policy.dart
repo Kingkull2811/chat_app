@@ -119,7 +119,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
         preferences.setBool(AppConstants.firstTimeOpenKey, false);
         if (mounted) {
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => OnBoardingPage()));
+              MaterialPageRoute(builder: (context) => const OnBoardingPage()));
         }
       } else {
         if (DatabaseService().chatKey != null) {
@@ -130,7 +130,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
           if (mounted) {
             //todo: remove test
             Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => OnBoardingPage()));
+                MaterialPageRoute(builder: (context) => const OnBoardingPage()));
             // Navigator.pushReplacement(
             //   context,
             //   MaterialPageRoute(

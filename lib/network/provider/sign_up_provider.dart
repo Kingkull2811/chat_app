@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:dio/dio.dart';
@@ -26,7 +24,7 @@ class SignUpProvider with ProviderMixin {
       );
       return SignUpResponse.fromJson(response.data);
     } catch (error, stacktrace) {
-      //showErrorLog(error, stacktrace, ApiPath.signup);
+      showErrorLog(error, stacktrace, ApiPath.signup);
       if(error is DioError){
         return SignUpResponse.fromJson(error.response?.data);
       }

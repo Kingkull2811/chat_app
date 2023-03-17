@@ -141,19 +141,19 @@ class MainAppState extends State<MainApp>
   }
 
   void changeTabToChat() {
-    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.chat));
+    BlocProvider.of<TabBloc>(context).add(const TabUpdated(AppTab.chat));
   }
 
   void changeTabToNews() {
-    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.news));
+    BlocProvider.of<TabBloc>(context).add(const TabUpdated(AppTab.news));
   }
 
   void changeTabToTranscript() {
-    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.transcript));
+    BlocProvider.of<TabBloc>(context).add(const TabUpdated(AppTab.transcript));
   }
 
   void changeTabToProfile() {
-    BlocProvider.of<TabBloc>(context).add(TabUpdated(AppTab.profile));
+    BlocProvider.of<TabBloc>(context).add(const TabUpdated(AppTab.profile));
   }
 
   Future<bool> _onWillPop() async {

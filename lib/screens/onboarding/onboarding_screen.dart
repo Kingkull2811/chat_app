@@ -20,7 +20,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
   @override
   Widget build(BuildContext context) {
     final padding = MediaQuery.of(context).padding;
-    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -33,7 +32,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
               onPageChanged: (int index) {
                 _currentPageNotifier.value = index;
               },
-              children: [
+              children: const [
                 OnBoarding1Page(),
                 OnBoarding2Page(),
                 OnBoarding3Page(),

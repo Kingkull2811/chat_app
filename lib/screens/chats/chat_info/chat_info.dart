@@ -170,7 +170,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                           builder: (context) => AlertDialog(
                             //todo:::
                             //set align top when keyboard show, center when keyboard hide
-                            alignment: Alignment.topCenter,
+                            alignment: Alignment.center,
                             shape: const RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(15))),

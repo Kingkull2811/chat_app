@@ -9,7 +9,6 @@ import 'package:local_auth_android/types/auth_messages_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
 import '../screens/authenticator/login/login_bloc.dart';
-import '../screens/chats/chat_state.dart';
 import '../screens/main/main_app.dart';
 import '../services/database.dart';
 import '../widgets/message_dialog.dart';
