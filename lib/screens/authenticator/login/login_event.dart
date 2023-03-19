@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 abstract class LoginEvent extends Equatable {
+  //const LoginEvent();
+
   @override
   List<Object> get props => [];
 }
@@ -14,3 +16,27 @@ class CheckAuthenticationFailed extends LoginEvent {
     this.isShowBiometrics = false,
   });
 }
+
+abstract class LoginFormEvent extends Equatable {
+  //const LoginFormEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+class ValidateForm extends LoginFormEvent {
+  final bool isValidate;
+
+  ValidateForm({
+    this.isValidate = false,
+  });
+}
+
+class DisplayLoading extends LoginFormEvent {
+  final bool isLoading;
+
+  DisplayLoading({this.isLoading = false,});
+
+}
+
+class LoginWithBiometrics extends LoginFormEvent {}

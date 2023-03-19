@@ -5,11 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../response/base_response.dart';
-import 'auth_provider.dart';
+import 'authentication_provider.dart';
 
 mixin ProviderMixin {
   late Dio _dio;
-  AuthProvider? _authenticationProvider;
+  AuthenticationProvider? _authenticationProvider;
 
   Dio get dio {
     _dio = Dio()..httpClientAdapter = HttpClientAdapter();
@@ -39,29 +39,30 @@ mixin ProviderMixin {
     );
   }
 
-  // Future<Options> defaultOptions({
-  //   required String url,
-  // }) async {
-  //   String token = await SecureStorage().readSecureData(AppConstants.accessTokenKey);
-  //   if (kDebugMode) {
-  //     if (isNotNullOrEmpty(url)) {
-  //       print('URL: $url');
-  //     }
-  //     // log('TOKEN - ${AppConstants.buildRegion.toUpperCase()}: $token');
-  //   }
-  //   return Options(
-  //     headers: {
-  //       // 'Authorization': ApiInfo.getAuthorizationString(token),
-  //       // if (AppConstants.buildRegion == AppConstants.regionUS)
-  //       //   'pta_code': SharedPreferencesStorage().getPTAToken(),
-  //       // if (AppConstants.buildRegion == AppConstants.regionUS)
-  //       //   'oscDomain': SharedPreferencesStorage().getOscDomain(),
-  //     },
-  //   );
-  // }
+  Future<Options> defaultOptions({
+    required String url,
+  }) async {
+    String token =
+    await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+    if (kDebugMode) {
+      if (isNotNullOrEmpty(url)) {
+        print('URL: $url');
+      }
+      // log('TOKEN - ${AppConstants.buildRegion.toUpperCase()}: $token');
+    }
+    return Options(
+      headers: {
+        // 'Authorization': ApiInfo.getAuthorizationString(token),
+        // if (AppConstants.buildRegion == AppConstants.regionUS)
+        //   'pta_code': SharedPreferencesStorage().getPTAToken(),
+        // if (AppConstants.buildRegion == AppConstants.regionUS)
+        //   'oscDomain': SharedPreferencesStorage().getOscDomain(),
+      },
+    );
+  }
 
   Future<bool> isExpiredToken() async {
-    _authenticationProvider ??= AuthProvider();
+    _authenticationProvider ??= AuthenticationProvider();
     return !(await _authenticationProvider?.checkAuthenticationStatus() ??
         false);
   }

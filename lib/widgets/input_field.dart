@@ -5,30 +5,36 @@ import 'package:flutter/services.dart';
 
 class Input extends StatelessWidget {
   final bool useCupertinoTextField;
+  final FocusNode? focusNode;
   final void Function(String)? onSubmit;
   final TextInputAction textInputAction;
   final String? hint;
   final TextEditingController controller;
-  final Function(String)? onChanged;
+  final void Function(String)? onChanged;
+  final int? maxText;
   final Pattern? whiteList;
+  final bool obscureText;
   final TextInputType? keyboardType;
   final String? initText;
-  final IconData? prefixIcon;
-  final bool isInputError;
+  final Icon? prefixIcon;
+  final String? prefixIconPath;
 
   const Input({
     Key? key,
     this.useCupertinoTextField = false,
+    this.focusNode,
     this.onSubmit,
     required this.textInputAction,
     this.hint,
     required this.controller,
     required this.onChanged,
     this.keyboardType,
+    this.maxText,
     this.whiteList,
+    this.obscureText = false,
     this.initText,
     this.prefixIcon,
-    this.isInputError = false,
+    this.prefixIconPath,
   }) : super(key: key);
 
   @override
@@ -43,12 +49,14 @@ class Input extends StatelessWidget {
 
     return useCupertinoTextField
         ? CupertinoTextField(
+            focusNode: focusNode,
             textInputAction: textInputAction,
             onSubmitted: onSubmit,
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            // inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
+            obscureText: obscureText,
+            inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
             style: const TextStyle(
               fontSize: 16,
               color: Color.fromARGB(255, 26, 26, 26),
@@ -62,22 +70,26 @@ class Input extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(15),
             ),
-            prefix: Icon(
-              prefixIcon,
-              size: 24,
-              color: AppConstants().greyLight,
-            ),
+            prefix: (prefixIconPath != null)
+                ? Image.asset(
+                    (prefixIconPath!),
+                    height: 24,
+                    width: 24,
+                  )
+                : prefixIcon,
             placeholder: hint,
             maxLines: 1,
           )
         : TextField(
+            focusNode: focusNode,
             textInputAction: textInputAction,
             onSubmitted: onSubmit,
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
+            obscureText: obscureText,
             inputFormatters: [
-              // LengthLimitingTextInputFormatter(maxText),
+              LengthLimitingTextInputFormatter(maxText),
               FilteringTextInputFormatter.allow(whiteList ?? RegExp('([\\S])'))
             ],
             style: const TextStyle(
@@ -85,11 +97,13 @@ class Input extends StatelessWidget {
                 color: Color.fromARGB(255, 26, 26, 26),
                 height: 1.35),
             decoration: InputDecoration(
-              prefixIcon: Icon(
-                prefixIcon,
-                size: 24,
-                color: AppConstants().greyLight,
-              ),
+              prefixIcon: (prefixIconPath != null)
+                  ? Image.asset(
+                      (prefixIconPath!),
+                      height: 24,
+                      width: 24,
+                    )
+                  : prefixIcon,
               prefixIconColor: AppConstants().greyLight,
               contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
               filled: true,
@@ -103,11 +117,9 @@ class Input extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   width: 1,
-                  color: isInputError
-                      ? AppConstants().red700
-                      : const Color.fromARGB(128, 130, 130, 130),
+                  color: Color.fromARGB(128, 130, 130, 130),
                 ),
               ),
               hintText: hint,

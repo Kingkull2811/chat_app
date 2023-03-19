@@ -1,86 +1,46 @@
 import 'dart:async';
-import 'package:chat_app/network/repository/auth_repository.dart';
-import 'package:chat_app/screens/authenticator/set_new_password/set_new_password.dart';
-import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_bloc.dart';
-import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_bloc.dart';
-import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_event.dart';
-import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_state.dart';
 import 'package:chat_app/utilities/app_constants.dart';
-import 'package:chat_app/utilities/enum/api_error_result.dart';
-import 'package:chat_app/utilities/screen_utilities.dart';
-import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/primary_button.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
-class VerifyOtp extends StatefulWidget {
-  final String email;
+import '../../../utilities/screen_utilities.dart';
+import '../set_new_password/set_new_password.dart';
 
-  const VerifyOtp({Key? key, required this.email}) : super(key: key);
+class VerifyOtp extends StatefulWidget {
+  final String? email;
+
+  const VerifyOtp({Key? key, this.email}) : super(key: key);
 
   @override
   State<VerifyOtp> createState() => _VerifyOtpState();
 }
 
 class _VerifyOtpState extends State<VerifyOtp> {
-  String _otpCode = '';
+  final focusNode = FocusNode();
+  final _otpController = List.generate(6, (index) => TextEditingController());
+  bool isOtpSent = false;
+  String? _otpCode;
+  bool isEnableButton = true;
 
-  final _authRepository = AuthRepository();
-
-  late VerifyOtpBloc _verifyOtpBloc;
   int _timerCounter = 60;
-  late Timer _timer;
+  Timer? _timer;
 
   @override
   void initState() {
-    _verifyOtpBloc = BlocProvider.of<VerifyOtpBloc>(context);
     super.initState();
   }
 
   @override
   void dispose() {
-    _verifyOtpBloc.close();
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<VerifyOtpBloc, VerifyOtpState>(
-      listenWhen: (previousState, currentState) {
-        return currentState.apiError != ApiError.noError;
-      },
-      listener: (context, state) {
-        if (state.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'internal_server_error',
-          );
-        }
-        if (state.apiError == ApiError.noInternetConnection) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'no_internet_connection',
-          );
-        }
-      },
-      builder: (context, state) {
-        Widget body = const SizedBox.shrink();
-        if (state.isLoading) {
-          body = const Scaffold(body: AnimationLoading());
-        } else {
-          body = _body(state);
-        }
-        return body;
-      },
-    );
-  }
+    final height = MediaQuery.of(context).size.height;
 
-  Widget _body(VerifyOtpState state) {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -106,7 +66,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
               child: Column(
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height - 200,
+                    height: height - 200,
                     child: Column(
                       children: <Widget>[
                         const Image(
@@ -143,7 +103,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                     ),
                   ),
                   _reSendOtp(),
-                  _buttonVerify(state)
+                  _buttonVerify()
                 ],
               ),
             ),
@@ -164,6 +124,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
           fontWeight: FontWeight.bold,
           color: Theme.of(context).primaryColor,
         ),
+
         focusedBorderColor: Theme.of(context).primaryColor,
         enabledBorderColor: Theme.of(context).primaryColor,
         disabledBorderColor: Colors.grey,
@@ -179,68 +140,92 @@ class _VerifyOtpState extends State<VerifyOtp> {
         onSubmit: (String verificationCode) {
           setState(() {
             _otpCode = verificationCode;
-            _verifyOtpBloc.add(Validate(isValidate: true));
+
           });
         },
       ),
+      // Row(
+      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //   crossAxisAlignment: CrossAxisAlignment.end,
+      //   children: List.generate(
+      //     6,
+      //     (index) => Container(
+      //       height: 85,
+      //       width: 55,
+      //       padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      //       child: AspectRatio(
+      //         aspectRatio: 1.0,
+      //         child: TextField(
+      //           autofocus: false,
+      //           controller: _otpController[index],
+      //           onChanged: (value) {
+      //             if (value.length == 1 && index < 5) {
+      //               FocusScope.of(context).nextFocus();
+      //             }
+      //             if (value.isEmpty && index > 0) {
+      //               FocusScope.of(context).previousFocus();
+      //             }
+      //           },
+      //           onSubmitted: (String value){
+      //
+      //             print('otp:$value');
+      //           },
+      //           showCursor: false,
+      //           readOnly: false,
+      //           textAlign: TextAlign.center,
+      //           style:
+      //               const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      //           keyboardType: TextInputType.number,
+      //           maxLength: 1,
+      //           decoration: InputDecoration(
+      //             hintText: '_',
+      //             counter: const Offstage(),
+      //             border: OutlineInputBorder(
+      //               borderRadius: BorderRadius.circular(12),
+      //               borderSide:
+      //                   BorderSide(width: 1, color: AppConstants().greyLight),
+      //             ),
+      //             enabledBorder: OutlineInputBorder(
+      //                 borderSide:
+      //                     BorderSide(width: 2, color: AppConstants().greyLight),
+      //                 borderRadius: BorderRadius.circular(12)),
+      //             focusedBorder: OutlineInputBorder(
+      //                 borderSide:
+      //                     const BorderSide(width: 2, color: Colors.pink),
+      //                 borderRadius: BorderRadius.circular(12)),
+      //           ),
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
     );
   }
 
-  _buttonVerify(VerifyOtpState state) {
+  _buttonVerify() {
     return Align(
       alignment: Alignment.bottomCenter,
       child: PrimaryButton(
         text: 'Verify',
-        isDisable: !state.isEnable,
-        onTap: state.isEnable
-            ? () async {
-                ConnectivityResult connectivityResult =
-                    await Connectivity().checkConnectivity();
-                if (connectivityResult == ConnectivityResult.none && mounted) {
-                  showMessageNoInternetDialog(context);
-                } else {
-                  _verifyOtpBloc.add(DisplayLoading());
-
-                  final response = await _authRepository.verifyOtp(
-                    // email: widget.email,
-                    email: 'truong4@gmail.com',
-                    otpCode: _otpCode,
-                  );
-
-                  //todo:::
-                  print(response);
-                  if (response.isSuccess && mounted) {
-                    _verifyOtpBloc.add(OnSuccess());
-                    showSuccessBottomSheet(
+        isDisable: !isEnableButton,
+        onTap: isEnableButton
+            ? () {
+                showSuccessBottomSheet(
+                  context,
+                  enableDrag: false,
+                  isDismissible: false,
+                  titleMessage: 'Verified!',
+                  contentMessage: 'You have successfully verified the account.',
+                  buttonLabel: 'Set a new password',
+                  onTap: () {
+                    Navigator.pushReplacement(
                       context,
-                      enableDrag: false,
-                      isDismissible: false,
-                      titleMessage: 'Verified!',
-                      contentMessage:
-                          'You have successfully verified the account.\n${response.message}',
-                      buttonLabel: 'Set a new password',
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                BlocProvider<SetNewPasswordBloc>(
-                              create: (context) => SetNewPasswordBloc(context),
-                              child: SetNewPassword(
-                                email: widget.email,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                      MaterialPageRoute(
+                        builder: (context) =>const SetNewPassword(),
+                      ),
                     );
-                  } else {
-                    _verifyOtpBloc.add(OnFailure(
-                      errorMessage: response.errors?.first.errorMessage,
-                    ));
-                    _verifyOtpBloc.add(Validate(isValidate: false));
-                  }
-                }
+                  },
+                );
               }
             : null,
       ),
@@ -256,7 +241,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
             _timerCounter--;
           });
         } else {
-          _timer.cancel();
+          _timer?.cancel();
         }
       },
     );

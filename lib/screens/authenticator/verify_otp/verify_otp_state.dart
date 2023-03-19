@@ -1,34 +1,26 @@
-import 'package:chat_app/bloc/api_result_state.dart';
-import 'package:chat_app/utilities/enum/api_error_result.dart';
+import 'package:chat_app/network/response/error_response.dart';
 
-class VerifyOtpState  implements ApiResultState{
+class VerifyOtpState {
   final bool isLoading;
-  final String? errorMessage;
-  final ApiError _apiError;
-  final bool isEnable;
+  final String? message;
+  final List<Errors>? errors;
 
   VerifyOtpState({
-    ApiError apiError = ApiError.noError,
     this.isLoading = false,
-    this.errorMessage,
-    this.isEnable = false,
-  }) : _apiError = apiError;
-
-  @override
-  ApiError get apiError => _apiError;
+    this.message,
+    this.errors,
+  });
 }
 
 extension VerifyOtpStateEx on VerifyOtpState {
   VerifyOtpState copyWith({
     bool? isLoading,
-    String? errorMessage,
-    ApiError? apiError,
-    bool? isEnable,
+    String? message,
+    List<Errors>? errors,
   }) =>
       VerifyOtpState(
         isLoading: isLoading ?? this.isLoading,
-        errorMessage: errorMessage ?? this.errorMessage,
-        apiError: apiError ?? this.apiError,
-        isEnable: isEnable ?? this.isEnable,
+        message: message ?? this.message,
+        errors: errors ?? this.errors,
       );
 }

@@ -12,7 +12,6 @@ class VerifyOtpBloc extends Bloc<VerifyOtpEvent, VerifyOtpState> {
         emit(
           state.copyWith(
             isLoading: false,
-            isEnable:  event.isValidate,
           ),
         );
       }
@@ -35,7 +34,7 @@ class VerifyOtpBloc extends Bloc<VerifyOtpEvent, VerifyOtpState> {
         emit(
           state.copyWith(
             isLoading: false,
-            errorMessage: event.errorMessage,
+            errors: event.errors,
           ),
         );
       }
