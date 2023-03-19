@@ -1,46 +1,69 @@
+import 'package:chat_app/network/response/user_info_response.dart';
 import 'package:chat_app/utilities/secure_storage.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../network/response/login_response.dart';
 import 'app_constants.dart';
 
 class SharedPreferencesStorage {
   static late SharedPreferences _prefs;
+  final SecureStorage _secureStorage = SecureStorage();
 
   static Future<void> inti() async {
     _prefs = await SharedPreferences.getInstance();
+    
   }
 
-  Future<void> setSaveUserInfo(LoginData? loginData) async {
-    if (loginData != null) {
-      var token = loginData.accessToken?.split(' ')[1];
-      final SecureStorage secureStorage = SecureStorage();
+  ///save user info
+  Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
+    if (signInData != null) {
+      var token = signInData.accessToken?.split(' ')[1];
+      await _secureStorage.writeSecureData(AppConstants.accessTokenKey, token);
+      await _secureStorage.writeSecureData(
+          AppConstants.refreshTokenKey, signInData.refreshToken);
+      await _secureStorage.writeSecureData(
+          AppConstants.emailKey, signInData.email.toString());
 
-      //write accessToken, refreshToken to secureStorage
-      await secureStorage.writeSecureData(AppConstants.accessTokenKey, token);
-      await secureStorage.writeSecureData(
-          AppConstants.refreshTokenKey, loginData.refreshToken);
-      await _prefs.setString(AppConstants.emailKey, loginData.email.toString());
-      await _prefs.setString(
-          AppConstants.usernameKey, loginData.username.toString());
+      if (signInData.expiredAccessToken != null) {
+        await _prefs.setString(
+            AppConstants.accessTokenExpiredKey, signInData.expiredAccessToken!);
+      }
 
-      //Decode token and get expiration time
-      if (token != null) {
-        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-        bool hasExpired = JwtDecoder.isExpired(token);
-        DateTime expirationDate = JwtDecoder.getExpirationDate(token);
+      if (signInData.expiredRefreshToken != null) {
+        await _prefs.setString(AppConstants.refreshTokenExpiredKey,
+            signInData.expiredRefreshToken!);
+      }
+
+      if (signInData.username != null) {
+        await _prefs.setString(
+            AppConstants.usernameKey, signInData.username!);
       }
     }
   }
 
-  void resetDataWhenLogout() {
-    // _prefs?.remove(AppConstants.onlyUsingWifiToDownloadKey);
-    // _prefs?.remove(AppConstants.usingOnlineModeKey);
-    _prefs.setBool(AppConstants.isLoggedOut, true);
+  Future<String> getAccessToken() async {
+    final token = await _secureStorage.readSecureData(
+      AppConstants.accessTokenKey,
+    );
+    return token;
   }
 
-  String getPasswordExpireTime() {
-    return _prefs.getString(AppConstants.passwordExpireTimeKey) ?? '';
+  String getAccessTokenExpired() {
+    return _prefs.getString(AppConstants.accessTokenExpiredKey) ?? '';
+  }
+
+  String getRefreshTokenExpired() {
+    return _prefs.getString(AppConstants.refreshTokenExpiredKey) ?? '';
+  }
+
+  void resetDataWhenLogout() {
+    _prefs.remove(AppConstants.accessTokenExpiredKey);
+    _prefs.remove(AppConstants.refreshTokenExpiredKey);
+    _prefs.remove(AppConstants.usernameKey);
+    _prefs.setBool(AppConstants.isLoggedOut, false);
+    _prefs.setBool(AppConstants.rememberInfo, false);
+
+    _secureStorage.deleteSecureData(AppConstants.emailKey);
+    _secureStorage.deleteSecureData(AppConstants.accessTokenKey);
+    _secureStorage.deleteSecureData(AppConstants.refreshTokenKey);
   }
 
   Future<bool> setNightMode(bool isNightMode){

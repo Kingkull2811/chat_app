@@ -1,29 +1,44 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'forgot_password_event.dart';
 import 'forgot_password_state.dart';
 
-class ForgotPasswordBloc
-    extends Bloc<ForgotPasswordEvent, ForgotPasswordState> {
-  ForgotPasswordBloc() : super(const ForgotPasswordState()) {
+class ForgotPasswordBloc extends Bloc<ForgotPasswordEvent, ForgotPasswordState> {
+  final BuildContext context;
+
+  ForgotPasswordBloc(this.context) : super(ForgotPasswordState()) {
     on((event, emit) async {
-      if (event is ValidateForm){
+      if (event is Validate) {
         emit(
           state.copyWith(
-            isEnable: event.isValidate,
             isLoading: false,
-
           ),
         );
       }
-      if (event is DisplayLoading){
+      if (event is DisplayLoading) {
         emit(
           state.copyWith(
             isLoading: true,
           ),
         );
       }
-      if (event is OnSuccess){}
-    });
+      if (event is OnSuccess) {
+        emit(
+          state.copyWith(
+            isLoading: false,
+          ),
+        );
+      }
+      if (event is OnFailure) {
+        emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: event.errorMessage,
+          ),
+        );
+      }
+    },
+    );
   }
 }
