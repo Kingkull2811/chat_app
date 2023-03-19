@@ -2,15 +2,21 @@ import 'package:equatable/equatable.dart';
 
 abstract class ForgotPasswordEvent extends Equatable {
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
-class ValidateForm extends ForgotPasswordEvent {
-  final bool isValidate;
+class Validate extends ForgotPasswordEvent {
+  final bool isValidated;
 
-  ValidateForm({this.isValidate = false});
+  Validate({this.isValidated = false});
 }
 
-class DisplayLoading extends ForgotPasswordEvent{}
+class DisplayLoading extends ForgotPasswordEvent {}
 
-class OnSuccess extends ForgotPasswordEvent{}
+class OnSuccess extends ForgotPasswordEvent {}
+
+class OnFailure extends ForgotPasswordEvent {
+  final String? errorMessage;
+
+  OnFailure({this.errorMessage});
+}

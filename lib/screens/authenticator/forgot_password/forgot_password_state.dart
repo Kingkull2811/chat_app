@@ -1,46 +1,30 @@
-import 'package:equatable/equatable.dart';
+import 'package:chat_app/bloc/api_result_state.dart';
+import 'package:chat_app/utilities/enum/api_error_result.dart';
 
-import '../../../network/response/error_response.dart';
-
-class ForgotPasswordState extends Equatable {
+class ForgotPasswordState implements ApiResultState {
   final bool isLoading;
-  final bool isEnable;
-  final Errors? errors;
+  final String? errorMessage;
+  final ApiError _apiError;
 
-  const ForgotPasswordState({
+  ForgotPasswordState({
+    ApiError apiError = ApiError.noError,
     this.isLoading = false,
-    this.isEnable = false,
-    this.errors,
-  });
+    this.errorMessage,
+  }) : _apiError = apiError;
 
   @override
-  List<Object> get props => [];
+  ApiError get apiError => _apiError;
 }
 
 extension ForgotPasswordStateEx on ForgotPasswordState {
   ForgotPasswordState copyWith({
     bool? isLoading,
-    bool? isEnable,
-    Errors? errors,
+    String? errorMessage,
+    ApiError? apiError,
   }) =>
       ForgotPasswordState(
-          isLoading: isLoading ?? this.isLoading,
-          isEnable: isEnable ?? this.isEnable,
-          errors: errors ?? this.errors);
+        isLoading: isLoading ?? this.isLoading,
+        errorMessage: errorMessage ?? this.errorMessage,
+        apiError: apiError ?? this.apiError,
+      );
 }
-
-// class Initial extends ForgotPasswordState {}
-//
-// class DisplayLoading extends ForgotPasswordState {}
-//
-// class OnSuccess extends ForgotPasswordState {}
-//
-// class OnFailure extends ForgotPasswordState {
-//   final int? httpStatus;
-//   final Errors? error;
-//
-//   OnFailure({
-//     this.httpStatus,
-//     this.error,
-//   });
-// }

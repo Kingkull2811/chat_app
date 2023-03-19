@@ -1,8 +1,7 @@
-import 'package:chat_app/network/model/sign_up_result.dart';
-import 'package:chat_app/network/repository/sign_up_repository.dart';
-import 'package:chat_app/network/response/error_response.dart';
-import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
-import 'package:chat_app/screens/authenticator/login/login_page.dart';
+import 'package:chat_app/network/repository/auth_repository.dart';
+import 'package:chat_app/network/response/error_data_response.dart';
+import 'package:chat_app/screens/authenticator/login/login_form/login_form.dart';
+import 'package:chat_app/screens/authenticator/login/login_form/login_form_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_event.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_state.dart';
@@ -14,6 +13,7 @@ import 'package:chat_app/widgets/input_field.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -32,18 +32,21 @@ class _SignUpPageState extends State<SignUpPage> {
   final _confirmPasswordController = TextEditingController();
   bool _isShowPassword = false;
   bool _isShowConfirmPassword = false;
-  bool _isMatch = false;
-  bool _isEnableButton = true;
 
-  String validateMessage = '';
+  String messageValidate = '';
+  String messageValidateEmail = '';
+  bool hasCharacter = false;
+  bool checkValidate = false;
+  bool errorEmail = false;
+  bool errorPassword = false;
 
   late SignUpBloc _signUpBloc;
-  final _signUpRepository = SignUpRepository();
+
+  final AuthRepository _authRepository = AuthRepository();
 
   @override
   void initState() {
     _signUpBloc = BlocProvider.of<SignUpBloc>(context);
-    //showButton();
     super.initState();
   }
 
@@ -57,53 +60,79 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  void showButton() {
-    if (_userNameController.text.trim().isEmpty &&
-        _emailController.text.trim().isEmpty &&
-        _passwordController.text.trim().isEmpty &&
-        _confirmPasswordController.text.trim().isEmpty) {
-      _isEnableButton = false;
+  bool _validatePassword() {
+    if (_passwordController.text.isEmpty &&
+        _confirmPasswordController.text.isEmpty) {
+      messageValidate = 'Password cannot be empty';
+      return false;
     }
+    if (_passwordController.text.length < 6 &&
+        _confirmPasswordController.text.length < 6 &&
+        _passwordController.text.isNotEmpty &&
+        _confirmPasswordController.text.isNotEmpty) {
+      messageValidate = 'Passwords must be at least 6 characters';
+      return false;
+    }
+
+    if (_passwordController.text.trim() !=
+            _confirmPasswordController.text.trim() &&
+        _passwordController.text.isNotEmpty &&
+        _confirmPasswordController.text.isNotEmpty) {
+      messageValidate = 'Password and confirm password do not match';
+      return false;
+    }
+    return true;
+  }
+
+  bool _validateEmail(value) {
+    focusNode.requestFocus();
+    if (!AppConstants.emailExp.hasMatch(value)) {
+      setState(() {
+        messageValidateEmail = AppConstants.emailNotMatch;
+        hasCharacter = true;
+      });
+      return false;
+    }
+    // if (!AppConstants.passwordExp.hasMatch(_passwordController.text.trim())) {
+    //   setState(() {
+    //     messageValidateEmail = AppConstants.passwordNotMatch;
+    //   });
+    //   return false;
+    // }
+    // if (!AppConstants.emailExp.hasMatch(_emailController.text.trim()) &&
+    //     !AppConstants.passwordExp.hasMatch(_passwordController.text.trim())) {
+    //   setState(() {
+    //     messageValidateEmail = AppConstants.emailPasswordNotMatch;
+    //   });
+    //   return false;
+    // }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SignUpBloc, SignUpState>(
-      listenWhen: (previousState, currentState) {
-        return currentState.apiError != ApiError.noError;
+      listenWhen: (preState, curState) {
+        return curState.apiError != ApiError.noError;
       },
-      listener: (context, state) {
-        if (state.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'internal_server_error',
-          );
+      listener: (context, curState) {
+        if (curState.apiError == ApiError.internalServerError) {
+          showCupertinoMessageDialog(context, 'Error!',
+              content: 'Internal_server_error');
         }
-        // if (state is SignUpFailure) {
-        //   List<Errors>? errors = state.errors;
-        //   String errorMessage = '';
-        //   for( var error in errors!){
-        //     errorMessage = '$errorMessage\n${error.errorMessage}';
-        //   }
-        //
-        //   showCupertinoMessageDialog(
-        //     context,
-        //     errorMessage,
-        //     buttonLabel: 'OK',
-        //     onCloseDialog: () {
-        //       Navigator.pop(context);
-        //     },
-        //   );
-        // }
+        if (curState.apiError == ApiError.noInternetConnection) {
+          showCupertinoMessageDialog(context, 'Error!',
+              content: 'No_internet_connection');
+        }
       },
-      builder: (context, state) {
+      builder: (context, curState) {
         Widget body = const SizedBox.shrink();
-        if (state.isLoading) {
+        if (curState.isLoading) {
           body = const AnimationLoading();
         } else {
-          body = _body(state);
+          body = _body(curState);
         }
+
         return Scaffold(body: body);
       },
     );
@@ -146,27 +175,26 @@ class _SignUpPageState extends State<SignUpPage> {
                     _inputTextField(
                       hintText: 'Enter username',
                       controller: _userNameController,
-                      keyboardType: TextInputType.text,
-                      iconLeading: Icon(
-                        Icons.person_outline,
-                        color: AppConstants().greyLight,
-                        size: 24,
-                      ),
+                      onSubmit: (_) => focusNode.requestFocus(),
+                      prefixIcon: Icons.person_outline,
                     ),
                     _inputTextField(
-                      hintText: 'Enter email',
-                      controller: _emailController,
-                      keyboardType: TextInputType.text,
-                      iconLeading: Icon(
-                        Icons.mail_outline,
-                        color: AppConstants().greyLight,
-                        size: 24,
-                      ),
-                    ),
+                        hintText: 'Enter email',
+                        controller: _emailController,
+                        prefixIcon: Icons.mail_outline,
+                        onSubmit: (value) {
+                          _validateEmail(value);
+                        }),
                     _inputPasswordField(
                       hintText: 'Enter password',
                       controller: _passwordController,
                       obscureText: !_isShowPassword,
+                      onSubmitted: (_) => focusNode.requestFocus(),
+                      inputError: hasCharacter
+                          ? errorPassword
+                              ? true
+                              : false
+                          : false,
                       onTapSuffixIcon: () {
                         setState(() {
                           _isShowPassword = !_isShowPassword;
@@ -174,16 +202,112 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                     ),
                     _inputPasswordField(
-                      hintText: 'Confirm password',
-                      controller: _confirmPasswordController,
-                      obscureText: !_isShowConfirmPassword,
-                      onTapSuffixIcon: () {
-                        setState(
-                          () {
-                            _isShowConfirmPassword = !_isShowConfirmPassword;
-                          },
-                        );
-                      },
+                        hintText: 'Confirm password',
+                        controller: _confirmPasswordController,
+                        obscureText: !_isShowConfirmPassword,
+                        inputError: hasCharacter
+                            ? errorPassword
+                                ? true
+                                : false
+                            : false,
+                        onTapSuffixIcon: () {
+                          setState(
+                            () {
+                              _isShowConfirmPassword = !_isShowConfirmPassword;
+                            },
+                          );
+                        },
+                        onSubmitted: (_) {
+                          focusNode.requestFocus();
+                          hasCharacter = true;
+                          checkValidate = _validatePassword();
+                          errorPassword = !checkValidate;
+                        }),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 16, top: 16, right: 16),
+                      child: !hasCharacter
+                          ? const SizedBox()
+                          : !errorEmail
+                              ? Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: const [
+                                    Icon(
+                                      Icons.task_alt,
+                                      size: 20,
+                                      color: Colors.green,
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.cancel_outlined,
+                                      size: 20,
+                                      color: Colors.red,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width -
+                                          16 * 4 -
+                                          20 -
+                                          10,
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        messageValidateEmail,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 16, top: 16, right: 16),
+                      child: !hasCharacter
+                          ? const SizedBox()
+                          : checkValidate
+                              ? Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: const [
+                                    Icon(
+                                      Icons.task_alt,
+                                      size: 20,
+                                      color: Colors.green,
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.cancel_outlined,
+                                      size: 20,
+                                      color: Colors.red,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width -
+                                          16 * 4 -
+                                          20 -
+                                          10,
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        messageValidate,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                     ),
                   ],
                 ),
@@ -203,8 +327,8 @@ class _SignUpPageState extends State<SignUpPage> {
         children: [
           PrimaryButton(
             text: 'Sign Up',
-            isDisable: !_isEnableButton,
-            onTap: _isEnableButton
+            isDisable: !checkValidate,
+            onTap: checkValidate
                 ? () async {
                     ConnectivityResult connectivityResult =
                         await Connectivity().checkConnectivity();
@@ -213,58 +337,57 @@ class _SignUpPageState extends State<SignUpPage> {
                       showMessageNoInternetDialog(context);
                     } else {
                       _signUpBloc.add(SignUpLoading());
-                      SignUpResult? signUpResult =
-                          await _signUpRepository.signUp(
-                            //todo::::
-                              // username: _userNameController.text.trim(),
-                              // email: _emailController.text.trim(),
-                              // password: _passwordController.text.trim(),
-                              email: 'truong3@gmail.com',
-                              username: 'truong3',
-                              password: '123456');
-                      print('signUpResult: $signUpResult');
-                      if (mounted) {
-                        if (signUpResult.isSuccess) {
-                          _signUpBloc.add(
-                            SignUpSuccess(message: signUpResult.message),
-                          );
-                          showSuccessBottomSheet(
-                            context,
-                            titleMessage: 'Sign Up Successfully!',
-                            contentMessage: signUpResult.message ?? '',
-                            buttonLabel: 'Login',
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BlocProvider<LoginFormBloc>(
-                                        create: (context) => LoginFormBloc(context),
-                                        child: const IDPassLoginForm(),
-                                  ),
+                      final response = await _authRepository.signUp(
+                          //todo::::
+                          // username: _userNameController.text.trim(),
+                          // email: _emailController.text.trim(),
+                          // password: _passwordController.text.trim(),
+                          email: 'truong3@gmail.com',
+                          username: 'truong3',
+                          password: '123456');
+                      if (kDebugMode) {
+                        print(response);
+                      }
+
+                      if (response.isSuccess && mounted) {
+                        _signUpBloc.add(
+                          SignUpSuccess(message: response.message),
+                        );
+                        showSuccessBottomSheet(
+                          context,
+                          titleMessage: 'Sign Up Successfully!',
+                          contentMessage: response.message ?? 'Please login!',
+                          buttonLabel: 'Login',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    BlocProvider<LoginFormBloc>(
+                                  create: (context) => LoginFormBloc(context),
+                                  child: const LoginFormPage(),
                                 ),
-                              );
-                            },
-                          );
-                        } else {
-                          _signUpBloc.add(
-                            SignUpFailure(errors: signUpResult.errors),
-                          );
-                          String? errorMessage = '';
-                          List<Errors>? errors = signUpResult.errors;
-                          for (var error in errors!) {
-                            errorMessage =
-                                '$errorMessage\n${error.errorMessage}';
-                          }
-                          showCupertinoMessageDialog(
-                            context,
-                            errorMessage,
-                            buttonLabel: 'OK',
-                            onCloseDialog: () {
-                              // Navigator.pop(context);
-                            },
-                          );
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        _signUpBloc.add(
+                          SignUpFailure(errors: response.errors),
+                        );
+                        String? errorMessage = '';
+                        List<Errors>? errors = response.errors;
+                        for (var error in errors!) {
+                          errorMessage = '$errorMessage\n${error.errorMessage}';
                         }
+                        showCupertinoMessageDialog(
+                          context,
+                          errorMessage,
+                          buttonLabel: 'OK',
+                          onCloseDialog: () {
+                            Navigator.pop(context);
+                          },
+                        );
                       }
                     }
                   }
@@ -276,30 +399,25 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _inputTextField({
-    required String hintText,
-    required TextEditingController controller,
-    required TextInputType keyboardType,
-    Icon? iconLeading,
-    String? prefixIconPath,
-    int? maxText,
-  }) {
+  Widget _inputTextField(
+      {required String hintText,
+      required TextEditingController controller,
+      IconData? prefixIcon,
+      Function(String)? onSubmit}) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: SizedBox(
         height: 50,
         child: Input(
-          keyboardType: keyboardType,
-          maxText: maxText,
+          keyboardType: TextInputType.text,
           controller: controller,
           onChanged: (text) {
             //_validateForm();
           },
           textInputAction: TextInputAction.next,
-          onSubmit: (_) => focusNode.requestFocus(),
+          onSubmit: onSubmit,
           hint: hintText,
-          prefixIconPath: prefixIconPath,
-          prefixIcon: iconLeading,
+          prefixIcon: prefixIcon,
         ),
       ),
     );
@@ -310,14 +428,15 @@ class _SignUpPageState extends State<SignUpPage> {
     required TextEditingController controller,
     bool obscureText = false,
     Function()? onTapSuffixIcon,
+    Function(String)? onSubmitted,
     String? Function(String?)? validator,
+    bool inputError = false,
   }) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: SizedBox(
         height: 50,
         child: InputPasswordField(
-          isInputError: false,
           obscureText: obscureText,
           onTapSuffixIcon: onTapSuffixIcon,
           keyboardType: TextInputType.text,
@@ -327,6 +446,7 @@ class _SignUpPageState extends State<SignUpPage> {
           onFieldSubmitted: (_) => focusNode.requestFocus(),
           hint: hintText,
           prefixIcon: Icons.lock_outline,
+          inputError: inputError,
           validator: validator,
         ),
       ),
@@ -352,7 +472,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 MaterialPageRoute(
                   builder: (context) => BlocProvider<LoginFormBloc>(
                     create: (context) => LoginFormBloc(context),
-                    child: const IDPassLoginForm(),
+                    child: const LoginFormPage(),
                   ),
                 ),
               );
@@ -369,34 +489,5 @@ class _SignUpPageState extends State<SignUpPage> {
         ],
       ),
     );
-  }
-
-  bool _validate() {
-    RegExp emailExp =
-        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-    RegExp passwordExp =
-        RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
-
-    if (!emailExp.hasMatch(_emailController.text.trim())) {
-      setState(() {
-        validateMessage = AppConstants.emailNotMatch;
-      });
-      return false;
-    }
-    if (!passwordExp.hasMatch(_passwordController.text.trim())) {
-      setState(() {
-        validateMessage = AppConstants.passwordNotMatch;
-      });
-      return false;
-    }
-    if (!emailExp.hasMatch(_emailController.text.trim()) &&
-        !passwordExp.hasMatch(_passwordController.text.trim())) {
-      setState(() {
-        validateMessage = AppConstants.emailPasswordNotMatch;
-      });
-      return false;
-    }
-
-    return true;
   }
 }

@@ -16,10 +16,10 @@ class InputPasswordField extends StatelessWidget {
   final String? initText;
   final IconData? prefixIcon;
   final void Function()? onTapSuffixIcon;
-  final bool isInputError;
+  final bool inputError;
   final String? Function(String?)? validator;
 
-  const InputPasswordField({
+   const InputPasswordField({
     Key? key,
     this.focusNode,
     this.onFieldSubmitted,
@@ -34,7 +34,7 @@ class InputPasswordField extends StatelessWidget {
     this.initText,
     this.prefixIcon,
     this.onTapSuffixIcon,
-    this.isInputError = false,
+    this.inputError = false,
     this.validator,
   }) : super(key: key);
 
@@ -66,7 +66,7 @@ class InputPasswordField extends StatelessWidget {
                 color: Color.fromARGB(255, 26, 26, 26),
                 height: 1.35),
             decoration: InputDecoration(
-              prefixIcon: Icon(prefixIcon, size: 24,),
+              prefixIcon: Icon(prefixIcon, size: 24, color: AppConstants().greyLight,),
               prefixIconColor: AppConstants().greyLight,
               suffixIcon: InkWell(
                 onTap: onTapSuffixIcon,
@@ -75,19 +75,20 @@ class InputPasswordField extends StatelessWidget {
                       ? Icons.visibility_off
                       : Icons.visibility,
                   size: 24,
+                  color: AppConstants().greyLight,
                 ),
               ),
               suffixIconColor: AppConstants().greyLight,
               contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
               filled: true,
-              fillColor: isInputError
+              fillColor: inputError
                   ? AppConstants().red700
                   : const Color.fromARGB(102, 230, 230, 230),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide(
                   width: 1,
-                  color: isInputError
+                  color: inputError
                       ? AppConstants().red700
                       : Theme.of(context).primaryColor,
                 ),
@@ -96,7 +97,7 @@ class InputPasswordField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide(
                   width: 1,
-                  color: isInputError
+                  color: inputError
                       ? AppConstants().red700
                       : const Color.fromARGB(128, 130, 130, 130),
                 ),
