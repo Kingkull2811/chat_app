@@ -29,6 +29,10 @@ void showLoading(BuildContext context) {
 }
 
 void logout(BuildContext? context) async {
+  // FirebaseMessagingUtilities.unsubscribeTopicForCurrentUser(
+  //   distributorId: SharedPreferencesStorage().getSelectedDistributor(),
+  // );
+
   SharedPreferencesStorage().resetDataWhenLogout();
   if (context != null) {
     Navigator.pushAndRemoveUntil(
@@ -46,7 +50,7 @@ void logout(BuildContext? context) async {
 
 void logoutIfNeed(BuildContext? context) async {
   final passwordExpiredTime =
-      SharedPreferencesStorage().getRefreshTokenExpired();
+      SharedPreferencesStorage().getPasswordExpireTime();
   if (passwordExpiredTime.isEmpty) {
     logout(context);
   } else {
@@ -61,54 +65,11 @@ void logoutIfNeed(BuildContext? context) async {
   }
 }
 
-clearFocus(BuildContext context) {
-  if (FocusScope.of(context).hasFocus) {
-    FocusScope.of(context).unfocus();
-  } else {
-    FocusScope.of(context).requestFocus(FocusNode());
-  }
-}
-
-void backToChat(BuildContext context) {
-  // Reset app mode
-  //resetSwitchAppMode();
-  Navigator.popUntil(context, (route) => route.isFirst);
-  DatabaseService().gpsInfo = null;
-  try {
-    (DatabaseService().chatKey?.currentState as MainAppState).changeTabToChat();
-    (DatabaseService().chatKey?.currentState as MainAppState).reloadPage();
-  } catch (_) {}
-  try {
-    (DatabaseService().chatKey?.currentState as ChatsPageState).reloadPage();
-  } catch (_) {}
-}
-
-AndroidAuthMessages androidLocalAuthMessage(
-        //BuildContext context,
-        ) =>
-    const AndroidAuthMessages(
-      cancelButton: 'OK',
-      goToSettingsButton: 'Setting',
-      goToSettingsDescription:
-          'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
-    );
-
-IOSAuthMessages iosLocalAuthMessages(
-        //BuildContext context,
-        ) =>
-    const IOSAuthMessages(
-      cancelButton: 'OK',
-      goToSettingsButton: 'Setting',
-      goToSettingsDescription:
-          'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
-    );
-
-
 Future<void> showMessageNoInternetDialog(
-    BuildContext context, {
-      Function()? onClose,
-      String? buttonLabel,
-    }) async {
+  BuildContext context, {
+  Function()? onClose,
+  String? buttonLabel,
+}) async {
   await showDialog(
       barrierDismissible: false,
       context: context,
@@ -159,14 +120,14 @@ Future<void> showMessageNoInternetDialog(
 }
 
 Future<void> showCupertinoMessageDialog(
-    BuildContext context,
-    String? title, {
-      String? content,
-      Function()? onCloseDialog,
-      String? buttonLabel,
-      /// false = user must tap button, true = tap outside dialog
-      bool barrierDismiss = false,
-    }) async {
+  BuildContext context,
+  String? title, {
+  String? content,
+  Function()? onCloseDialog,
+  String? buttonLabel,
+  /// false = user must tap button, true = tap outside dialog
+  bool barrierDismiss = false,
+}) async {
   await showDialog(
       barrierDismissible: barrierDismiss,
       context: context,
@@ -181,14 +142,14 @@ Future<void> showCupertinoMessageDialog(
 }
 
 Future<void> showSuccessBottomSheet(
-    BuildContext context, {
-      bool isDismissible = false,
-      bool enableDrag = false,
-      required String titleMessage,
-      required String contentMessage,
-      required String buttonLabel,
-      required Function() onTap,
-    }) async {
+  BuildContext context, {
+  bool isDismissible = false,
+  bool enableDrag = false,
+  required String titleMessage,
+  required String contentMessage,
+  required String buttonLabel,
+  required Function() onTap,
+}) async {
   await showModalBottomSheet(
     context: context,
     isDismissible: isDismissible,
@@ -217,7 +178,7 @@ Future<void> showSuccessBottomSheet(
                     const Padding(
                       padding:  EdgeInsets.only(top: 16),
                       child: Icon(
-                        Icons.verified_outlined,
+                       Icons.verified_outlined,
                         size: 150,
 
                       ),
@@ -261,3 +222,37 @@ Future<void> showSuccessBottomSheet(
     ),
   );
 }
+
+void backToChat(BuildContext context) {
+  // Reset app mode
+  //resetSwitchAppMode();
+  Navigator.popUntil(context, (route) => route.isFirst);
+  DatabaseService().gpsInfo = null;
+  try {
+    (DatabaseService().chatKey?.currentState as MainAppState).changeTabToChat();
+    (DatabaseService().chatKey?.currentState as MainAppState).reloadPage();
+  } catch (_) {}
+  try {
+    (DatabaseService().chatKey?.currentState as ChatsPageState).reloadPage();
+  } catch (_) {}
+}
+
+AndroidAuthMessages androidLocalAuthMessage(
+        //BuildContext context,
+        ) =>
+    const AndroidAuthMessages(
+      cancelButton: 'OK',
+      goToSettingsButton: 'Setting',
+      goToSettingsDescription:
+          'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
+    );
+
+IOSAuthMessages iosLocalAuthMessages(
+        //BuildContext context,
+        ) =>
+    const IOSAuthMessages(
+      cancelButton: 'OK',
+      goToSettingsButton: 'Setting',
+      goToSettingsDescription:
+          'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
+    );

@@ -9,24 +9,21 @@ class AppConstants {
   static const messagingSenderId = '103251286025';
   static const projectId = 'chatapp-97dbc';
 
-
+  final primaryColor = const Color(0xFFee7b64);
   final greyLight = const Color(0xFF7b7b7b);
   final grey630 = const Color(0xFF737373);
   final grey130 = const Color(0xFFCFD8DC);
   final red700 = const Color(0xFFCA0000);
   final green600 = const Color(0xFF2AD000);
 
-  static RegExp emailExp = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-  static RegExp passwordExp = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
-
   static const int maxConnectionPerHost = 16;
 
   static const String rememberInfo = 'REMEMBER_INFO';
   static const String isLoggedOut = 'IS_LOGGED_OUT';
+  static const String passwordExpireTimeKey = 'PASSWORD_EXPIRE_TIME';
   static const String refreshTokenKey = 'REFRESH_TOKEN';
-  static const String refreshTokenExpiredKey = 'REFRESH_TOKEN_EXPIRED';
   static const String accessTokenKey = 'ACCESS_TOKEN';
-  static const String accessTokenExpiredKey = 'ACCESS_TOKEN_EXPIRED';
+  static const String authTokenExpireKey = 'AUTH_TOKEN_EXPIRE_TIME';
   static const String usernameKey = 'USERNAME';
   static const String emailKey = 'EMAIL';
 

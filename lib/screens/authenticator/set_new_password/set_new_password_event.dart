@@ -1,6 +1,7 @@
+import 'package:chat_app/network/response/error_response.dart';
 import 'package:equatable/equatable.dart';
 
-abstract class SetNewPasswordEvent extends Equatable {
+abstract class SetNewPasswordEvent extends Equatable{
   @override
   List<Object?> get props => [];
 }
@@ -16,7 +17,7 @@ class DisplayLoading extends SetNewPasswordEvent {}
 class OnSuccess extends SetNewPasswordEvent {}
 
 class OnFailure extends SetNewPasswordEvent {
-  final String errorMessage;
+  final List<Errors> errors;
 
-  OnFailure({required this.errorMessage});
+  OnFailure({required this.errors});
 }

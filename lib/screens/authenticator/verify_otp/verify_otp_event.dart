@@ -1,3 +1,4 @@
+import 'package:chat_app/network/response/error_response.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class VerifyOtpEvent extends Equatable {
@@ -16,6 +17,7 @@ class DisplayLoading extends VerifyOtpEvent {}
 class OnSuccess extends VerifyOtpEvent {}
 
 class OnFailure extends VerifyOtpEvent {
-  final String? errorMessage;
-  OnFailure({this.errorMessage});
+  final List<Errors> errors;
+
+  OnFailure({required this.errors});
 }
