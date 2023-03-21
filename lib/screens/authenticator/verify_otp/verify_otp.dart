@@ -181,6 +181,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
             _otpCode = verificationCode;
             _verifyOtpBloc.add(Validate(isValidate: true));
           });
+          print(_otpCode);
         },
       ),
     );
@@ -203,7 +204,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
 
                   final response = await _authRepository.verifyOtp(
                     // email: widget.email,
-                    email: 'truong4@gmail.com',
+                    email: 'truong3@gmail.com',
                     otpCode: _otpCode,
                   );
 

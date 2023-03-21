@@ -1,5 +1,5 @@
 class ApiPath{
-  static const String apiDomain = 'http://192.168.1.26:8080';
+  static const String apiDomain = 'http://10.0.58.89:8080';
   static const String apiDomainMac = 'http://10.10.142.45:8080';
 
   //change [useMac] - false: ip window
@@ -21,8 +21,5 @@ class ApiPath{
   static const String refreshToken = '$domain/api/auth/refresh-token';
 
   static const String sendOtp = '$domain/api/auth/send-otp';
-
-
-
 
 }

@@ -18,7 +18,10 @@ class MessageDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoAlertDialog(
       title: title == null? null : Text(title!),
-      content: content == null ? null : Text(content!),
+      content: content == null ? null : Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Text(content!),
+      ),
       actions: <Widget>[
         CupertinoDialogAction(
             onPressed: (){

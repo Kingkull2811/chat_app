@@ -214,11 +214,12 @@ Future<void> showSuccessBottomSheet(
               Expanded(
                 child: Column(
                   children: [
-                    const Padding(
-                      padding:  EdgeInsets.only(top: 16),
+                     Padding(
+                      padding: const EdgeInsets.only(top: 16),
                       child: Icon(
                         Icons.verified_outlined,
                         size: 150,
+                        color: AppConstants().green600,
 
                       ),
                     ),
