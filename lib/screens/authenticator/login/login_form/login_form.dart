@@ -5,6 +5,8 @@ import 'package:chat_app/screens/authenticator/login/login_form/login_form_bloc.
 import 'package:chat_app/screens/authenticator/login/login_form/login_form_event.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
+import 'package:chat_app/screens/main/main_app.dart';
+import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -67,8 +69,6 @@ class _LoginFormPageState extends State<LoginFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    final padding = MediaQuery.of(context).padding;
-
     return BlocConsumer<LoginFormBloc, LoginFormState>(
       listenWhen: (prevState, currState) {
         return currState.isSuccessAuthenticateBiometric;
@@ -165,7 +165,6 @@ class _LoginFormPageState extends State<LoginFormPage> {
                             ),
                           ),
                           _rememberOrForgot(),
-                          _buildBiometricsButton(state),
                         ],
                       ),
                     ),
@@ -191,40 +190,62 @@ class _LoginFormPageState extends State<LoginFormPage> {
 
   Future<void> _goToTermPolicy() async {
     final prefs = await SharedPreferences.getInstance();
-
     prefs.setBool(AppConstants.isLoggedOut, false);
+    bool agreedWithTerms =
+        prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const TermPolicyPage()),
-      );
-      DatabaseService().isShowingTerm = true;
+      if (!agreedWithTerms) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TermPolicyPage(),
+          ),
+        );
+      } else {
+        showLoading(context);
+        _navigateToMainPage();
+      }
     }
   }
 
+  _navigateToMainPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => TabBloc(),
+          child: MainApp(
+            navFromStart: true,
+          ),
+        ),
+      ),
+    );
+  }
+
   _buildBiometricsButton(LoginFormState currentState) {
-    return (currentState.buttonStatus != HighlightStatus.notAvailable)
-        ? Padding(
-            padding: const EdgeInsets.only(top: 30, bottom: 32),
-            child: Center(
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  _loginFormBloc.add(LoginWithBiometrics());
-                },
-                child: Image.asset(
-                  getBiometricsButtonPath(
-                      buttonType: currentState.biometricButtonType),
-                  width: 60,
-                  height: 60,
-                  color: currentState.buttonStatus == HighlightStatus.active
-                      ? Theme.of(context).primaryColor
-                      : AppConstants().greyLight,
-                ),
-              ),
+    if (currentState.buttonStatus != HighlightStatus.notAvailable) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 30, bottom: 32),
+        child: Center(
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _loginFormBloc.add(LoginWithBiometrics());
+            },
+            child: Image.asset(
+              getBiometricsButtonPath(
+                  buttonType: currentState.biometricButtonType),
+              width: 80,
+              height: 80,
+              color: currentState.buttonStatus == HighlightStatus.active
+                  ? Theme.of(context).primaryColor
+                  : AppConstants().greyLight,
             ),
-          )
-        : const SizedBox.shrink();
+          ),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   _validateForm() {

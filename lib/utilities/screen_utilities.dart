@@ -103,12 +103,11 @@ IOSAuthMessages iosLocalAuthMessages(
           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
     );
 
-
 Future<void> showMessageNoInternetDialog(
-    BuildContext context, {
-      Function()? onClose,
-      String? buttonLabel,
-    }) async {
+  BuildContext context, {
+  Function()? onClose,
+  String? buttonLabel,
+}) async {
   await showDialog(
       barrierDismissible: false,
       context: context,
@@ -159,14 +158,15 @@ Future<void> showMessageNoInternetDialog(
 }
 
 Future<void> showCupertinoMessageDialog(
-    BuildContext context,
-    String? title, {
-      String? content,
-      Function()? onCloseDialog,
-      String? buttonLabel,
-      /// false = user must tap button, true = tap outside dialog
-      bool barrierDismiss = false,
-    }) async {
+  BuildContext context,
+  String? title, {
+  String? content,
+  Function()? onCloseDialog,
+  String? buttonLabel,
+
+  /// false = user must tap button, true = tap outside dialog
+  bool barrierDismiss = false,
+}) async {
   await showDialog(
       barrierDismissible: barrierDismiss,
       context: context,
@@ -181,14 +181,14 @@ Future<void> showCupertinoMessageDialog(
 }
 
 Future<void> showSuccessBottomSheet(
-    BuildContext context, {
-      bool isDismissible = false,
-      bool enableDrag = false,
-      required String titleMessage,
-      required String contentMessage,
-      required String buttonLabel,
-      required Function() onTap,
-    }) async {
+  BuildContext context, {
+  bool isDismissible = false,
+  bool enableDrag = false,
+  required String titleMessage,
+  required String contentMessage,
+  required String buttonLabel,
+  required Function() onTap,
+}) async {
   await showModalBottomSheet(
     context: context,
     isDismissible: isDismissible,
@@ -214,13 +214,12 @@ Future<void> showSuccessBottomSheet(
               Expanded(
                 child: Column(
                   children: [
-                     Padding(
+                    Padding(
                       padding: const EdgeInsets.only(top: 16),
                       child: Icon(
                         Icons.verified_outlined,
                         size: 150,
                         color: AppConstants().green600,
-
                       ),
                     ),
                     Padding(

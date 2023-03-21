@@ -1,4 +1,7 @@
+import 'package:chat_app/screens/main/main_app.dart';
+import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/database.dart';
@@ -114,7 +117,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       preferences.setBool(AppConstants.agreedWithTermsKey, true);
       bool isFirstTimeOpenApp =
-          preferences.getBool(AppConstants.firstTimeOpenKey) ?? false;
+          preferences.getBool(AppConstants.firstTimeOpenKey) ?? true;
       if (isFirstTimeOpenApp) {
         preferences.setBool(AppConstants.firstTimeOpenKey, false);
         if (mounted) {
@@ -128,19 +131,16 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
           }
         } else {
           if (mounted) {
-            //todo: remove test
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const OnBoardingPage()));
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => BlocProvider<TabBloc>(
-            //       create: (BuildContext context) => TabBloc(),
-            //       child: MainApp(navFromStart: true),
-            //     ),
-            //   ),
-            // );
-
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    BlocProvider<TabBloc>(
+                      create: (BuildContext context) => TabBloc(),
+                      child: MainApp(navFromStart: true),
+                    ),
+              ),
+            );
           }
         }
       }

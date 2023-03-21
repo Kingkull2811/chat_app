@@ -10,7 +10,7 @@ class AppConstants {
   static const projectId = 'chatapp-97dbc';
 
 
-  final greyLight = const Color(0xFF7b7b7b);
+  final greyLight = const Color(0xffbebebe);
   final grey630 = const Color(0xFF737373);
   final grey130 = const Color(0xFFCFD8DC);
   final red700 = const Color(0xFFCA0000);
@@ -37,8 +37,8 @@ class AppConstants {
 
   //for set options timeOut waiting request dio connect to servers
   static Options options = Options(
-    sendTimeout: const Duration(seconds: 3),
-    receiveTimeout: const Duration(seconds: 3),
+    sendTimeout: const Duration(seconds: 5),
+    receiveTimeout: const Duration(seconds: 5),
     receiveDataWhenStatusError: true,
   );
 

@@ -5,6 +5,7 @@ import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -67,7 +68,52 @@ class DrawerMenu extends StatelessWidget {
                       iconPath: '',
                       icon: Icons.logout_outlined,
                       onTap: () {
-                        logout(context);
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CupertinoAlertDialog(
+                                title: const Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                content: const Padding(
+                                  padding: EdgeInsets.only(top: 16.0),
+                                  child: Text(
+                                    'Do you want to log out ?',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  CupertinoDialogAction(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Cancel',
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                  ),
+                                  CupertinoDialogAction(
+                                    isDefaultAction: true,
+                                    onPressed: () async {
+                                      logout(context);
+                                    },
+                                    child: Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppConstants().red700),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            });
                       },
                     ),
                   ],
@@ -96,7 +142,9 @@ class DrawerMenu extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => BlocProvider<ProfileBloc>(
                 create: (context) => ProfileBloc(context),
-                child:  ProfilePage(key: DatabaseService().profileKey,),
+                child: ProfilePage(
+                  key: DatabaseService().profileKey,
+                ),
               ),
             ),
           );

@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:chat_app/screens/chats/group_participants/dialog_add_member.dart';
-import 'package:chat_app/utilities/app_constants.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chat_app/widgets/info_dialog.dart';
 import 'package:flutter/material.dart';
 
 class GroupParticipantPage extends StatefulWidget {
@@ -71,8 +72,6 @@ class _GroupParticipantPageState extends State<GroupParticipantPage> {
                       focusNode: _focusNode,
                       items: _item,
                     ),
-
-                    // _dialogAddMember(context),
                   );
                 },
                 child: Padding(
@@ -120,63 +119,86 @@ class _GroupParticipantPageState extends State<GroupParticipantPage> {
   }
 
   Widget itemList(BuildContext context, GroupItems items) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 6,
-      ),
-      child: Container(
-        height: 70,
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(25),
+    return InkWell(
+      onTap: () async {
+        await showDialog(
+            context: context,
+            builder: (context) => InfoDialog(
+                  imageUrl: items.image,
+                  name: items.title,
+                  isAdmin: items.isAdmin,
+                  onTapSee: () {
+                    //see member profile
+                    log('see member profile');
+                  },
+                  onTapRemoveMember: () {
+                    //remove member from group
+                    log('remove member from group');
+                    Navigator.pop(context);
+                    setState(() {
+                      _item.removeWhere((item) => item.title == items.title);
+                    });
+                  },
+                ));
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 6,
         ),
-        child: ListTile(
-          leading: Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(25),
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(items.image),
-                ),
-                border: Border.all(
-                  width: 1,
-                  color: Theme.of(context).primaryColor,
-                )),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(25),
           ),
-          title: Text(
-            items.title,
-            style: const TextStyle(
-              fontSize: 20,
-              color: Colors.black,
+          child: ListTile(
+            leading: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(25),
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: NetworkImage(items.image),
+                  ),
+                  border: Border.all(
+                    width: 1,
+                    color: Theme.of(context).primaryColor,
+                  )),
             ),
-          ),
-          subtitle: Text(
-            items.subtitle,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Colors.black,
-            ),
-          ),
-          trailing: Container(
-            height: 30,
-            width: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                width: 1.5,
-                style: BorderStyle.solid,
-                color: Theme.of(context).primaryColor,
+            title: Text(
+              items.title,
+              style: const TextStyle(
+                fontSize: 20,
+                color: Colors.black,
               ),
             ),
-            child: Center(
-              child: Text(
-                items.isAdmin ? 'Admin' : 'Member',
-                style: TextStyle(
-                  fontSize: 12,
+            subtitle: Text(
+              items.subtitle,
+              style: const TextStyle(
+                fontSize: 10,
+                color: Colors.black,
+              ),
+            ),
+            trailing: Container(
+              height: 30,
+              width: 60,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                  width: 1.5,
+                  style: BorderStyle.solid,
                   color: Theme.of(context).primaryColor,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  items.isAdmin ? 'Admin' : 'Member',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -197,63 +219,63 @@ class _GroupParticipantPageState extends State<GroupParticipantPage> {
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title1',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title2',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title3',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title4',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title5',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title6',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title7',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title8',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
     GroupItems(
       image:
           "https://images.pexels.com/photos/1772973/pexels-photo-1772973.png?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-      title: 'title',
+      title: 'title9',
       subtitle: 'https://images.pexels.com/photos',
       isAdmin: false,
     ),
