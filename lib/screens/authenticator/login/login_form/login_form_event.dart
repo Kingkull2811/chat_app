@@ -1,4 +1,3 @@
-import 'package:chat_app/network/response/error_data_response.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class LoginFormEvent extends Equatable {

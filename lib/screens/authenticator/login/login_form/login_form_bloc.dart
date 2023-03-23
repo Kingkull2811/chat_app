@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';

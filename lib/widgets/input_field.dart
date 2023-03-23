@@ -68,7 +68,7 @@ class Input extends StatelessWidget {
               color: AppConstants().greyLight,
             ),
             placeholder: hint,
-            maxLines: 1,
+            // maxLines: 1,
           )
         : TextField(
             textInputAction: textInputAction,

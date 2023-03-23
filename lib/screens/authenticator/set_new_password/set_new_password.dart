@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_bloc.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_event.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_state.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/animation_loading.dart';

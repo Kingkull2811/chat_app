@@ -8,7 +8,6 @@ import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
-import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
