@@ -1,0 +1,10 @@
+diff a/android/app/build.gradle b/android/app/build.gradle	(rejected hunks)
+@@ -29,7 +29,7 @@
+ 
+ android {
+     compileSdkVersion 33
+-    ndkVersion '34.0.0 rc2'
++    ndkVersion '21.1.6352462'
+ 
+     sourceSets {
+         main.java.srcDirs += 'src/main/kotlin'
