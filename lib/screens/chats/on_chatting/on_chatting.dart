@@ -50,6 +50,8 @@ class OnChattingPageState extends State<OnChattingPage> {
               onTapLeadingIcon: () {
                 Navigator.pop(context);
               },
+              image: widget.item.imageUrlAvt,
+              title: widget.item.name,
             ),
             body: const AnimationLoading(),
           );
@@ -84,7 +86,7 @@ class OnChattingPageState extends State<OnChattingPage> {
           itemBuilder: (context, index) {
             if (index == 0) {
               return Container(
-                padding:const EdgeInsets.only(top: 40, bottom: 20),
+                padding: const EdgeInsets.only(top: 40, bottom: 20),
                 child: Column(
                   children: [
                     SizedBox(
@@ -92,13 +94,16 @@ class OnChattingPageState extends State<OnChattingPage> {
                       width: 150,
                       child: CircleAvatar(
                         radius: 75,
-                        child: Image.asset(widget.item.imageUrlAvt ,fit: BoxFit.cover,),
+                        child: Image.asset(
+                          widget.item.imageUrlAvt,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Text(
-                        widget.item.name ,
+                        widget.item.name,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 28,
@@ -158,18 +163,20 @@ class OnChattingPageState extends State<OnChattingPage> {
                 ),
               ),
             ),
-            !_showIconSend ? IconButton(
-              onPressed: () {},
-              iconSize: 30,
-              icon: Icon(
-                Icons.image_outlined,
-                color: Theme.of(context).primaryColor,
-              ),
-            ): const SizedBox.shrink(),
+            !_showIconSend
+                ? IconButton(
+                    onPressed: () {},
+                    iconSize: 30,
+                    icon: Icon(
+                      Icons.image_outlined,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  )
+                : const SizedBox.shrink(),
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,
-                constraints:const BoxConstraints(
+                constraints: const BoxConstraints(
                   maxHeight: 34,
                   // maxHeight: 50,
                   // minHeight: 34,
@@ -290,7 +297,7 @@ class OnChattingPageState extends State<OnChattingPage> {
                   ),
                   child: CircleAvatar(
                     radius: 12,
-                    child: Image.asset(widget.item.imageUrlAvt ),
+                    child: Image.asset(widget.item.imageUrlAvt),
                   ),
                 )
               ],
@@ -448,12 +455,12 @@ class OnChattingPageState extends State<OnChattingPage> {
         ),
       ),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width*0.5,
+        width: MediaQuery.of(context).size.width * 0.5,
         child: Row(
           children: [
             Icon(
               Icons.play_arrow,
-              color:  Theme.of(context).primaryColor,
+              color: Theme.of(context).primaryColor,
             ),
             Expanded(
               child: Padding(
@@ -480,7 +487,6 @@ class OnChattingPageState extends State<OnChattingPage> {
                     ),
                   ],
                 ),
-
               ),
             ),
             const Padding(

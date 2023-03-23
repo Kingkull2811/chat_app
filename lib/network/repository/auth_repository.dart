@@ -50,7 +50,10 @@ class AuthRepository {
     if (loginResponse.httpStatus == 200) {
       _saveUserInfo(loginResponse.data);
       return BaseAuthResult(
-          isSuccess: true, message: loginResponse.message, errors: null);
+        isSuccess: true,
+        message: loginResponse.message,
+        errors: null,
+      );
     }
     return BaseAuthResult(
       isSuccess: false,
@@ -108,8 +111,10 @@ class AuthRepository {
     required String email,
     required String otpCode,
   }) async {
-    final response =
-        await _authProvider.verifyOtp(email: email, otpCode: otpCode);
+    final response = await _authProvider.verifyOtp(
+      email: email,
+      otpCode: otpCode,
+    );
 
     log('verify response ${response.toString()}');
     if (response.httpStatus == 200) {

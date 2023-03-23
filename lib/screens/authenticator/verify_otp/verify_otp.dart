@@ -5,7 +5,6 @@ import 'package:chat_app/screens/authenticator/set_new_password/set_new_password
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_bloc.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_event.dart';
 import 'package:chat_app/screens/authenticator/verify_otp/verify_otp_state.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
@@ -181,6 +180,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
             _otpCode = verificationCode;
             _verifyOtpBloc.add(Validate(isValidate: true));
           });
+          print(_otpCode);
         },
       ),
     );
@@ -203,7 +203,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
 
                   final response = await _authRepository.verifyOtp(
                     // email: widget.email,
-                    email: 'truong4@gmail.com',
+                    email: 'truong3@gmail.com',
                     otpCode: _otpCode,
                   );
 
@@ -250,7 +250,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
   Widget _reSendOtp() {
     _timer = Timer.periodic(
       const Duration(seconds: 1),
-      (timer) {
+      (_) {
         if (_timerCounter > 0) {
           setState(() {
             _timerCounter--;
@@ -260,6 +260,26 @@ class _VerifyOtpState extends State<VerifyOtp> {
         }
       },
     );
+
+    Duration duration = const Duration(minutes: 2);
+    // String countTime = '';
+    // _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    //   if (duration.inSeconds > 0) {
+
+    //     setState(() {
+    //       final seconds = duration.inSeconds - 1;
+    //       duration = Duration(seconds: seconds);
+    //
+    //       String mm = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    //       String ss = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    //
+    //       countTime = "$mm:$ss";
+    //     });
+    //   } else {
+    //         _timer.cancel();
+    //   }
+    // });
+
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 16),
       child: Row(
@@ -272,13 +292,23 @@ class _VerifyOtpState extends State<VerifyOtp> {
             ),
           ),
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               //todo: resend OTP code
+              final response = await _authRepository.forgotPassword(
+                // email: widget.email,
+                email: 'truong3@gmail.com',
+              );
+              if (response.isSuccess) {
+                setState(() {
+                  duration = const Duration(minutes: 2);
+                });
+              }
             },
             child: Text(
               (_timerCounter == 0) ? 'Resend Code' : '00:$_timerCounter',
+              // (duration.inSeconds == 0) ? 'Resend Code' : countTime,
               style: TextStyle(
-                color: AppConstants().greyLight,
+                color: Theme.of(context).primaryColor,
                 fontSize: 14,
                 fontStyle: FontStyle.italic,
               ),

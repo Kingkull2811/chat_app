@@ -1,13 +1,16 @@
-import 'package:chat_app/screens/authenticator/login/login_form/login_form_event.dart';
-import 'package:chat_app/screens/authenticator/login/login_form/login_form_state.dart';
+import 'package:equatable/equatable.dart';
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_ios/local_auth_ios.dart';
+
+import 'login_form_event.dart';
+import 'login_form_state.dart';
 
 class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
   final BuildContext context;
@@ -63,7 +66,7 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
             );
 
             final result = await auth.authenticate(
-              localizedReason: '',
+              localizedReason: 'Please authenticate.',
               options: const AuthenticationOptions(biometricOnly: true),
               authMessages: <AuthMessages>[
                 androidLocalAuthMessage(),

@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
+import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,6 +49,8 @@ class OnBoarding3Page extends StatelessWidget {
             child: PrimaryButton(
               text: 'Next',
               onTap: () async {
+                showLoading(context);
+                const Duration(milliseconds: 500);
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(

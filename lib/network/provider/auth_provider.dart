@@ -80,6 +80,7 @@ class AuthProvider with ProviderMixin {
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);
       if (error is DioError) {
+
         return LoginResponse.fromJson(error.response?.data);
       }
       return LoginResponse();
@@ -120,7 +121,7 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.forgotPassword,
         data: {"email": email},
-        options: AppConstants.options,
+        //options: AppConstants.options,
       );
       return BaseResponse.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -147,7 +148,7 @@ class AuthProvider with ProviderMixin {
       );
       return BaseResponse.fromJson(response.data);
     } catch (error, stacktrace) {
-      //showErrorLog(error, stacktrace, ApiPath.sendOtp);
+      // showErrorLog(error, stacktrace, ApiPath.sendOtp);
       // if (error is DioError) {
       //   return BaseResponse.fromJson(error.response?.data);
       // }

@@ -2,8 +2,10 @@ import 'package:chat_app/screens/profile/profile.dart';
 import 'package:chat_app/screens/profile/profile_bloc.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -65,7 +67,54 @@ class DrawerMenu extends StatelessWidget {
                       title: 'Logout',
                       iconPath: '',
                       icon: Icons.logout_outlined,
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CupertinoAlertDialog(
+                                title: const Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                content: const Padding(
+                                  padding: EdgeInsets.only(top: 16.0),
+                                  child: Text(
+                                    'Do you want to log out ?',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  CupertinoDialogAction(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Cancel',
+                                        style: TextStyle(
+                                            fontSize: 14, color: Colors.black)),
+                                  ),
+                                  CupertinoDialogAction(
+                                    isDefaultAction: true,
+                                    onPressed: () async {
+                                      logout(context);
+                                    },
+                                    child: Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppConstants().red700),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
                     ),
                   ],
                 ),
@@ -93,7 +142,9 @@ class DrawerMenu extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => BlocProvider<ProfileBloc>(
                 create: (context) => ProfileBloc(context),
-                child:  ProfilePage(key: DatabaseService().profileKey,),
+                child: ProfilePage(
+                  key: DatabaseService().profileKey,
+                ),
               ),
             ),
           );
@@ -163,37 +214,40 @@ class DrawerMenu extends StatelessWidget {
   _drawerItem({
     required String title,
     required String iconPath,
-    required Function onTap,
+    required Function() onTap,
     IconData? icon,
     bool hasColor = false,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            maxLines: 1,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: hasColor ? AppConstants().red700 : Colors.black,
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: hasColor ? AppConstants().red700 : Colors.black,
+              ),
             ),
-          ),
-          isNullOrEmpty(icon)
-              ? Image.asset(
-                  iconPath,
-                  height: 24,
-                  width: 24,
-                  color: hasColor ? AppConstants().red700 : Colors.black,
-                )
-              : Icon(
-                  icon,
-                  size: 24,
-                  color: hasColor ? AppConstants().red700 : Colors.black,
-                ),
-        ],
+            isNullOrEmpty(icon)
+                ? Image.asset(
+                    iconPath,
+                    height: 24,
+                    width: 24,
+                    color: hasColor ? AppConstants().red700 : Colors.black,
+                  )
+                : Icon(
+                    icon,
+                    size: 24,
+                    color: hasColor ? AppConstants().red700 : Colors.black,
+                  ),
+          ],
+        ),
       ),
     );
   }

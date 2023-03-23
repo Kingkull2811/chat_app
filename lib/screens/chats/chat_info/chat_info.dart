@@ -1,7 +1,7 @@
-import 'package:chat_app/screens/chats/audio_call/audio_call.dart';
+import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
 import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
 import 'package:chat_app/screens/chats/media_shared/media_shared.dart';
-import 'package:chat_app/screens/chats/video_call/video_call.dart';
+import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -100,7 +100,10 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const AudioCallPage(),
+                          builder: (context) => AudioCallPage(
+                            imageUrl: widget.urlImage,
+                            name: widget.name,
+                          ),
                         ),
                       );
                     },
@@ -113,7 +116,10 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VideoCallPage(),
+                          builder: (context) => VideoCallPage(
+                            imageUrl: widget.urlImage,
+                            name: widget.name,
+                          ),
                         ),
                       );
                     },

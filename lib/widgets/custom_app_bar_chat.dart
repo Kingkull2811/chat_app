@@ -1,15 +1,18 @@
-import 'package:chat_app/screens/chats/audio_call/audio_call.dart';
+import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
 import 'package:chat_app/screens/chats/chat_info/chat_info.dart';
-import 'package:chat_app/screens/chats/video_call/video_call.dart';
+import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBarChat extends StatelessWidget implements PreferredSizeWidget {
-  final String? image;
-  final String? title;
+  final String image;
+  final String title;
   final Function()? onTapLeadingIcon;
 
   const CustomAppBarChat(
-      {super.key, this.image, this.title, this.onTapLeadingIcon});
+      {super.key,
+      required this.image,
+      required this.title,
+      this.onTapLeadingIcon});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -42,12 +45,12 @@ class CustomAppBarChat extends StatelessWidget implements PreferredSizeWidget {
             ),
             child: CircleAvatar(
               radius: 30,
-              child: Image.asset(image ?? ''),
+              child: Image.asset(image),
             ),
           ),
           const SizedBox(width: 8),
           Text(
-            title ?? '',
+            title,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -67,7 +70,10 @@ class CustomAppBarChat extends StatelessWidget implements PreferredSizeWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const AudioCallPage(),
+                builder: (context) => AudioCallPage(
+                  imageUrl: image,
+                  name: title,
+                ),
               ),
             );
 
@@ -84,7 +90,10 @@ class CustomAppBarChat extends StatelessWidget implements PreferredSizeWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const VideoCallPage(),
+                builder: (context) => VideoCallPage(
+                  imageUrl: image,
+                  name: title,
+                ),
               ),
             );
             // Add the action you want to perform when the icon is tapped
@@ -101,8 +110,8 @@ class CustomAppBarChat extends StatelessWidget implements PreferredSizeWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ChatInfoPage(
-                  name: title ?? '',
-                  urlImage: image ?? '',
+                  name: title,
+                  urlImage: image,
                   isGroup: true,
                 ),
               ),
