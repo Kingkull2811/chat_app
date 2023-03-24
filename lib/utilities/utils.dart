@@ -1,4 +1,9 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 
 String getBiometricsButtonPath({
   BiometricButtonType? buttonType,
@@ -30,3 +35,64 @@ bool isNotNullOrEmpty(dynamic obj) => !isNullOrEmpty(obj);
 bool isNullOrEmpty(dynamic obj) =>
     obj == null ||
         ((obj is String || obj is List || obj is Map) && obj.isEmpty);
+
+Future<File?> pickImageFromGallery(BuildContext context) async {
+  File? imagePath;
+  try {
+    final pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if(pickImage != null){
+      imagePath = File(pickImage.path);
+    }
+  }
+  catch(e){
+    log(e.toString());
+  }
+  return imagePath;
+}
+Future<File?> pickImageFromCamera(BuildContext context) async {
+  File? imagePath;
+  try {
+    final pickImage = await ImagePicker().pickImage(source: ImageSource.camera);
+    if(pickImage != null){
+      imagePath = File(pickImage.path);
+    }
+  }
+  catch(e){
+    log(e.toString());
+  }
+  return imagePath;
+}
+
+Future<File?> pickVideoFromGallery(BuildContext context) async {
+  File? video;
+  try {
+    final pickVideo = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if(pickVideo != null){
+      video = File(pickVideo.path);
+    }
+  }
+  catch(e){
+    log(e.toString());
+  }
+  return video;
+}
+
+// Future<GiphyGif?> pickGIF(BuildContext context) async {
+//   GiphyGif? gif;
+//   try {
+//     gif = await Giphy.getGif(
+//       context: context,
+//       apiKey: 'pwXu0t7iuNVm8VO5bgND2NzwCpVH9S0F',
+//     );
+//   } catch (e) {
+//     showSnackBar(context: context, content: e.toString());
+//   }
+//   return gif;
+// }
+// void showSnackBar({required BuildContext context, required String content}) {
+//   ScaffoldMessenger.of(context).showSnackBar(
+//     SnackBar(
+//       content: Text(content),
+//     ),
+//   );
+// }

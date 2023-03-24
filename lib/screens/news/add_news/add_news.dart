@@ -1,6 +1,15 @@
+import 'dart:io';
+
+import 'package:chat_app/screens/news/news.dart';
+import 'package:chat_app/screens/news/news_bloc.dart';
+import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/utilities/utils.dart';
+import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddNewsPage extends StatefulWidget {
   const AddNewsPage({Key? key}) : super(key: key);
@@ -93,7 +102,7 @@ class _AddNewsPageState extends State<AddNewsPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width - 16*2,
+              width: MediaQuery.of(context).size.width - 16 * 2,
               height: 100,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -126,11 +135,70 @@ class _AddNewsPageState extends State<AddNewsPage> {
                       ),
                     );
                   }
-                  return _createItemAddNews(_itemAddNews[index - 1]);
+                  return Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            _itemAddNews[index - 1].urlImage,
+                            fit: BoxFit.cover,
+                            width: 70,
+                            height: 100,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _itemAddNews.removeAt(index - 1);
+                              });
+                            },
+                            child: Icon(
+                              Icons.cancel_outlined,
+                              size: 18,
+                              color: AppConstants().red700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
                 },
               ),
             ),
-
+          ),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: PrimaryButton(
+              text: 'Post News',
+              // isDisable: !(_titleController.text.isEmpty && _itemAddNews.isEmpty),
+              onTap:
+                  // (_titleController.text.isEmpty && _itemAddNews.isEmpty) ? null : // => backToNews(context),
+                  () async {
+                //todo: post news, clean _itemAddNews before switch screen
+                print('post news');
+                // showLoading(context);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      create: (context) => NewsBloc(context),
+                      child: const NewsPage(),
+                    ),
+                  ),
+                  (route) => false,
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -144,8 +212,14 @@ class _AddNewsPageState extends State<AddNewsPage> {
         return CupertinoActionSheet(
           actions: <Widget>[
             CupertinoActionSheetAction(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
+                final imagePath = await pickImageFromGallery(context);
+                if (imagePath != null) {
+                  setState(() {
+                    _itemAddNews.add(ListImageAddNews(urlImage: imagePath));
+                  });
+                }
               },
               child: const Text(
                 'Pick image from Gallery',
@@ -156,11 +230,17 @@ class _AddNewsPageState extends State<AddNewsPage> {
               ),
             ),
             CupertinoActionSheetAction(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
+                final imagePath = await pickImageFromCamera(context);
+                if (imagePath != null) {
+                  setState(() {
+                    _itemAddNews.add(ListImageAddNews(urlImage: imagePath));
+                  });
+                }
               },
               child: const Text(
-                'Pick image from Camera',
+                'Take image from Camera',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black,
@@ -184,65 +264,13 @@ class _AddNewsPageState extends State<AddNewsPage> {
       },
     );
   }
-
-  Widget _createItemAddNews(ListImageAddNews itemAddNews) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(6),
-          child: Container(
-            width: 70,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: Colors.grey,
-                width: 1,
-              ),
-              image: DecorationImage(
-                image: AssetImage(itemAddNews.urlImage),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          right: 0,
-          top: 0,
-          child: SizedBox(
-            height: 18, width: 18,
-            child: IconButton(
-              onPressed: _onPressedIconRemove(),
-              icon: Icon(
-                Icons.cancel_outlined,
-                size: 18,
-                color: AppConstants().red700,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Function()? _onPressedIconRemove(){
-    return null;
-  }
 }
 
-List<ListImageAddNews> _itemAddNews = [
-  ListImageAddNews(urlImage: 'assets/images/image_onboarding_2.png'),
-  ListImageAddNews(urlImage: 'assets/images/image_onboarding_1.png'),
-  ListImageAddNews(urlImage: 'assets/images/image_onboarding_3.png'),
-  ListImageAddNews(urlImage: 'assets/images/image_onboarding_1.png'),
-  ListImageAddNews(urlImage: 'assets/images/image_onboarding_2.png'),
-  ListImageAddNews(urlImage: 'assets/images/image_onboarding_3.png'),
-];
+List<ListImageAddNews> _itemAddNews = [];
 
 class ListImageAddNews {
   // final String title;
-  final String urlImage;
+  final File urlImage;
 
   ListImageAddNews({
     // required this.title,

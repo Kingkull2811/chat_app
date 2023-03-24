@@ -25,8 +25,8 @@ class MainApp extends StatefulWidget {
       : super(key: GlobalKey<MainAppState>());
 
   @override
-  MainAppState createState() {
-    // DatabaseService().chatKey = this.key as GlobalKey<State<StatefulWidget>>?;
+  MainAppState createState(){
+    // DatabaseService().mainKey = this.key as GlobalKey<State<StatefulWidget>>?;
     return MainAppState();
   }
 }

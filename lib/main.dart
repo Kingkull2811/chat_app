@@ -2,8 +2,13 @@ import 'dart:io';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
+import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
+import 'package:chat_app/screens/news/news.dart';
+import 'package:chat_app/screens/profile/profile.dart';
+import 'package:chat_app/screens/transcript/transcript.dart';
+import 'package:chat_app/services/database.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -22,10 +27,10 @@ void main() async {
   _removeBadgeWhenOpenApp();
 
   //init global key for tabs
-  // DatabaseService().homeKey = GlobalKey<HomePageState>();
-  // DatabaseService().myWalletKey = GlobalKey<MyWalletPageState>();
-  // DatabaseService().newCollectionKey = GlobalKey<NewCollectionPageState>();
-  // DatabaseService().reportKey = GlobalKey<ReportPageState>();
+  DatabaseService().chatKey = GlobalKey<ChatsPageState>();
+  DatabaseService().newsKey = GlobalKey<NewsPageState>();
+  DatabaseService().transcriptKey = GlobalKey<TranscriptPageState>();
+  DatabaseService().profileKey = GlobalKey<ProfilePageState>();
   // DatabaseService().otherKey = GlobalKey<OtherPageState>();
 
   // Init SharedPreferences storage

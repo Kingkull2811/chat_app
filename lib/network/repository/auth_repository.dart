@@ -1,14 +1,30 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:chat_app/network/model/base_auth_result.dart';
 import 'package:chat_app/network/provider/auth_provider.dart';
 import 'package:chat_app/network/response/login_response.dart';
 import 'package:chat_app/network/response/user_info_response.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:flutter/cupertino.dart';
 
 class AuthRepository {
   final _authProvider = AuthProvider();
   final _sharedPrefs = SharedPreferencesStorage();
+
+  Future<void> _saveUserDataToFirebase({
+    required BuildContext context,
+    // required ProviderRef ref,
+    required  int? id,
+    required String? username,
+    required String? email,
+    required String? phoneNumber,
+    required String? roles,
+    required File? imageAvt,
+
+}) async {
+
+  }
 
   Future<void> _saveUserInfo(UserInfoResponse? userInfoData) async {
     await _sharedPrefs.setSaveUserInfo(userInfoData);

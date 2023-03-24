@@ -14,11 +14,11 @@ class NewsPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<NewsPage> createState() => _NewsPageState();
+  State<NewsPage> createState() => NewsPageState();
 }
 
-class _NewsPageState extends State<NewsPage> {
-  bool isAdmin = true;
+class NewsPageState extends State<NewsPage> {
+  bool isAdmin = false;
 
   @override
   void initState() {

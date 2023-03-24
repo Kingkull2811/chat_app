@@ -83,6 +83,16 @@ void backToChat(BuildContext context) {
   } catch (_) {}
 }
 
+void backToNews(BuildContext context){
+  try {
+    (DatabaseService().mainKey?.currentState as MainAppState).changeTabToNews();
+    (DatabaseService().mainKey?.currentState as MainAppState).reloadPage();
+  } catch (_) {}
+  try {
+    (DatabaseService().mainKey?.currentState as ChatsPageState).reloadPage();
+  } catch (_) {}
+}
+
 AndroidAuthMessages androidLocalAuthMessage(
         //BuildContext context,
         ) =>

@@ -1,6 +1,3 @@
-import 'package:chat_app/utilities/app_constants.dart';
-import 'package:chat_app/utilities/secure_storage.dart';
-import 'package:chat_app/utilities/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 

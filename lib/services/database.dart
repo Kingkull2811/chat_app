@@ -9,6 +9,7 @@ class DatabaseService{
 
   DatabaseService._internal();
 
+  GlobalKey? mainKey;
   GlobalKey? chatKey;
   GlobalKey? newsKey;
   GlobalKey? transcriptKey;
