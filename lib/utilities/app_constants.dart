@@ -29,6 +29,7 @@ class AppConstants {
   static const String accessTokenExpiredKey = 'ACCESS_TOKEN_EXPIRED';
   static const String usernameKey = 'USERNAME';
   static const String emailKey = 'EMAIL';
+  static const String userIdKey = 'USER_ID';
 
   static const String nightMode = 'IS_NIGHT_MODE';
 

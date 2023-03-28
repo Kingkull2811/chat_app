@@ -7,7 +7,7 @@ class SharedPreferencesStorage {
   static late SharedPreferences _prefs;
   final SecureStorage _secureStorage = SecureStorage();
 
-  static Future<void> inti() async {
+  static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     
   }
@@ -35,6 +35,10 @@ class SharedPreferencesStorage {
       if (signInData.username != null) {
         await _prefs.setString(
             AppConstants.usernameKey, signInData.username!);
+      }
+      if (signInData.id != null) {
+        await _prefs.setString(
+            AppConstants.userIdKey, signInData.id.toString());
       }
     }
   }

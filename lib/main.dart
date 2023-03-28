@@ -12,6 +12,7 @@ import 'package:chat_app/services/database.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -31,10 +32,9 @@ void main() async {
   DatabaseService().newsKey = GlobalKey<NewsPageState>();
   DatabaseService().transcriptKey = GlobalKey<TranscriptPageState>();
   DatabaseService().profileKey = GlobalKey<ProfilePageState>();
-  // DatabaseService().otherKey = GlobalKey<OtherPageState>();
 
   // Init SharedPreferences storage
-  await SharedPreferencesStorage.inti();
+  await SharedPreferencesStorage.init();
 
   if (kIsWeb) {
     await Firebase.initializeApp(
@@ -62,6 +62,8 @@ _removeBadgeWhenOpenApp() async {
 class MyApp extends StatefulWidget {
   //final AppTheme appTheme;
   final navigatorKey = GlobalKey<NavigatorState>();
+
+  // final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   MyApp({super.key});
 
