@@ -38,8 +38,8 @@ class AppConstants {
 
   //for set options timeOut waiting request dio connect to servers
   static Options options = Options(
-    sendTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 5),
+    sendTimeout: const Duration(seconds: 8),
+    receiveTimeout: const Duration(seconds: 8),
     receiveDataWhenStatusError: true,
   );
 

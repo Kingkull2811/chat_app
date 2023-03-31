@@ -207,9 +207,11 @@ class _SetNewPasswordState extends State<SetNewPassword> {
   _buttonVerify(SetNewPasswordState state) {
     return PrimaryButton(
       text: 'Set a password',
-      isDisable: !checkValidatePassword, //!state.isEnable,
-      onTap: checkValidatePassword //state.isEnable
-          ? () async {
+      // isDisable: !checkValidatePassword, //!state.isEnable,
+      onTap:
+      // checkValidatePassword //state.isEnable
+      //     ?
+          () async {
               ConnectivityResult connectivityResult =
                   await Connectivity().checkConnectivity();
               if (connectivityResult == ConnectivityResult.none && mounted) {
@@ -217,8 +219,8 @@ class _SetNewPasswordState extends State<SetNewPassword> {
               } else {
                 _newPasswordBloc.add(DisplayLoading());
                 final response = await _authRepository.newPassword(
-                  // email: widget.email,
-                  email: 'truong3@gmail.com',
+                  email: widget.email,
+                  // email: 'truong3@gmail.com',
                   password: _passwordController.text.trim(),
                   confirmPassword: _confirmPasswordController.text.trim(),
                 );
@@ -248,11 +250,11 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                     },
                   );
                 } else {
-                  //iSuccess false
+                  //iSuccess==false
                 }
               }
             }
-          : null,
+          // : null,
     );
   }
 

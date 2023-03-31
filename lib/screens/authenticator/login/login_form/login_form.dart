@@ -51,7 +51,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   void initState() {
     _loginFormBloc = BlocProvider.of<LoginFormBloc>(context);
     if (widget.isShowLoginBiometrics) {
-      Future.delayed(const Duration(microseconds: 500), () {
+      Future.delayed(const Duration(microseconds: 200), () {
         _loginFormBloc.add(LoginWithBiometrics());
       });
     }
@@ -84,7 +84,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
             clearFocus(context);
           },
           child: Scaffold(
-            resizeToAvoidBottomInset: true,
+            // resizeToAvoidBottomInset: true,
             body: Padding(
               padding: const EdgeInsets.fromLTRB(16, 40, 16, 0),
               child: Column(
@@ -130,7 +130,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                                 onChanged: (text) {
                                   _validateForm();
                                 },
-                                textInputAction: TextInputAction.next,
+                                 textInputAction: TextInputAction.done,
                                 onSubmit: (_) => focusNode.requestFocus(),
                                 hint: 'Enter your username',
                                 prefixIcon: Icons.person_outline,
@@ -155,9 +155,11 @@ class _LoginFormPageState extends State<LoginFormPage> {
                                 keyboardType: TextInputType.text,
                                 controller: _inputPasswordController,
                                 onChanged: (text) {},
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) =>
-                                    focusNode.requestFocus(),
+                                textInputAction: TextInputAction.done,
+                                onFieldSubmitted: (_) {
+                                  focusNode.requestFocus();
+                                  _validateForm();
+                                },
                                 hint: 'Enter your password',
                                 prefixIcon: Icons.lock_outline,
                               ),
@@ -248,51 +250,54 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   _validateForm() {
-    _loginFormBloc.add(ValidateForm(
-      isValidate: (_inputUsernameController.text.isNotEmpty &&
-          _inputPasswordController.text.isNotEmpty),
-    ));
+    setState(() {
+      _loginFormBloc.add(ValidateForm(
+        isValidate: (_inputUsernameController.text.isNotEmpty &&
+            _inputPasswordController.text.isNotEmpty),
+      ));
+    });
   }
 
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
-        text: 'Login',
-        // isDisable: !currentState.isEnable,
-        onTap:
-            //currentState.isEnable ?
-            () async {
-          ConnectivityResult connectivityResult =
-              await Connectivity().checkConnectivity();
-          if (connectivityResult == ConnectivityResult.none && mounted) {
-            showMessageNoInternetDialog(context);
-          } else {
-            _loginFormBloc.add(DisplayLoading(isLoading: true));
-            final loginResult = await _authRepository.login(
-              username: 'truong3', password: '123456',
-              // username: _inputUsernameController.text.trim(),
-              // password: _inputPasswordController.text.trim(),
-            );
-            //todo:::::
-            print(loginResult);
+      text: 'Login',
+      isDisable: !currentState.isEnable,
+      onTap: currentState.isEnable
+          ? () async {
+              ConnectivityResult connectivityResult =
+                  await Connectivity().checkConnectivity();
+              if (connectivityResult == ConnectivityResult.none && mounted) {
+                showMessageNoInternetDialog(context);
+              } else {
+                _loginFormBloc.add(DisplayLoading(isLoading: true));
+                final loginResult = await _authRepository.login(
+                  // username: 'truong3', password: '123456',
+                  username: _inputUsernameController.text,
+                  password: _inputPasswordController.text,
+                );
+                //todo:::::
+                print(loginResult);
 
-            if (loginResult.isSuccess && mounted) {
-              SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
-              await preferences.setBool(
-                  AppConstants.rememberInfo, _rememberInfo);
+                if (loginResult.isSuccess && mounted) {
+                  SharedPreferences preferences =
+                      await SharedPreferences.getInstance();
+                  await preferences.setBool(
+                      AppConstants.rememberInfo, _rememberInfo);
 
-              await _goToTermPolicy();
-            } else {
-              _loginFormBloc.add(ValidateForm(isValidate: true));
-              showCupertinoMessageDialog(
-                context,
-                'Error',
-                content: loginResult.errors?.first.errorMessage,
-                barrierDismiss: false,
-              );
+                  await _goToTermPolicy();
+                } else {
+                  _loginFormBloc.add(ValidateForm(isValidate: true));
+                  showCupertinoMessageDialog(
+                    context,
+                    'Error',
+                    content: loginResult.errors?.first.errorMessage,
+                    barrierDismiss: false,
+                  );
+                }
+              }
             }
-          }
-        });
+          : null,
+    );
   }
 
   Widget _goToSignUpPage() {

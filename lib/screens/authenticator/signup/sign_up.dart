@@ -241,7 +241,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                             color: Colors.red,
                                           ),
                                         ),
-                                      )
+                                      ),
                                     ],
                                   ),
                       ),
@@ -327,7 +327,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                             color: Colors.red,
                                           ),
                                         ),
-                                      )
+                                      ),
                                     ],
                                   ),
                       ),
@@ -363,12 +363,12 @@ class _SignUpPageState extends State<SignUpPage> {
                       _signUpBloc.add(SignUpLoading());
                       final response = await _authRepository.signUp(
                           //todo::::
-                          // username: _userNameController.text.trim(),
-                          // email: _emailController.text.trim(),
-                          // password: _passwordController.text.trim(),
-                          email: 'truong3@gmail.com',
-                          username: 'truong3',
-                          password: '123456');
+                          username: _userNameController.text.trim(),
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim(),);
+                          // email: 'truong3@gmail.com',
+                          // username: 'truong3',
+                          // password: '123456');
                       if (kDebugMode) {
                         print(response);
                       }

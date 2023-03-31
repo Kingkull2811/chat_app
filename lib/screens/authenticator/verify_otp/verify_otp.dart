@@ -202,8 +202,8 @@ class _VerifyOtpState extends State<VerifyOtp> {
                   _verifyOtpBloc.add(DisplayLoading());
 
                   final response = await _authRepository.verifyOtp(
-                    // email: widget.email,
-                    email: 'truong3@gmail.com',
+                    email: widget.email,
+                    // email: 'truong3@gmail.com',
                     otpCode: _otpCode,
                   );
 
@@ -235,6 +235,9 @@ class _VerifyOtpState extends State<VerifyOtp> {
                       },
                     );
                   } else {
+                    // setState(() {
+                    //   state.isLoading = false;
+                    // });
                     _verifyOtpBloc.add(OnFailure(
                       errorMessage: response.errors?.first.errorMessage,
                     ));
@@ -295,8 +298,8 @@ class _VerifyOtpState extends State<VerifyOtp> {
             onTap: () async {
               //todo: resend OTP code
               final response = await _authRepository.forgotPassword(
-                // email: widget.email,
-                email: 'truong3@gmail.com',
+                email: widget.email,
+                // email: 'truong3@gmail.com',
               );
               if (response.isSuccess) {
                 setState(() {

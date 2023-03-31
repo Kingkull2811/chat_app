@@ -121,7 +121,7 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.forgotPassword,
         data: {"email": email},
-        //options: AppConstants.options,
+        options: AppConstants.options,
       );
       return BaseResponse.fromJson(response.data);
     } catch (error, stacktrace) {

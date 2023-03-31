@@ -12,7 +12,6 @@ import 'package:chat_app/services/database.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

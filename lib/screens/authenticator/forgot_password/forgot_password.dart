@@ -77,7 +77,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  Widget _body(ForgotPasswordState stater) {
+  Widget _body(ForgotPasswordState state) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -140,7 +140,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               ),
             ),
-            _buttonSendCode(),
+            _buttonSendCode(state),
           ],
         ),
       ),
@@ -162,54 +162,59 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           onSubmit: (_) => focusNode.requestFocus(),
           hint: 'Enter your email',
           prefixIcon: Icons.mail_outline,
-
         ),
       ),
     );
   }
 
-  Widget _buttonSendCode() {
+  Widget _buttonSendCode(ForgotPasswordState state) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: PrimaryButton(
         text: "Send me Code",
-        // isDisable: _emailController.text.isEmpty,
-        onTap:
-            // _emailController.text.isEmpty ? null :
-            () async {
-          ConnectivityResult connectivityResult =
-              await Connectivity().checkConnectivity();
-          if (connectivityResult == ConnectivityResult.none && mounted) {
-            showMessageNoInternetDialog(context);
-          } else {
-            _forgotPasswordBloc.add(DisplayLoading());
-            final response = await _authRepository.forgotPassword(
-              // email: _emailController.text.trim(),
-              email: 'truong3@gmail.com',
-            );
+        isDisable: _emailController.text.isEmpty,
+        onTap: _emailController.text.isEmpty
+            ? null
+            : () async {
+                ConnectivityResult connectivityResult =
+                    await Connectivity().checkConnectivity();
+                if (connectivityResult == ConnectivityResult.none && mounted) {
+                  showMessageNoInternetDialog(context);
+                } else {
+                  _forgotPasswordBloc.add(DisplayLoading());
+                  final response = await _authRepository.forgotPassword(
+                    email: _emailController.text.trim(),
+                    // email: 'truong3@gmail.com',
+                  );
 
-            print(response);
-            if (response.isSuccess && mounted) {
-              _forgotPasswordBloc.add(OnSuccess());
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider<VerifyOtpBloc>(
-                    create: (context) => VerifyOtpBloc(context),
-                    child: VerifyOtp(
-                      email: _emailController.text.trim(),
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              _forgotPasswordBloc.add(OnFailure(
-                errorMessage: response.errors?.first.errorMessage,
-              ));
-              showCupertinoMessageDialog(context, response.errors?.first.errorMessage);
-            }
-          }
-        },
+                  print(response);
+                  if (response.isSuccess && mounted) {
+                    _forgotPasswordBloc.add(OnSuccess());
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BlocProvider<VerifyOtpBloc>(
+                          create: (context) => VerifyOtpBloc(context),
+                          child: VerifyOtp(
+                            email: _emailController.text.trim(),
+                          ),
+                        ),
+                      ),
+                    );
+                  } else {
+                    // setState(() {
+                    //   state.isLoading = false;
+                    // });
+                    _forgotPasswordBloc.add(OnFailure(
+                      errorMessage: response.errors?.first.errorMessage,
+                    ));
+                    showCupertinoMessageDialog(
+                      context,
+                      response.errors?.first.errorMessage,
+                    );
+                  }
+                }
+              },
       ),
     );
   }
