@@ -33,3 +33,12 @@ appId: "1:103251286025:web:03d480e7b5bdae42f840d8"
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+
+//config using localhost for connect physic mobile device to mac IP:
+//follow: https://stackoverflow.com/a/36605431
+- get IP address mobile device
+- get IP address mac: using command 'config'
+- On MAC, open Terminal, run command 'sudo nano /etc/hosts'. 
+- Enter password, add line '<ip mac>  <ip mobile device>' to end, Ctrl+X, Y, Enter to save
+- note: mobile device and MAC must using share the same wifi network

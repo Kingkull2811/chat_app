@@ -73,7 +73,7 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.login,
         data: {"password": password, "username": username},
-        options: AppConstants.options,
+        // options: AppConstants.options,
       );
 
       return LoginResponse.fromJson(response.data);

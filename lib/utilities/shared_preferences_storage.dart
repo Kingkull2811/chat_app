@@ -9,7 +9,14 @@ class SharedPreferencesStorage {
 
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
-    
+  }
+
+  Future<bool> setLoggedOutStatus(bool value) async {
+    return await _prefs.setBool(AppConstants.isLoggedOut, value);
+  }
+
+  bool? getLoggedOutStatus(){
+    return _prefs.getBool(AppConstants.isLoggedOut);
   }
 
   ///save user info
@@ -33,8 +40,7 @@ class SharedPreferencesStorage {
       }
 
       if (signInData.username != null) {
-        await _prefs.setString(
-            AppConstants.usernameKey, signInData.username!);
+        await _prefs.setString(AppConstants.usernameKey, signInData.username!);
       }
       if (signInData.id != null) {
         await _prefs.setString(
@@ -70,10 +76,11 @@ class SharedPreferencesStorage {
     _secureStorage.deleteSecureData(AppConstants.refreshTokenKey);
   }
 
-  Future<bool> setNightMode(bool isNightMode){
+  Future<bool> setNightMode(bool isNightMode) {
     return _prefs.setBool(AppConstants.nightMode, isNightMode);
   }
-  bool? getNightMode(){
+
+  bool? getNightMode() {
     return _prefs.getBool(AppConstants.nightMode);
   }
 }

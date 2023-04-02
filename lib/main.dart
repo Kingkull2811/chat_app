@@ -20,8 +20,6 @@ import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'helper/helper_functions.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _removeBadgeWhenOpenApp();
@@ -37,11 +35,13 @@ void main() async {
 
   if (kIsWeb) {
     await Firebase.initializeApp(
-        options: const FirebaseOptions(
-            apiKey: AppConstants.apiKey,
-            appId: AppConstants.appId,
-            messagingSenderId: AppConstants.messagingSenderId,
-            projectId: AppConstants.projectId));
+      options: const FirebaseOptions(
+        apiKey: AppConstants.apiKey,
+        appId: AppConstants.appId,
+        messagingSenderId: AppConstants.messagingSenderId,
+        projectId: AppConstants.projectId,
+      ),
+    );
   } else {
     await Firebase.initializeApp();
   }
@@ -71,7 +71,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isSignedIn = false;
+  final bool? _isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
 
   @override
   void initState() {
@@ -85,13 +85,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   getUserLoggedInStatus() async {
-    await HelperFunctions.getUserLoggedInStatus().then((value) {
-      if (value != null) {
-        setState(() {
-          _isSignedIn = value;
-        });
-      }
-    });
+    // await HelperFunctions.getUserLoggedInStatus().then((value) {
+    //   if (value != null) {
+    //     setState(() {
+    //       _isSignedIn = value;
+    //     });
+    //   }
+    // });
   }
 
   @override
@@ -123,24 +123,19 @@ class _MyAppState extends State<MyApp> {
         DefaultCupertinoLocalizations.delegate
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
-      //home: home: _isSignedIn ? const HomePage() : const LoginPage(),
       routes: {
-        // AppRoutes.main: (context) => BlocProvider<TabBloc>(
-        //       create: (BuildContext context) => TabBloc(),
-        //       child: MainApp(
-        //         navFromStart: true,
-        //       ),
-        //     ),
         AppRoutes.main: (context) {
-          return _isSignedIn
-              ? BlocProvider<TabBloc>(
-                  create: (BuildContext context) => TabBloc(),
-                  child: MainApp(navFromStart: true),
-                )
-              : BlocProvider<LoginBloc>(
-                  create: (BuildContext context) => LoginBloc(),
-                  child: const LoginPage(),
-                );
+          if (_isLoggedOut == null || _isLoggedOut == true) {
+            return BlocProvider<LoginBloc>(
+              create: (BuildContext context) => LoginBloc(),
+              child: const LoginPage(),
+            );
+          } else {
+            return BlocProvider<TabBloc>(
+              create: (BuildContext context) => TabBloc(),
+              child: MainApp(navFromStart: true),
+            );
+          }
         }
       },
     );
