@@ -132,7 +132,7 @@ class TranscriptPageState extends State<TranscriptPage> {
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Container(
-        height: 160,
+        height: 150,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: Colors.grey[200],
@@ -142,17 +142,21 @@ class TranscriptPageState extends State<TranscriptPage> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8),
-              child: AppImage(
-                localPathOrUrl: urlImage,
-                boxFit: BoxFit.cover,
-                width: 100,
-                errorWidget: Container(
-                  color: Colors.grey,
-                  child: Center(
-                    child: Icon(
-                      Icons.person_outline,
-                      size: 26,
-                      color: Colors.grey[200],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: AppImage(
+                  localPathOrUrl: urlImage,
+                  boxFit: BoxFit.cover,
+                  width: 100,
+                  height: 150,
+                  errorWidget: Container(
+                    color: Colors.grey,
+                    child: Center(
+                      child: Icon(
+                        Icons.person_outline,
+                        size: 100,
+                        color: Colors.grey[200],
+                      ),
                     ),
                   ),
                 ),
@@ -163,7 +167,7 @@ class TranscriptPageState extends State<TranscriptPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.only(top: 16, bottom: 16),
+                    padding: EdgeInsets.only(top: 16, bottom: 12),
                     child: Center(
                       child: Text(
                         'Student Card',
@@ -174,7 +178,7 @@ class TranscriptPageState extends State<TranscriptPage> {
                       ),
                     ),
                   ),
-                  _itemCard('Student ID', stInfo.userId.toString()),
+                  _itemCard('ID', stInfo.userId.toString()),
                   _itemCard('Name', stInfo.studentName.toString()),
                   _itemCard('Class', stInfo.studentClass.toString()),
                 ],
@@ -191,14 +195,14 @@ class TranscriptPageState extends State<TranscriptPage> {
     String titleValue,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 5.0),
+            padding: const EdgeInsets.only(left: 0.0),
             child: SizedBox(
-              width: 70,
+              width: 50,
               child: Text(
                 title,
                 style: const TextStyle(
@@ -207,7 +211,14 @@ class TranscriptPageState extends State<TranscriptPage> {
               ),
             ),
           ),
-          Text(': $titleValue'),
+          SizedBox(
+            width: MediaQuery.of(context).size.width* 0.4,
+            child: Text(
+              ': $titleValue',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );
@@ -266,21 +277,29 @@ class TranscriptPageState extends State<TranscriptPage> {
       ];
 
       return DataRow(
-          cells: modelBuilder(cells, (index, cell) {
-        //isAdmin -> show edit Icon
-        // final bool showEdit = isAdmin;
+        cells: modelBuilder(
+          cells,
+          (index, cell) {
+            //isAdmin -> show edit Icon
+            // final bool showEdit = isAdmin;
 
-        if (cell == null) {
-          return const DataCell(
-            Center(child: Text('-')),
-            showEditIcon: false,
-          );
-        }
-        return DataCell(
-          Center(child: Text('$cell')),
-          showEditIcon: false,
-        );
-      }));
+            if (cell == null) {
+              return const DataCell(
+                Center(
+                  child: Text('-'),
+                ),
+                showEditIcon: false,
+              );
+            }
+            return DataCell(
+              Center(
+                child: Text('$cell'),
+              ),
+              showEditIcon: false,
+            );
+          },
+        ),
+      );
     }).toList();
   }
 }
@@ -301,7 +320,7 @@ class StudentInfo {
 
 StudentInfo stInfo = StudentInfo(
   studentId: 'SID123456',
-  studentName: 'Name_of_ID_',
+  studentName: 'Name_of_ID_sds das da sd',
   studentClass: 'Class AA',
   userId: '001',
 );

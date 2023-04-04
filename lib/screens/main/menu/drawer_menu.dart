@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/profile/profile.dart';
 import 'package:chat_app/screens/profile/profile_bloc.dart';
+import 'package:chat_app/screens/settings/notification_sound/setting_notification.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
@@ -43,7 +44,15 @@ class DrawerMenu extends StatelessWidget {
                       title: 'Notification & Sound',
                       iconPath: '',
                       icon: Icons.notifications_active_outlined,
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const SettingNotificationPage(),
+                          ),
+                        );
+                      },
                     ),
                     _drawerItem(
                       title: 'Privacy & Safety',

@@ -271,9 +271,9 @@ class _LoginFormPageState extends State<LoginFormPage> {
               } else {
                 _loginFormBloc.add(DisplayLoading(isLoading: true));
                 final loginResult = await _authRepository.login(
-                  username: 'truong3', password: '123456',
-                  // username: _inputUsernameController.text,
-                  // password: _inputPasswordController.text,
+                  // username: 'truong3', password: '123456',
+                  username: _inputUsernameController.text,
+                  password: _inputPasswordController.text,
                 );
                 //todo:::::
                 print(loginResult);

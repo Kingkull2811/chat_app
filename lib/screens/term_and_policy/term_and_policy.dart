@@ -25,22 +25,24 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
   Widget build(BuildContext context) {
     final padding = MediaQuery.of(context).padding;
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: const Text(
+          'Term and Policy',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Container(
         padding: EdgeInsets.fromLTRB(16, padding.top, 16, 16 + padding.bottom),
         child: Column(
           children: <Widget>[
-            const Padding(
-              padding: EdgeInsets.only(top: 60, bottom: 36),
-              child: Text(
-                'Term and Policy',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
             Container(
-              height: 450,
+              height: MediaQuery.of(context).size.height * 0.45,
               padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
               decoration: BoxDecoration(
                 border: Border.all(

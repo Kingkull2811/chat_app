@@ -32,6 +32,9 @@ class AppConstants {
   static const String userIdKey = 'USER_ID';
 
   static const String nightMode = 'IS_NIGHT_MODE';
+  static const String soundModeKey = 'IS_TURN_ON_SOUND';
+  static const String previewModeKey = 'IS_TURN_ON_PREVIEW_NOTIFICATION';
+  static const String vibrateModeKey = 'IS_TURN_ON_VIBRATE_CALL_COMING';
 
   static const String firstTimeOpenKey = 'FIRST_TIME_OPEN';
   static const String agreedWithTermsKey = 'AGREED_WITH_TERMS';

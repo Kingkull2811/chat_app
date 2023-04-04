@@ -120,6 +120,10 @@ class ProfilePageState extends State<ProfilePage> {
               ),
             ),
             _itemView(title: userData.username, leading: Icons.person_outline, trailing: false),
+            _itemView(title: userData.email, leading: Icons.email_outlined, trailing: false),
+            _itemView(title: userData.phone, leading: Icons.phone, trailing: false),
+            _itemView(title: userData.role, leading: Icons.admin_panel_settings_outlined, trailing: false),
+            _itemView(title: userData.parentOf, leading: Icons.group_outlined, trailing:  true),
           ],
         ),
       ),
@@ -141,14 +145,14 @@ class ProfilePageState extends State<ProfilePage> {
         ),
         child: ListTile(
           dense: true,
-          // horizontalTitleGap: 10,
+          horizontalTitleGap: 10,
           // visualDensity: const VisualDensity(
           //   horizontal: 0,
           //   vertical: -2.5,
           // ),
-          // contentPadding: const EdgeInsets.symmetric(
-          //   horizontal: 10,
-          // ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+          ),
           leading: leading != null
               ? Icon(
                   leading,
@@ -184,8 +188,8 @@ class ProfilePageState extends State<ProfilePage> {
     phone: '+84123456789',
     avartarUrl:
         'https://images.pexels.com/photos/1758531/pexels-photo-1758531.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-    role: '',
+    role: 'role_User',
     token: '',
-    parentOf: '',
+    parentOf: 'SID_00000 - Student_Name',
   );
 }

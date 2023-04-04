@@ -76,6 +76,8 @@ class SharedPreferencesStorage {
     _secureStorage.deleteSecureData(AppConstants.refreshTokenKey);
   }
 
+  /// ---setting---
+
   Future<bool> setNightMode(bool isNightMode) {
     return _prefs.setBool(AppConstants.nightMode, isNightMode);
   }
@@ -83,4 +85,30 @@ class SharedPreferencesStorage {
   bool? getNightMode() {
     return _prefs.getBool(AppConstants.nightMode);
   }
+
+  Future<bool> setSoundMode(bool value) {
+    return _prefs.setBool(AppConstants.soundModeKey, value);
+  }
+
+  bool? getSoundMode() {
+    return _prefs.getBool(AppConstants.soundModeKey);
+  }
+
+  Future<bool> setPreviewNotification(bool value) {
+    return _prefs.setBool(AppConstants.previewModeKey, value);
+  }
+
+  bool? getPreviewNotification() {
+    return _prefs.getBool(AppConstants.previewModeKey);
+  }
+
+  Future<bool> setVibrateMode(bool value) {
+    return _prefs.setBool(AppConstants.vibrateModeKey, value);
+  }
+
+  bool? getVibrateMode() {
+    return _prefs.getBool(AppConstants.vibrateModeKey);
+  }
+
+  ///
 }
