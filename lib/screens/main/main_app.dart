@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -25,7 +28,7 @@ class MainApp extends StatefulWidget {
       : super(key: GlobalKey<MainAppState>());
 
   @override
-  MainAppState createState(){
+  MainAppState createState() {
     // DatabaseService().mainKey = this.key as GlobalKey<State<StatefulWidget>>?;
     return MainAppState();
   }
@@ -130,10 +133,6 @@ class MainAppState extends State<MainApp>
     return currentTab;
   }
 
-  Future<int?> getChatBadge() async {
-    int chatNumber = 2;
-    return chatNumber;
-  }
 
   // Update badge for bottom tab
   void reloadPage() {
@@ -159,17 +158,21 @@ class MainAppState extends State<MainApp>
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) => CupertinoAlertDialog(
             title: const Text(
-              'Are you sure exit app?',
+              'Exit the app?',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            content: const Text(
-              'Do you want to exit an App',
-              style: TextStyle(fontSize: 16),
+            content:const Padding(
+              padding:  EdgeInsets.only(top: 16),
+              child: Text(
+                'Are you sure you want to exit the app?',
+                //Bạn có chắc chắn muốn thoát khỏi ứng dụng?
+                style: TextStyle(fontSize: 14),
+              ),
             ),
             actions: <Widget>[
               TextButton(
@@ -190,5 +193,61 @@ class MainAppState extends State<MainApp>
           ),
         )) ??
         false;
+  }
+
+
+  Future<int?> getChatBadge() async {
+    int chatNumber = 2;
+    return chatNumber;
+  }
+
+
+  Future<int> getNewsBadge() async {
+    int reportNumber = 1;
+    return reportNumber;
+  }
+
+  Future<int> getTranscriptBadge() async {
+    int reportNumber = 2;
+    return reportNumber;
+  }
+
+  Future<void> setAppBadge() async {
+    bool osSupportBadge = await FlutterAppBadger.isAppBadgeSupported();
+    if (osSupportBadge && Platform.isIOS) {
+      int appBadgeNumber = newChatBadge + newsBadge + newTranscriptBadge ;
+      if (appBadgeNumber > 0) {
+        FlutterAppBadger.updateBadgeCount(appBadgeNumber);
+      } else {
+        FlutterAppBadger.removeBadge();
+      }
+    }
+  }
+
+  Future<void> clearChatBadge() async {
+    newChatBadge = 0;
+    reloadPage();
+    setAppBadge();
+  }
+
+  Future<void> clearNewsBadge() async {
+    newsBadge = 0;
+    reloadPage();
+    setAppBadge();
+  }
+
+  Future<void> clearTranscriptBadge() async {
+    newTranscriptBadge = 0;
+    reloadPage();
+    setAppBadge();
+  }
+
+  void clearAllBadge() {
+    setState(() {
+      newChatBadge = 0;
+      newsBadge = 0;
+      newTranscriptBadge = 0;
+      reloadPage();
+    });
   }
 }

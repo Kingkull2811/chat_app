@@ -18,4 +18,5 @@ class DatabaseService{
 
   String? gpsInfo;
 
+  bool isUsingOnlineMode = true;
 }

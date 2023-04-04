@@ -1,5 +1,5 @@
 import 'package:chat_app/network/repository/auth_repository.dart';
-import 'package:chat_app/network/response/error_data_response.dart';
+import 'package:chat_app/network/model/error.dart';
 import 'package:chat_app/screens/authenticator/login/login_form/login_form.dart';
 import 'package:chat_app/screens/authenticator/login/login_form/login_form_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';

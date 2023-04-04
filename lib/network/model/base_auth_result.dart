@@ -1,4 +1,4 @@
-import 'package:chat_app/network/response/error_data_response.dart';
+import 'package:chat_app/network/model/error.dart';
 
 class BaseAuthResult {
   final bool isSuccess;

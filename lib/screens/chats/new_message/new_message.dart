@@ -5,9 +5,14 @@ import 'package:flutter/material.dart';
 class CreateNewMessage extends StatefulWidget {
   final TextEditingController searchNewController;
   final FocusNode focusNode;
+  final bool isAdmin;
 
-  const CreateNewMessage(
-      {super.key, required this.searchNewController, required this.focusNode});
+  const CreateNewMessage({
+    super.key,
+    required this.searchNewController,
+    required this.focusNode,
+    required this.isAdmin,
+  });
 
   @override
   State<CreateNewMessage> createState() => _CreateNewMessageState();
@@ -34,10 +39,11 @@ class _CreateNewMessageState extends State<CreateNewMessage> {
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.only(
-                    left: width * 0.45,
-                    top: 6,
-                    right: width * 0.45,
-                    bottom: 5),
+                  left: width * 0.45,
+                  top: 6,
+                  right: width * 0.45,
+                  bottom: 5,
+                ),
                 child: Container(
                   height: 4,
                   decoration: BoxDecoration(
@@ -92,8 +98,7 @@ class _CreateNewMessageState extends State<CreateNewMessage> {
                       },
                       child: Text(
                         'Create',
-                        style:
-                            TextStyle(fontSize: 14, color: Colors.blue[300]),
+                        style: TextStyle(fontSize: 14, color: Colors.blue[300]),
                       ),
                     ),
                   ],
@@ -136,48 +141,50 @@ class _CreateNewMessageState extends State<CreateNewMessage> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: InkWell(
-                  onTap: () {
-                    //todo::::
-                    print('create new group');
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Icon(
-                          Icons.groups,
-                          size: 24,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      const Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(
-                            'Create a new group',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                child: widget.isAdmin
+                    ? InkWell(
+                        onTap: () {
+                          //todo::::
+                          print('create new group');
+                        },
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Icon(
+                                Icons.groups,
+                                size: 24,
+                                color: Theme.of(context).primaryColor,
+                              ),
                             ),
-                          ),
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Text(
+                                  'Create a new group',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              size: 20,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
                         ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        size: 20,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ],
-                  ),
-                ),
+                      )
+                    : const SizedBox.shrink(),
               ),
               Expanded(
                 child: ListView.separated(
@@ -225,7 +232,8 @@ class _CreateNewMessageState extends State<CreateNewMessage> {
           children: <Widget>[
             Container(
               width: 40,
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(20)),
               child: CircleAvatar(
                 child: Image.asset(
                   itemList.imageUrlAvt,
@@ -236,7 +244,7 @@ class _CreateNewMessageState extends State<CreateNewMessage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: Text(
-                  itemList.name ,
+                  itemList.name,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

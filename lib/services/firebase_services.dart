@@ -1,11 +1,10 @@
 import 'dart:io';
 
+import 'package:chat_app/network/model/user_firebase.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting.dart';
 import 'package:chat_app/utilities/app_constants.dart';
-import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:chat_app/utilities/enum/user_role.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,15 +28,41 @@ class FirebaseService {
   }
 
   Future<void> uploadDataFireStore(
-      String collectionPath, String path, Map<String, String> dataNeedUpdate) {
+    String collectionPath,
+    String path,
+    Map<String, String> dataNeedUpdate,
+  ) {
     return firebaseFirestore
         .collection(collectionPath)
         .doc(path)
         .update(dataNeedUpdate);
   }
 
-  Future<DocumentReference> addMessageToGuestBook(
-      String message, String receiver) async {
+  Future<dynamic> uploadUserData() async {
+    String name = 'id';
+    // UploadTask uploadTask = ;
+
+    try {
+      // TaskSnapshot taskSnapshot  = await uploadTask;
+      // String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      UserFirebaseData userData = UserFirebaseData(
+        userId: '',
+        username: '',
+        email: '',
+        phone: '',
+        token: '',
+        role: 'UserRole.user',
+        parentOf: '',
+      );
+
+      uploadDataFireStore('account', 'path', userData.toJson())
+          .then((value) async {})
+          .catchError((onError) {});
+    } on FirebaseException catch (_) {}
+  }
+
+  Future<DocumentReference> addMessageToGuestBook(String message) async {
     _prefs = await SharedPreferences.getInstance();
 
     // if (!_loggedIn) {
@@ -51,7 +76,6 @@ class FirebaseService {
       // 'userId': FirebaseAuth.instance.currentUser!.uid,
       'sender': _prefs.getString(AppConstants.usernameKey),
       'userId': _prefs.getString(AppConstants.userIdKey),
-      'receiver': receiver,
       'typeMessage': TypeMessage.text,
       'status': MessageStatus.notView,
     });

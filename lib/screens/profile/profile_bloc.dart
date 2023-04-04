@@ -7,7 +7,11 @@ import './profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState>{
   ProfileBloc(BuildContext context): super(ProfileState()){
     on((event, emit) async{
-
+      if(event is DisplayLoading){
+        emit( state.copyWith(
+          isLoading: true,
+        ));
+      }
     });
   }
 }

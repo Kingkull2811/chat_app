@@ -1,5 +1,5 @@
 import 'package:chat_app/bloc/api_result_state.dart';
-import 'package:chat_app/network/response/error_data_response.dart';
+import 'package:chat_app/network/model/error.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 
 class SignUpState implements ApiResultState {

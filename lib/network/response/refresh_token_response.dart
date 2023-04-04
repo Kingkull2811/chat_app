@@ -1,5 +1,5 @@
 import 'package:chat_app/network/response/base_response.dart';
-import 'package:chat_app/network/response/error_data_response.dart';
+import 'package:chat_app/network/model/error.dart';
 import 'package:chat_app/network/response/token_data_response.dart';
 
 class RefreshTokenResponse extends BaseResponse{
