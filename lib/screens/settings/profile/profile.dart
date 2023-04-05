@@ -1,13 +1,13 @@
 import 'package:chat_app/network/model/user_firebase.dart';
-import 'package:chat_app/screens/profile/profile_bloc.dart';
-import 'package:chat_app/screens/profile/profile_state.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../utilities/enum/api_error_result.dart';
-import '../../utilities/screen_utilities.dart';
-import '../../widgets/animation_loading.dart';
+import '../../../utilities/enum/api_error_result.dart';
+import '../../../utilities/screen_utilities.dart';
+import '../../../widgets/animation_loading.dart';
+import 'profile_bloc.dart';
+import 'profile_state.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -72,6 +72,16 @@ class ProfilePageState extends State<ProfilePage> {
         elevation: 0.5,
         backgroundColor: Colors.grey[50],
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            size: 24,
+            color: Colors.black,
+          ),
+        ),
         title: const Text(
           'Profile',
           style: TextStyle(
@@ -119,11 +129,24 @@ class ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            _itemView(title: userData.username, leading: Icons.person_outline, trailing: false),
-            _itemView(title: userData.email, leading: Icons.email_outlined, trailing: false),
-            _itemView(title: userData.phone, leading: Icons.phone, trailing: false),
-            _itemView(title: userData.role, leading: Icons.admin_panel_settings_outlined, trailing: false),
-            _itemView(title: userData.parentOf, leading: Icons.group_outlined, trailing:  true),
+            _itemView(
+                title: userData.username,
+                leading: Icons.person_outline,
+                trailing: false),
+            _itemView(
+                title: userData.email,
+                leading: Icons.email_outlined,
+                trailing: false),
+            _itemView(
+                title: userData.phone, leading: Icons.phone, trailing: false),
+            _itemView(
+                title: userData.role,
+                leading: Icons.admin_panel_settings_outlined,
+                trailing: false),
+            _itemView(
+                title: userData.parentOf,
+                leading: Icons.group_outlined,
+                trailing: true),
           ],
         ),
       ),

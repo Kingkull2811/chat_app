@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 
 class AudioCallGroupPage extends StatefulWidget {
   final String imageUrl;
   final String name;
 
-  const AudioCallGroupPage({Key? key, required this.imageUrl, required this.name})
+  const AudioCallGroupPage(
+      {Key? key, required this.imageUrl, required this.name})
       : super(key: key);
 
   @override
@@ -175,7 +176,7 @@ class _AudioCallGroupPageState extends State<AudioCallGroupPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.only(bottom: 16),
                       child: Text(
                         isOnCalling ? countTime : 'connecting ...',
                         style: const TextStyle(
@@ -245,7 +246,7 @@ class _AudioCallGroupPageState extends State<AudioCallGroupPage> {
                               width: 50,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(25),
-                                color: AppConstants().red700,
+                                color: AppColors.red700,
                               ),
                               child: const Icon(
                                 Icons.call_end_outlined,

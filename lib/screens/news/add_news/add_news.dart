@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:chat_app/screens/news/news.dart';
 import 'package:chat_app/screens/news/news_bloc.dart';
-import 'package:chat_app/services/database.dart';
-import 'package:chat_app/utilities/app_constants.dart';
-import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -161,10 +159,10 @@ class _AddNewsPageState extends State<AddNewsPage> {
                                 _itemAddNews.removeAt(index - 1);
                               });
                             },
-                            child: Icon(
+                            child: const Icon(
                               Icons.cancel_outlined,
                               size: 18,
-                              color: AppConstants().red700,
+                              color: AppColors.red700,
                             ),
                           ),
                         ),

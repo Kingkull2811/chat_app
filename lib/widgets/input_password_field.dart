@@ -1,4 +1,4 @@
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,7 +19,7 @@ class InputPasswordField extends StatelessWidget {
   final bool inputError;
   final String? Function(String?)? validator;
 
-   const InputPasswordField({
+  const InputPasswordField({
     Key? key,
     this.focusNode,
     this.onFieldSubmitted,
@@ -49,61 +49,60 @@ class InputPasswordField extends StatelessWidget {
     }
 
     return TextFormField(
-            focusNode: focusNode,
-            textInputAction: textInputAction,
-            onFieldSubmitted: onFieldSubmitted,
-            controller: controller,
-            onChanged: onChanged,
-            keyboardType: keyboardType,
-            obscureText: obscureText,
-            validator: validator,
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(maxText),
-              FilteringTextInputFormatter.allow(whiteList ?? RegExp('([\\S])'))
-            ],
-            style: const TextStyle(
-                fontSize: 16,
-                color: Color.fromARGB(255, 26, 26, 26),
-                height: 1.35),
-            decoration: InputDecoration(
-              prefixIcon: Icon(prefixIcon, size: 24, color: AppConstants().greyLight,),
-              prefixIconColor: AppConstants().greyLight,
-              suffixIcon: InkWell(
-                onTap: onTapSuffixIcon,
-                child: Icon(
-                  obscureText
-                      ? Icons.visibility_off
-                      : Icons.visibility,
-                  size: 24,
-                  color: AppConstants().greyLight,
-                ),
-              ),
-              suffixIconColor: AppConstants().greyLight,
-              contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-              filled: true,
-              fillColor: inputError
-                  ? AppConstants().red700
-                  : const Color.fromARGB(102, 230, 230, 230),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  width: 1,
-                  color: inputError
-                      ? AppConstants().red700
-                      : Theme.of(context).primaryColor,
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  width: 1,
-                  color: inputError
-                      ? AppConstants().red700
-                      : const Color.fromARGB(128, 130, 130, 130),
-                ),
-              ),
-              hintText: hint,
-            ),
-          );
+      focusNode: focusNode,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
+      controller: controller,
+      onChanged: onChanged,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      validator: validator,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(maxText),
+        FilteringTextInputFormatter.allow(whiteList ?? RegExp('([\\S])'))
+      ],
+      style: const TextStyle(
+          fontSize: 16, color: Color.fromARGB(255, 26, 26, 26), height: 1.35),
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          prefixIcon,
+          size: 24,
+          color: AppColors.greyLight,
+        ),
+        prefixIconColor: AppColors.greyLight,
+        suffixIcon: InkWell(
+          onTap: onTapSuffixIcon,
+          child: Icon(
+            obscureText ? Icons.visibility_off : Icons.visibility,
+            size: 24,
+            color: AppColors.greyLight,
+          ),
+        ),
+        suffixIconColor: AppColors.greyLight,
+        contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+        filled: true,
+        fillColor: inputError
+            ? AppColors.red700
+            : const Color.fromARGB(102, 230, 230, 230),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            width: 1,
+            color:
+                inputError ? AppColors.red700 : Theme.of(context).primaryColor,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            width: 1,
+            color: inputError
+                ? AppColors.red700
+                : const Color.fromARGB(128, 130, 130, 130),
+          ),
+        ),
+        hintText: hint,
+      ),
+    );
   }
 }

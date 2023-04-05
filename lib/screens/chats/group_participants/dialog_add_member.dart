@@ -1,4 +1,4 @@
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +9,12 @@ class DialogAddMember extends StatefulWidget {
   final FocusNode focusNode;
   final List<GroupItems> items;
 
-   const DialogAddMember({Key? key, required this.searchController, required this.focusNode, required this.items}) : super(key: key);
+  const DialogAddMember(
+      {Key? key,
+      required this.searchController,
+      required this.focusNode,
+      required this.items})
+      : super(key: key);
 
   @override
   State<DialogAddMember> createState() => _DialogAddMemberState();
@@ -20,7 +25,7 @@ class _DialogAddMemberState extends State<DialogAddMember> {
 
   @override
   Widget build(BuildContext context) {
-    return  AlertDialog(
+    return AlertDialog(
       alignment: Alignment.center,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(15))),
@@ -38,10 +43,10 @@ class _DialogAddMemberState extends State<DialogAddMember> {
             onTap: () {
               Navigator.pop(context);
             },
-            child: Icon(
+            child: const Icon(
               Icons.cancel_outlined,
               size: 24,
-              color: AppConstants().red700,
+              color: AppColors.red700,
             ),
           ),
         ],
@@ -117,7 +122,8 @@ class _DialogAddMemberState extends State<DialogAddMember> {
                                 borderRadius: BorderRadius.circular(20),
                                 image: DecorationImage(
                                   fit: BoxFit.cover,
-                                  image: NetworkImage(widget.items[index].image),
+                                  image:
+                                      NetworkImage(widget.items[index].image),
                                 ),
                               ),
                             ),
@@ -156,21 +162,21 @@ class _DialogAddMemberState extends State<DialogAddMember> {
                                   color: isAdded
                                       ? Colors.transparent
                                       : Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5),
+                                          .primaryColor
+                                          .withOpacity(0.5),
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: isAdded
-                                    ? Icon(
-                                  Icons.task_alt,
-                                  size: 20,
-                                  color: AppConstants().green600,
-                                )
+                                    ? const Icon(
+                                        Icons.task_alt,
+                                        size: 20,
+                                        color: AppColors.green600,
+                                      )
                                     : const Icon(
-                                  Icons.person_add_alt_outlined,
-                                  size: 20,
-                                  color: Colors.black,
-                                ),
+                                        Icons.person_add_alt_outlined,
+                                        size: 20,
+                                        color: Colors.black,
+                                      ),
                               ),
                             ),
                           ),

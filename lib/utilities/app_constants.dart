@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dio/dio.dart';
 
 class AppConstants {
@@ -9,12 +7,6 @@ class AppConstants {
   static const messagingSenderId = '103251286025';
   static const projectId = 'chatapp-97dbc';
 
-
-  final greyLight = const Color(0xffbebebe);
-  final grey630 = const Color(0xFF737373);
-  final grey130 = const Color(0xFFCFD8DC);
-  final red700 = const Color(0xFFCA0000);
-  final green600 = const Color(0xFF2AD000);
 
   static RegExp emailExp = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
   static RegExp passwordExp = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');

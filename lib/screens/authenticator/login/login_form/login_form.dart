@@ -8,6 +8,7 @@ import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
@@ -109,9 +110,10 @@ class _LoginFormPageState extends State<LoginFormPage> {
                                   child: Text(
                                     'Welcome to \'app name\'',
                                     style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w900,
-                                        color: Colors.black),
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -130,7 +132,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                                 onChanged: (text) {
                                   _validateForm();
                                 },
-                                 textInputAction: TextInputAction.done,
+                                textInputAction: TextInputAction.done,
                                 onSubmit: (_) => focusNode.requestFocus(),
                                 hint: 'Enter your username',
                                 prefixIcon: Icons.person_outline,
@@ -240,7 +242,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
               height: 80,
               color: currentState.buttonStatus == HighlightStatus.active
                   ? Theme.of(context).primaryColor
-                  : AppConstants().greyLight,
+                  : AppColors.greyLight,
             ),
           ),
         ),

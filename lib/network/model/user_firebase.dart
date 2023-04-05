@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../../utilities/enum/user_role.dart';
 
 class UserFirebaseData {
   final String? userId;

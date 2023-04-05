@@ -1,6 +1,7 @@
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../theme.dart';
 
 class MessageDialog2Action extends StatelessWidget {
   final String title;
@@ -57,7 +58,7 @@ class MessageDialog2Action extends StatelessWidget {
             buttonRightLabel ?? 'OK',
             style: TextStyle(
               fontSize: 18,
-              color: isRedLabel? AppConstants().red700: Colors.black,
+              color: isRedLabel? AppColors.red700: Colors.black,
             ),
           ),
         ),

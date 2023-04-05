@@ -6,13 +6,20 @@ abstract class AppColors {
   static const secondary = Color(0xFF3B76F6);
   static const accent = Color(0xFFD6755B);
   static const textDark = Color(0xFF53585A);
-  static const textLigth = Color(0xFFF5F5F5);
+  static const textLight = Color(0xFFF5F5F5);
   static const textFaded = Color(0xFF9899A5);
   static const iconLight = Color(0xFFB1B4C0);
   static const iconDark = Color(0xFFB1B3C1);
   static const textHighlight = secondary;
   static const cardLight = Color(0xFFF9FAFE);
   static const cardDark = Color(0xFF303334);
+
+  static const primaryColor =  Color.fromARGB(255, 120, 144, 156);
+  static const greyLight = Color(0xffbebebe);
+  static const red700 = Color(0xFFCA0000);
+  static const grey630 = Color(0xFF737373);
+  static const grey130 = Color(0xFFCFD8DC);
+  static const green600 = Color(0xFF2AD000);
 }
 
 abstract class _LightColors {
@@ -77,7 +84,7 @@ class AppTheme {
         ),
         visualDensity: visualDensity,
         textTheme: GoogleFonts.interTextTheme().apply(
-          bodyColor: AppColors.textLigth,
+          bodyColor: AppColors.textLight,
         ),
         backgroundColor: _DarkColors.background,
         appBarTheme: darkBase.appBarTheme.copyWith(
@@ -98,7 +105,7 @@ class AppTheme {
         ),
         cardColor: _DarkColors.card,
         primaryTextTheme: const TextTheme(
-          headline6: TextStyle(color: AppColors.textLigth),
+          headline6: TextStyle(color: AppColors.textLight),
         ),
         iconTheme: const IconThemeData(
           color: AppColors.iconLight,

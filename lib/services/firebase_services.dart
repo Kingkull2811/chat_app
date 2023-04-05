@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:chat_app/network/model/user_firebase.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting.dart';
 import 'package:chat_app/utilities/app_constants.dart';
-import 'package:chat_app/utilities/enum/user_role.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';

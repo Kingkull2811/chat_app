@@ -14,7 +14,8 @@ class AppRoutes {
 
   static const chat = 'chat';
   static const news = 'news';
-  // static const chat = '/chat';
+  static const transcript = 'transcript';
+  static const profile = 'settings/profile';
 
   bool isLogin = false;
 

@@ -1,4 +1,4 @@
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,7 +57,7 @@ class Input extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(
-                color: AppConstants().greyLight,
+                color: AppColors.greyLight,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(15),
@@ -65,7 +65,7 @@ class Input extends StatelessWidget {
             prefix: Icon(
               prefixIcon,
               size: 24,
-              color: AppConstants().greyLight,
+              color: AppColors.greyLight,
             ),
             placeholder: hint,
             // maxLines: 1,
@@ -88,9 +88,9 @@ class Input extends StatelessWidget {
               prefixIcon: Icon(
                 prefixIcon,
                 size: 24,
-                color: AppConstants().greyLight,
+                color: AppColors.greyLight,
               ),
-              prefixIconColor: AppConstants().greyLight,
+              prefixIconColor: AppColors.greyLight,
               contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
               filled: true,
               fillColor: const Color.fromARGB(102, 230, 230, 230),
@@ -106,7 +106,7 @@ class Input extends StatelessWidget {
                 borderSide: BorderSide(
                   width: 1,
                   color: isInputError
-                      ? AppConstants().red700
+                      ? AppColors.red700
                       : const Color.fromARGB(128, 130, 130, 130),
                 ),
               ),

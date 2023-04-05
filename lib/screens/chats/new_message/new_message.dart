@@ -1,5 +1,5 @@
 import 'package:chat_app/screens/chats/chat.dart';
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 
 class CreateNewMessage extends StatefulWidget {
@@ -26,7 +26,7 @@ class _CreateNewMessageState extends State<CreateNewMessage> {
       alignment: Alignment.bottomCenter,
       child: Container(
         height: MediaQuery.of(context).copyWith().size.height * 0.9,
-        color: AppConstants().grey630,
+        color: AppColors.grey630,
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,

@@ -1,8 +1,7 @@
 import 'package:chat_app/screens/chats/chat_bloc.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting_bloc.dart';
-import 'package:chat_app/screens/main/menu/drawer_menu.dart';
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +55,7 @@ class ChatsPageState extends State<ChatsPage> {
             padding: const EdgeInsets.only(left: 16),
             child: GestureDetector(
               onTap: () {
-                _scaffoldKey.currentState?.openDrawer();
+                // Navigator.push(context, MaterialPageRoute(builder: builder))
               },
               child: const CircleAvatar(
                 backgroundImage:
@@ -66,7 +65,7 @@ class ChatsPageState extends State<ChatsPage> {
           ),
           title: InkWell(
             onTap: () {
-              _scaffoldKey.currentState?.openDrawer();
+              // _scaffoldKey.currentState?.openDrawer();
             },
             child: const Text(
               'Chat',
@@ -120,16 +119,16 @@ class ChatsPageState extends State<ChatsPage> {
           },
         ),
         //drawerEnableOpenDragGesture: false,
-        drawer: DrawerMenu(
-          imageUrl: 'assets/images/image_profile_1.png',
-          name: 'Martha Craig',
-          onTapNightMode: (value) {
-            setState(() {
-              isNightMode = !isNightMode;
-              SharedPreferencesStorage().setNightMode(isNightMode);
-            });
-          },
-        ),
+        // drawer: DrawerMenu(
+        //   imageUrl: 'assets/images/image_profile_1.png',
+        //   name: 'Martha Craig',
+        //   onTapNightMode: (value) {
+        //     setState(() {
+        //       isNightMode = !isNightMode;
+        //       SharedPreferencesStorage().setNightMode(isNightMode);
+        //     });
+        //   },
+        // ),
       );
     });
   }
@@ -189,7 +188,7 @@ class ChatsPageState extends State<ChatsPage> {
       builder: (value) {
         return Container(
           height: MediaQuery.of(context).copyWith().size.height * 0.9,
-          color: AppConstants().grey630,
+          color: AppColors.grey630,
           child: Container(
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -432,7 +431,8 @@ class ChatsPageState extends State<ChatsPage> {
                                   color: Theme.of(context).primaryColor,
                                 ),
                               ),
-                              Padding(padding: const EdgeInsets.only(left: 10),
+                              const Padding(
+                                padding: EdgeInsets.only(left: 10),
                               )
                             ],
                           ),
@@ -456,89 +456,90 @@ class ChatsPageState extends State<ChatsPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 0),
       child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlocProvider<OnChattingBloc>(
-                  create: (context) => OnChattingBloc(context),
-                  child: OnChattingPage(item: item),
-                ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider<OnChattingBloc>(
+                create: (context) => OnChattingBloc(context),
+                child: OnChattingPage(item: item),
               ),
-            );
-          },
-          child: SizedBox(
-            height: 70,
-            child: ListTile(
-              leading: Container(
-                height: 60,
-                width: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 2,
-                  ),
-                ),
-                child: CircleAvatar(
-                  radius: 50,
-                  child: Image.asset(
-                    item.imageUrlAvt,
-                  ),
-                ),
-              ),
-              title: Text(
-                item.name,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              subtitle: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.45,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.45),
-                      child: Text(
-                        item.lastMessage,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Text(
-                        item.time,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              trailing: SizedBox(
-                width: 16,
-                child: Icon(
-                  item.isRead ? Icons.check_circle : Icons.check_circle_outline,
-                  size: 16,
+            ),
+          );
+        },
+        child: SizedBox(
+          height: 70,
+          child: ListTile(
+            leading: Container(
+              height: 60,
+              width: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
                   color: Colors.grey,
+                  width: 2,
+                ),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                child: Image.asset(
+                  item.imageUrlAvt,
                 ),
               ),
             ),
-          )),
+            title: Text(
+              item.name,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            subtitle: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.45,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.45),
+                    child: Text(
+                      item.lastMessage,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(
+                      item.time,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            trailing: SizedBox(
+              width: 16,
+              child: Icon(
+                item.isRead ? Icons.check_circle : Icons.check_circle_outline,
+                size: 16,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

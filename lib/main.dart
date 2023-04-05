@@ -6,7 +6,6 @@ import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/screens/news/news.dart';
-import 'package:chat_app/screens/profile/profile.dart';
 import 'package:chat_app/screens/transcript/transcript.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/theme.dart';
@@ -28,7 +27,7 @@ void main() async {
   DatabaseService().chatKey = GlobalKey<ChatsPageState>();
   DatabaseService().newsKey = GlobalKey<NewsPageState>();
   DatabaseService().transcriptKey = GlobalKey<TranscriptPageState>();
-  DatabaseService().profileKey = GlobalKey<ProfilePageState>();
+  // DatabaseService().profileKey = GlobalKey<ProfilePageState>();
 
   // Init SharedPreferences storage
   await SharedPreferencesStorage.init();
@@ -76,7 +75,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    getUserLoggedInStatus();
+    // getUserLoggedInStatus();
   }
 
   @override
@@ -84,7 +83,7 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  getUserLoggedInStatus() async {
+  // getUserLoggedInStatus() async {
     // await HelperFunctions.getUserLoggedInStatus().then((value) {
     //   if (value != null) {
     //     setState(() {
@@ -92,7 +91,7 @@ class _MyAppState extends State<MyApp> {
     //     });
     //   }
     // });
-  }
+  // }
 
   @override
   Widget build(BuildContext context) {

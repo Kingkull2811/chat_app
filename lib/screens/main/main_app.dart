@@ -1,25 +1,24 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:chat_app/theme.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
-import '../../utilities/app_constants.dart';
+import '../../services/database.dart';
+import '../chats/chat.dart';
+import '../chats/chat_bloc.dart';
 import '../main/tab/tab_bloc.dart';
 import '../main/tab/tab_event.dart';
 import '../main/tab/tab_selector.dart';
 import '../news/news.dart';
 import '../news/news_bloc.dart';
-import '../profile/profile.dart';
-import '../profile/profile_bloc.dart';
+import '../settings/setting_page.dart';
 import '../transcript/transcript.dart';
 import '../transcript/transcript_bloc.dart';
-import '../chats/chat.dart';
-import '../chats/chat_bloc.dart';
-import '../../services/database.dart';
 
 class MainApp extends StatefulWidget {
   final bool navFromStart;
@@ -60,31 +59,31 @@ class MainAppState extends State<MainApp>
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<dynamic>(
-        future: Future.wait([getChatBadge()]),
-        builder: (context, snapshot) {
-          return BlocBuilder<TabBloc, AppTab>(builder: (context, activeTab) {
+      future: Future.wait([getChatBadge()]),
+      builder: (context, snapshot) {
+        return BlocBuilder<TabBloc, AppTab>(
+          builder: (context, activeTab) {
             _tabController?.index = AppTab.values.indexOf(activeTab);
             return WillPopScope(
               onWillPop: _onWillPop,
               child: Scaffold(
                 body: _handleScreen(activeTab),
-                // IndexedStack(
-                //   index:  AppTab.values.indexOf(activeTab),
-                //   children: _handleScreen(activeTab),
-                // ),
                 bottomNavigationBar: TabSelector(
-                    activeTab: activeTab,
-                    newChatsBadgeNumber: 1,
-                    newsBadgeNumber: 2,
-                    newTranscriptBadgeNumber: 1,
-                    onTabSelected: (tab) async {
-                      BlocProvider.of<TabBloc>(context).add(TabUpdated(tab));
-                      setState(() {});
-                    }),
+                  activeTab: activeTab,
+                  newChatsBadgeNumber: 1,
+                  newsBadgeNumber: 2,
+                  newTranscriptBadgeNumber: 1,
+                  onTabSelected: (tab) async {
+                    BlocProvider.of<TabBloc>(context).add(TabUpdated(tab));
+                    setState(() {});
+                  },
+                ),
               ),
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   _handleScreen(AppTab activeTab) {
@@ -115,12 +114,7 @@ class MainAppState extends State<MainApp>
         );
         break;
       case AppTab.profile:
-        currentTab = BlocProvider<ProfileBloc>(
-          create: (context) => ProfileBloc(context),
-          child: ProfilePage(
-            key: DatabaseService().profileKey,
-          ),
-        );
+        currentTab = const SettingPage();
         break;
       default:
         currentTab = BlocProvider(
@@ -132,7 +126,6 @@ class MainAppState extends State<MainApp>
     }
     return currentTab;
   }
-
 
   // Update badge for bottom tab
   void reloadPage() {
@@ -166,8 +159,8 @@ class MainAppState extends State<MainApp>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            content:const Padding(
-              padding:  EdgeInsets.only(top: 16),
+            content: const Padding(
+              padding: EdgeInsets.only(top: 16),
               child: Text(
                 'Are you sure you want to exit the app?',
                 //Bạn có chắc chắn muốn thoát khỏi ứng dụng?
@@ -184,9 +177,11 @@ class MainAppState extends State<MainApp>
                   Navigator.of(context).pop(true);
                   Navigator.of(context).pop();
                 },
-                child: Text(
+                child: const Text(
                   'Exits',
-                  style: TextStyle(color: AppConstants().red700),
+                  style: TextStyle(
+                    color: AppColors.red700,
+                  ),
                 ),
               ),
             ],
@@ -195,12 +190,10 @@ class MainAppState extends State<MainApp>
         false;
   }
 
-
   Future<int?> getChatBadge() async {
     int chatNumber = 2;
     return chatNumber;
   }
-
 
   Future<int> getNewsBadge() async {
     int reportNumber = 1;
@@ -215,7 +208,7 @@ class MainAppState extends State<MainApp>
   Future<void> setAppBadge() async {
     bool osSupportBadge = await FlutterAppBadger.isAppBadgeSupported();
     if (osSupportBadge && Platform.isIOS) {
-      int appBadgeNumber = newChatBadge + newsBadge + newTranscriptBadge ;
+      int appBadgeNumber = newChatBadge + newsBadge + newTranscriptBadge;
       if (appBadgeNumber > 0) {
         FlutterAppBadger.updateBadgeCount(appBadgeNumber);
       } else {

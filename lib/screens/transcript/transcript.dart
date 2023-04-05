@@ -1,4 +1,3 @@
-import 'package:chat_app/screens/transcript/add_transcript/add_transcript.dart';
 import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -72,39 +71,23 @@ class TranscriptPageState extends State<TranscriptPage> {
           ),
         ),
         actions: [
-          isAdmin
-              ? IconButton(
-                  onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddTranscriptsPage(),
-                      ),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.edit_note,
-                    size: 30,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                )
-              : IconButton(
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const MessageDialog(
-                        title: AppConstants.calculateFinalPoint,
-                        content:
-                            '${AppConstants.finalPoint}\n${AppConstants.processPoint}',
-                      ),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.info_outline,
-                    size: 24,
-                    color: Theme.of(context).primaryColor,
-                  ),
+          IconButton(
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (context) => const MessageDialog(
+                  title: AppConstants.calculateFinalPoint,
+                  content:
+                      '${AppConstants.finalPoint}\n${AppConstants.processPoint}',
                 ),
+              );
+            },
+            icon: Icon(
+              Icons.info_outline,
+              size: 24,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
         ],
       ),
       // extendBodyBehindAppBar: true,
@@ -212,7 +195,7 @@ class TranscriptPageState extends State<TranscriptPage> {
             ),
           ),
           SizedBox(
-            width: MediaQuery.of(context).size.width* 0.4,
+            width: MediaQuery.of(context).size.width * 0.4,
             child: Text(
               ': $titleValue',
               maxLines: 1,

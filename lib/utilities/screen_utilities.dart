@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/chats/chat.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -83,7 +84,7 @@ void backToChat(BuildContext context) {
   } catch (_) {}
 }
 
-void backToNews(BuildContext context){
+void backToNews(BuildContext context) {
   try {
     (DatabaseService().mainKey?.currentState as MainAppState).changeTabToNews();
     (DatabaseService().mainKey?.currentState as MainAppState).reloadPage();
@@ -93,8 +94,7 @@ void backToNews(BuildContext context){
   } catch (_) {}
 }
 
-AndroidAuthMessages androidLocalAuthMessage(
-        //BuildContext context,
+AndroidAuthMessages androidLocalAuthMessage(//BuildContext context,
         ) =>
     const AndroidAuthMessages(
       cancelButton: 'OK',
@@ -103,8 +103,7 @@ AndroidAuthMessages androidLocalAuthMessage(
           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
     );
 
-IOSAuthMessages iosLocalAuthMessages(
-        //BuildContext context,
+IOSAuthMessages iosLocalAuthMessages(//BuildContext context,
         ) =>
     const IOSAuthMessages(
       cancelButton: 'OK',
@@ -209,7 +208,7 @@ Future<void> showSuccessBottomSheet(
       },
       child: Container(
         height: 350,
-        color: AppConstants().grey630,
+        color: AppColors.grey630,
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -224,12 +223,12 @@ Future<void> showSuccessBottomSheet(
               Expanded(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
                       child: Icon(
                         Icons.verified_outlined,
                         size: 150,
-                        color: AppConstants().green600,
+                        color: AppColors.green600,
                       ),
                     ),
                     Padding(

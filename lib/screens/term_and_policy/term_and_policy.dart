@@ -34,6 +34,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
       ),

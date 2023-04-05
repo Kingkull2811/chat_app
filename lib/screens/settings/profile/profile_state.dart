@@ -1,5 +1,5 @@
-import '../../bloc/api_result_state.dart';
-import '../../utilities/enum/api_error_result.dart';
+import '../../../bloc/api_result_state.dart';
+import '../../../utilities/enum/api_error_result.dart';
 
 class ProfileState implements ApiResultState {
   final bool isLoading;
