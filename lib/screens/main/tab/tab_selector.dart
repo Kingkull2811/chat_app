@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'tab_event.dart';
@@ -31,7 +32,7 @@ class TabSelectorState extends State<TabSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
+    return CupertinoTabBar(
       currentIndex: AppTab.values.indexOf(widget.activeTab),
       onTap: (index) {
         widget.onTabSelected(AppTab.values[index]);
@@ -203,21 +204,26 @@ class TabSelectorState extends State<TabSelector> {
           label: 'Settings',
         ),
       ],
-      selectedLabelStyle: const TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-      ),
-      unselectedLabelStyle: TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).primaryColor,
-      ),
-      unselectedItemColor: Theme.of(context).primaryColor,
-      selectedItemColor: Colors.black,
-      showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed,
-      selectedFontSize: 12,
+      activeColor: Colors.black,
+      inactiveColor: Theme.of(context).primaryColor,
+      backgroundColor: Colors.grey[50],
+      iconSize: 30,
+      height: 50,
+      // selectedLabelStyle: const TextStyle(
+      //   fontSize: 10,
+      //   fontWeight: FontWeight.bold,
+      //   color: Colors.black,
+      // ),
+      // unselectedLabelStyle: TextStyle(
+      //   fontSize: 10,
+      //   fontWeight: FontWeight.bold,
+      //   color: Theme.of(context).primaryColor,
+      // ),
+      // unselectedItemColor: Theme.of(context).primaryColor,
+      // selectedItemColor: Colors.black,
+      // showUnselectedLabels: true,
+      // type: BottomNavigationBarType.fixed,
+      // selectedFontSize: 12,
     );
   }
 }

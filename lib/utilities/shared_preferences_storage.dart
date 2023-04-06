@@ -1,6 +1,7 @@
 import 'package:chat_app/network/response/user_info_response.dart';
 import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'app_constants.dart';
 
 class SharedPreferencesStorage {
@@ -15,7 +16,7 @@ class SharedPreferencesStorage {
     return await _prefs.setBool(AppConstants.isLoggedOut, value);
   }
 
-  bool? getLoggedOutStatus(){
+  bool? getLoggedOutStatus() {
     return _prefs.getBool(AppConstants.isLoggedOut);
   }
 
@@ -29,24 +30,20 @@ class SharedPreferencesStorage {
       await _secureStorage.writeSecureData(
           AppConstants.emailKey, signInData.email.toString());
 
-      if (signInData.expiredAccessToken != null) {
-        await _prefs.setString(
-            AppConstants.accessTokenExpiredKey, signInData.expiredAccessToken!);
-      }
+      await _prefs.setString(AppConstants.accessTokenExpiredKey,
+          signInData.expiredAccessToken ?? '');
+      await _prefs.setString(AppConstants.refreshTokenExpiredKey,
+          signInData.expiredRefreshToken ?? '');
+      await _prefs.setString(
+          AppConstants.usernameKey, signInData.username ?? '');
+      await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
 
-      if (signInData.expiredRefreshToken != null) {
-        await _prefs.setString(AppConstants.refreshTokenExpiredKey,
-            signInData.expiredRefreshToken!);
-      }
-
-      if (signInData.username != null) {
-        await _prefs.setString(AppConstants.usernameKey, signInData.username!);
-      }
-      if (signInData.id != null) {
-        await _prefs.setString(
-            AppConstants.userIdKey, signInData.id.toString());
-      }
+      await _prefs.setString(AppConstants.userRoleKey, signInData.roles ?? '');
     }
+  }
+
+  String getUserRole() {
+    return _prefs.getString(AppConstants.userRoleKey) ?? '';
   }
 
   Future<String> getAccessToken() async {

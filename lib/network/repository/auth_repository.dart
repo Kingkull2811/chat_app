@@ -10,24 +10,20 @@ import 'package:flutter/cupertino.dart';
 
 class AuthRepository {
   final _authProvider = AuthProvider();
-  final _sharedPrefs = SharedPreferencesStorage();
 
   Future<void> _saveUserDataToFirebase({
     required BuildContext context,
     // required ProviderRef ref,
-    required  int? id,
+    required int? id,
     required String? username,
     required String? email,
     required String? phoneNumber,
     required String? roles,
     required File? imageAvt,
-
-}) async {
-
-  }
+  }) async {}
 
   Future<void> _saveUserInfo(UserInfoResponse? userInfoData) async {
-    await _sharedPrefs.setSaveUserInfo(userInfoData);
+    await SharedPreferencesStorage().setSaveUserInfo(userInfoData);
   }
 
   Future<BaseAuthResult> refreshToken({
@@ -65,6 +61,7 @@ class AuthRepository {
 
     if (loginResponse.httpStatus == 200) {
       _saveUserInfo(loginResponse.data);
+
       return BaseAuthResult(
         isSuccess: true,
         message: loginResponse.message,

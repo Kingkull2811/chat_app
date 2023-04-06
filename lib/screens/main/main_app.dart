@@ -113,7 +113,7 @@ class MainAppState extends State<MainApp>
           ),
         );
         break;
-      case AppTab.profile:
+      case AppTab.settings:
         currentTab = const SettingPage();
         break;
       default:
@@ -145,7 +145,7 @@ class MainAppState extends State<MainApp>
   }
 
   void changeTabToProfile() {
-    BlocProvider.of<TabBloc>(context).add(const TabUpdated(AppTab.profile));
+    BlocProvider.of<TabBloc>(context).add(const TabUpdated(AppTab.settings));
   }
 
   Future<bool> _onWillPop() async {

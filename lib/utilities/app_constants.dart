@@ -7,9 +7,10 @@ class AppConstants {
   static const messagingSenderId = '103251286025';
   static const projectId = 'chatapp-97dbc';
 
-
-  static RegExp emailExp = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-  static RegExp passwordExp = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
+  static RegExp emailExp =
+      RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+  static RegExp passwordExp =
+      RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
 
   static const int maxConnectionPerHost = 16;
 
@@ -22,6 +23,7 @@ class AppConstants {
   static const String usernameKey = 'USERNAME';
   static const String emailKey = 'EMAIL';
   static const String userIdKey = 'USER_ID';
+  static const String userRoleKey = 'USER_ROLE';
 
   static const String nightMode = 'IS_NIGHT_MODE';
   static const String soundModeKey = 'IS_TURN_ON_SOUND';
@@ -37,7 +39,6 @@ class AppConstants {
     receiveTimeout: const Duration(seconds: 8),
     receiveDataWhenStatusError: true,
   );
-
 
   static const double defaultLoadingNetworkImageSize = 25;
 
@@ -58,7 +59,8 @@ class AppConstants {
       '(injected humour and the like).\nWhere does it come from? Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.';
 
   static const String calculateFinalPoint = 'How to calculate final point?';
-  static const String finalPoint = 'final_point = 0.6 x final_exam_point + 0.4 x process_point';
-  static const String processPoint = 'process_point = (first_point + second_point)/2';
-
+  static const String finalPoint =
+      'final_point = 0.6 x final_exam_point + 0.4 x process_point';
+  static const String processPoint =
+      'process_point = (first_point + second_point)/2';
 }

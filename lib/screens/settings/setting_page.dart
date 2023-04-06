@@ -46,7 +46,7 @@ class _SettingPageState extends State<SettingPage> {
           'Setting',
           style: TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.normal,
+            fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),

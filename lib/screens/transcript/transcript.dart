@@ -2,11 +2,13 @@ import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:chat_app/widgets/message_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../utilities/enum/user_role.dart';
 import '../../utilities/screen_utilities.dart';
 import '../../utilities/utils.dart';
 import '../../widgets/animation_loading.dart';
@@ -19,7 +21,25 @@ class TranscriptPage extends StatefulWidget {
 }
 
 class TranscriptPageState extends State<TranscriptPage> {
-  bool isAdmin = false;
+  bool isAdmin = true;
+
+  bool check() {
+    if (SharedPreferencesStorage().getUserRole() == UserRole.admin.name) {
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  void initState() {
+    // isAdmin = check();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +67,8 @@ class TranscriptPageState extends State<TranscriptPage> {
         Widget body = const SizedBox.shrink();
         if (curState.isLoading) {
           body = const Scaffold(body: AnimationLoading());
+        } else if (isAdmin) {
+          body = _bodyAdmin(context, curState);
         } else {
           body = _body(context, curState);
         }
@@ -101,6 +123,46 @@ class TranscriptPageState extends State<TranscriptPage> {
               _cardStudent(),
               _cardSubject(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _bodyAdmin(BuildContext context, TranscriptState state) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.5,
+        backgroundColor: Colors.grey[50],
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        title: const Text(
+          'Transcript',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () async {},
+            icon: Icon(
+              Icons.add_circle_outline_outlined,
+              size: 26,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        ],
+      ),
+      // extendBodyBehindAppBar: true,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          scrollDirection: Axis.vertical,
+          child: Container(
+            color: Colors.red,
           ),
         ),
       ),
