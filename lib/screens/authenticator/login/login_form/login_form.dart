@@ -12,6 +12,7 @@ import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/custom_check_box.dart';
@@ -192,10 +193,9 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   Future<void> _goToTermPolicy() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(AppConstants.isLoggedOut, false);
+    SharedPreferencesStorage().setLoggedOutStatus(false);
     bool agreedWithTerms =
-        prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
+        SharedPreferencesStorage().getAgreedWithTerms() ?? false;
     if (mounted) {
       if (!agreedWithTerms) {
         Navigator.pushReplacement(
@@ -388,12 +388,14 @@ class _LoginFormPageState extends State<LoginFormPage> {
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => BlocProvider<ForgotPasswordBloc>(
-                              create: (context) => ForgotPasswordBloc(context),
-                              child: const ForgotPasswordPage(),
-                            )));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider<ForgotPasswordBloc>(
+                      create: (context) => ForgotPasswordBloc(context),
+                      child: const ForgotPasswordPage(),
+                    ),
+                  ),
+                );
               },
               child: Text(
                 'Forgot password?',

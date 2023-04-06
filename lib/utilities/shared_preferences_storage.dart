@@ -20,6 +20,10 @@ class SharedPreferencesStorage {
     return _prefs.getBool(AppConstants.isLoggedOut);
   }
 
+  bool? getAgreedWithTerms() {
+    return _prefs.getBool(AppConstants.agreedWithTermsKey);
+  }
+
   ///save user info
   Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
     if (signInData != null) {
