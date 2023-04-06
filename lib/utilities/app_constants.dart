@@ -25,6 +25,8 @@ class AppConstants {
   static const String userIdKey = 'USER_ID';
   static const String userRoleKey = 'USER_ROLE';
 
+  static const String isFillProfileKey = 'IS_FILL_PROFILE_STATUS';
+
   static const String nightMode = 'IS_NIGHT_MODE';
   static const String soundModeKey = 'IS_TURN_ON_SOUND';
   static const String previewModeKey = 'IS_TURN_ON_PREVIEW_NOTIFICATION';

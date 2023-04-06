@@ -7,6 +7,7 @@ import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
+import 'package:chat_app/screens/settings/fill_profile/fill_profile.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -212,17 +213,24 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   _navigateToMainPage() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => TabBloc(),
-          child: MainApp(
-            navFromStart: true,
-          ),
-        ),
-      ),
-    );
+    SharedPreferencesStorage().getFillProfileStatus()
+        ? Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => TabBloc(),
+                child: MainApp(
+                  navFromStart: true,
+                ),
+              ),
+            ),
+          )
+        : Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FillProfilePage(),
+            ),
+          );
   }
 
   _buildBiometricsButton(LoginFormState currentState) {

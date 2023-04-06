@@ -24,6 +24,10 @@ class SharedPreferencesStorage {
     return _prefs.getBool(AppConstants.agreedWithTermsKey);
   }
 
+  bool getFillProfileStatus() {
+    return _prefs.getBool(AppConstants.isFillProfileKey) ?? false;
+  }
+
   ///save user info
   Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
     if (signInData != null) {
@@ -43,6 +47,9 @@ class SharedPreferencesStorage {
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
 
       await _prefs.setString(AppConstants.userRoleKey, signInData.roles ?? '');
+
+      //get isFillProfile in signData to save
+      await _prefs.setBool(AppConstants.isFillProfileKey, false);
     }
   }
 
