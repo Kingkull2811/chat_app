@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:chat_app/network/model/base_auth_result.dart';
 import 'package:chat_app/network/provider/auth_provider.dart';
 import 'package:chat_app/network/response/login_response.dart';
-import 'package:chat_app/network/response/user_info_response.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -22,17 +21,13 @@ class AuthRepository {
     required File? imageAvt,
   }) async {}
 
-  Future<void> _saveUserInfo(UserInfoResponse? userInfoData) async {
-    await SharedPreferencesStorage().setSaveUserInfo(userInfoData);
-  }
-
   Future<BaseAuthResult> refreshToken({
     required String refreshToken,
   }) async {
     final response =
         await _authProvider.refreshToken(refreshToken: refreshToken);
 
-    log('login response: ${response.toString()}');
+    // log('login response: ${response.toString()}');
 
     if (response.httpStatus == 200) {
       //_saveUserInfo(response.data);
@@ -57,10 +52,10 @@ class AuthRepository {
       username: username,
       password: password,
     );
-    log('login response: ${loginResponse.toString()}');
+    // log('login response: ${loginResponse.toString()}');
 
     if (loginResponse.httpStatus == 200) {
-      _saveUserInfo(loginResponse.data);
+      await SharedPreferencesStorage().setSaveUserInfo(loginResponse.data);
 
       return BaseAuthResult(
         isSuccess: true,
@@ -79,13 +74,22 @@ class AuthRepository {
     required String username,
     required String email,
     required String password,
+    required String confirmPassword,
+    required List<String> roles,
   }) async {
-    final signUpResponse = await _authProvider.signUp(
-      username: username,
-      email: email,
-      password: password,
-    );
-    log("sign_up response: ${signUpResponse.toString()}");
+    final data = {
+      "confirmPassword": confirmPassword,
+      "email": email,
+      "fullName": null,
+      "isFillProfileKey": false,
+      "password": password,
+      "phone": null,
+      "roles": [roles],
+      "username": username
+    };
+
+    final signUpResponse = await _authProvider.signUp(data: data);
+    // log("sign_up response: ${signUpResponse.toString()}");
     if (signUpResponse.httpStatus == 200) {
       return BaseAuthResult(
         isSuccess: true,
@@ -100,12 +104,37 @@ class AuthRepository {
     );
   }
 
+  Future<Object> getUserInfo({required int userId}) async =>
+      await _authProvider.getUserInfo(userId: userId);
+
+  Future<Object> fillProfile({
+    required int userID,
+    required String fullName,
+    required String phone,
+    required String imageUrl,
+  }) async {
+    final data = {
+      // "id": 1,
+      // "username": "string",
+      // "email": "string@gmail.com",
+      // "roles": [
+      //   {"id": 2, "name": "ROLE_USER"}
+      // ],
+      "fullName": fullName,
+      "phone": phone,
+      "isFillProfileKey": true,
+      "fileUrl": imageUrl
+    };
+
+    return await _authProvider.fillProfile(userID: userID, data: data);
+  }
+
   Future<BaseAuthResult> forgotPassword({
     required String email,
   }) async {
     final response = await _authProvider.forgotPassword(email: email);
 
-    log('forgot response: ${response.toString()})');
+    // log('forgot response: ${response.toString()})');
     if (response.httpStatus == 200) {
       return BaseAuthResult(
         isSuccess: true,
@@ -129,7 +158,7 @@ class AuthRepository {
       otpCode: otpCode,
     );
 
-    log('verify response ${response.toString()}');
+    // log('verify response ${response.toString()}');
     if (response.httpStatus == 200) {
       return BaseAuthResult(
         isSuccess: true,

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../services/database.dart';
 import '../utilities/app_constants.dart';
 import '../utilities/utils.dart';
 import 'animation_loading.dart';
@@ -12,6 +11,7 @@ class AppImage extends StatelessWidget {
   const AppImage({
     Key? key,
     required this.localPathOrUrl,
+    this.isOnline = false,
     this.width,
     this.height,
     this.boxFit,
@@ -19,6 +19,8 @@ class AppImage extends StatelessWidget {
     this.placeholder,
     this.alignment,
   }) : super(key: key);
+
+  final bool isOnline;
 
   /// Widget placeholder while image downloading from server
   final Widget? placeholder;
@@ -36,7 +38,7 @@ class AppImage extends StatelessWidget {
     if (isNullOrEmpty(localPathOrUrl)) {
       return errorWidget ?? const SizedBox.shrink();
     }
-    return DatabaseService().isUsingOnlineMode
+    return isOnline
         ? CachedNetworkImage(
             imageUrl: localPathOrUrl ?? '',
             alignment: alignment ?? Alignment.center,

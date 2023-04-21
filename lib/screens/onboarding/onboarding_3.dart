@@ -5,6 +5,10 @@ import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../utilities/shared_preferences_storage.dart';
+import '../settings/fill_profile/fill_profile.dart';
+import '../settings/fill_profile/fill_profile_bloc.dart';
+
 class OnBoarding3Page extends StatelessWidget {
   const OnBoarding3Page({
     Key? key,
@@ -52,18 +56,36 @@ class OnBoarding3Page extends StatelessWidget {
                 showLoading(context);
                 const Duration(milliseconds: 500);
                 Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider<TabBloc>(
-                      create: (context) => TabBloc(),
-                      child: MainApp(navFromStart: true),
-                    ),
-                  ),
-                );
+                    context,
+                    SharedPreferencesStorage().getAdminRole()
+                        ? _navigateToMainPage(context)
+                        : SharedPreferencesStorage().getFillProfileStatus()
+                            ? _navigateToMainPage(context)
+                            : _navigateToFillProfilePage());
               },
             ),
           )
         ],
+      ),
+    );
+  }
+
+  _navigateToFillProfilePage() {
+    return MaterialPageRoute(
+      builder: (context) => BlocProvider<FillProfileBloc>(
+        create: (context) => FillProfileBloc(context),
+        child: const FillProfilePage(),
+      ),
+    );
+  }
+
+  _navigateToMainPage(BuildContext context) {
+    return MaterialPageRoute(
+      builder: (context) => BlocProvider(
+        create: (context) => TabBloc(),
+        child: MainApp(
+          navFromStart: true,
+        ),
       ),
     );
   }

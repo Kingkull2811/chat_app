@@ -1,12 +1,10 @@
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/main/tab/tab_bloc.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/database.dart';
 import '../../utilities/app_constants.dart';
-import '../../utilities/screen_utilities.dart';
 import '../../widgets/custom_check_box.dart';
 import '../../widgets/primary_button.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -116,44 +114,57 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
   }
 
   Widget _nextButton() {
-    handleTap() async {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.setBool(AppConstants.agreedWithTermsKey, true);
-      bool isFirstTimeOpenApp =
-          preferences.getBool(AppConstants.firstTimeOpenKey) ?? true;
-      if (isFirstTimeOpenApp) {
-        preferences.setBool(AppConstants.firstTimeOpenKey, false);
-        if (mounted) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const OnBoardingPage()));
-        }
-      } else {
-        if (DatabaseService().chatKey != null) {
-          if (mounted) {
-            backToChat(context);
-          }
-        } else {
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    BlocProvider<TabBloc>(
-                      create: (BuildContext context) => TabBloc(),
-                      child: MainApp(navFromStart: true),
-                    ),
-              ),
-            );
-          }
-        }
-      }
-      return null;
-    }
-
     return PrimaryButton(
       text: 'Next',
       isDisable: !_isRead,
-      onTap: _isRead ? handleTap : null,
+      onTap: !_isRead
+          ? null
+          : () async {
+              await SharedPreferencesStorage().setAgreeTerm(true);
+              bool isFirstTimeOpenApp =
+                  SharedPreferencesStorage().getFirstTimeOpen();
+
+              if (isFirstTimeOpenApp) {
+                await SharedPreferencesStorage().setFirstTimeOpen(false);
+                if (mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const OnBoardingPage()),
+                  );
+                }
+              } else {
+                if (mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider<TabBloc>(
+                        create: (BuildContext context) => TabBloc(),
+                        child: MainApp(navFromStart: true),
+                      ),
+                    ),
+                  );
+                }
+                // if (DatabaseService().chatKey != null) {
+                //   if (mounted) {
+                //     backToChat(context);
+                //   }
+                // } else {
+                //   if (mounted) {
+                //     // log('isFill: ${SharedPreferencesStorage().getFillProfileStatus()}');
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => BlocProvider<TabBloc>(
+                //           create: (BuildContext context) => TabBloc(),
+                //           child: MainApp(navFromStart: true),
+                //         ),
+                //       ),
+                //     );
+                //   }
+                // }
+              }
+            },
     );
   }
 }

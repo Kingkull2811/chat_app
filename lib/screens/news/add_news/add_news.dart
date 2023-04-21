@@ -183,7 +183,6 @@ class _AddNewsPageState extends State<AddNewsPage> {
                   // (_titleController.text.isEmpty && _itemAddNews.isEmpty) ? null : // => backToNews(context),
                   () async {
                 //todo: post news, clean _itemAddNews before switch screen
-                print('post news');
                 // showLoading(context);
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -212,12 +211,12 @@ class _AddNewsPageState extends State<AddNewsPage> {
             CupertinoActionSheetAction(
               onPressed: () async {
                 Navigator.pop(context);
-                final imagePath = await pickImageFromGallery(context);
-                if (imagePath != null) {
-                  setState(() {
-                    _itemAddNews.add(ListImageAddNews(urlImage: imagePath));
-                  });
-                }
+                // final imagePath = await pickImageFromGallery(context);
+                // if (imagePath != null) {
+                //   setState(() {
+                //     _itemAddNews.add(ListImageAddNews(urlImage: imagePath));
+                //   });
+                // }
               },
               child: const Text(
                 'Pick image from Gallery',

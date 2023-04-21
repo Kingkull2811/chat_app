@@ -1,7 +1,9 @@
 import 'package:chat_app/network/response/user_info_response.dart';
 import 'package:chat_app/utilities/secure_storage.dart';
+import 'package:chat_app/utilities/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../network/response/token_data_response.dart';
 import 'app_constants.dart';
 
 class SharedPreferencesStorage {
@@ -12,16 +14,33 @@ class SharedPreferencesStorage {
     _prefs = await SharedPreferences.getInstance();
   }
 
+  Future<bool> setFirstTimeOpen(bool value) async {
+    return await _prefs.setBool(AppConstants.firstTimeOpenKey, value);
+  }
+
+  bool getFirstTimeOpen() =>
+      _prefs.getBool(AppConstants.firstTimeOpenKey) ?? true;
+
+  Future<bool> setRememberInfo(bool value) async {
+    return await _prefs.setBool(AppConstants.rememberInfo, value);
+  }
+
+  bool getRememberInfo() => _prefs.getBool(AppConstants.rememberInfo) ?? false;
+
   Future<bool> setLoggedOutStatus(bool value) async {
     return await _prefs.setBool(AppConstants.isLoggedOut, value);
   }
 
-  bool? getLoggedOutStatus() {
-    return _prefs.getBool(AppConstants.isLoggedOut);
+  bool getLoggedOutStatus() {
+    return _prefs.getBool(AppConstants.isLoggedOut) ?? true;
   }
 
-  bool? getAgreedWithTerms() {
-    return _prefs.getBool(AppConstants.agreedWithTermsKey);
+  Future<bool> setAgreeTerm(bool value) async {
+    return await _prefs.setBool(AppConstants.agreedWithTermsKey, value);
+  }
+
+  bool getAgreedWithTerms() {
+    return _prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
   }
 
   bool getFillProfileStatus() {
@@ -31,8 +50,8 @@ class SharedPreferencesStorage {
   ///save user info
   Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
     if (signInData != null) {
-      var token = signInData.accessToken?.split(' ')[1];
-      await _secureStorage.writeSecureData(AppConstants.accessTokenKey, token);
+      await _secureStorage.writeSecureData(
+          AppConstants.accessTokenKey, signInData.accessToken);
       await _secureStorage.writeSecureData(
           AppConstants.refreshTokenKey, signInData.refreshToken);
       await _secureStorage.writeSecureData(
@@ -46,16 +65,73 @@ class SharedPreferencesStorage {
           AppConstants.usernameKey, signInData.username ?? '');
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
 
-      await _prefs.setString(AppConstants.userRoleKey, signInData.roles ?? '');
+      await _prefs.setStringList(
+          AppConstants.rolesKey, signInData.roles ?? ['ROLE_USER']);
 
-      //get isFillProfile in signData to save
-      await _prefs.setBool(AppConstants.isFillProfileKey, false);
+      await checkRoles(signInData.roles ?? ['ROLE_USER']);
+
+      await _prefs.setBool(
+          AppConstants.isFillProfileKey, signInData.isFillProfileKey);
+      await _prefs.setString(AppConstants.userPhoneKey, signInData.phone ?? '');
+      await _prefs.setString(
+          AppConstants.fullNameKey, signInData.fullName ?? '');
     }
   }
 
-  String getUserRole() {
-    return _prefs.getString(AppConstants.userRoleKey) ?? '';
+  Future<void> saveInfoWhenRefreshToken(
+      {required TokenDataResponse? refreshTokenData}) async {
+    await _secureStorage.writeSecureData(
+        AppConstants.accessTokenKey, refreshTokenData?.accessToken);
+    await _secureStorage.writeSecureData(
+        AppConstants.refreshTokenKey, refreshTokenData?.refreshToken);
+    await _prefs.setString(AppConstants.accessTokenExpiredKey,
+        refreshTokenData?.expiredAccessToken ?? '');
   }
+
+  Future<void> checkRoles(List<String> listRoles) async {
+    if (isNotNullOrEmpty(listRoles)) {
+      if (listRoles.contains('ROLE_ADMIN')) {
+        await _prefs.setBool(AppConstants.isAdminRoleKey, true);
+        await _prefs.setBool(AppConstants.isTeacherRoleKey, false);
+      } else if (listRoles.contains('ROLE_TEACHER')) {
+        await _prefs.setBool(AppConstants.isAdminRoleKey, false);
+        await _prefs.setBool(AppConstants.isTeacherRoleKey, true);
+      } else {
+        await _prefs.setBool(AppConstants.isAdminRoleKey, false);
+        await _prefs.setBool(AppConstants.isTeacherRoleKey, false);
+      }
+    } else {
+      await _prefs.setBool(AppConstants.isAdminRoleKey, false);
+      await _prefs.setBool(AppConstants.isTeacherRoleKey, false);
+    }
+  }
+
+  bool getAdminRole() => _prefs.getBool(AppConstants.isAdminRoleKey) ?? false;
+
+  bool getTeacherRole() =>
+      _prefs.getBool(AppConstants.isTeacherRoleKey) ?? false;
+
+  bool getUserRole() => !getAdminRole() && !getTeacherRole();
+
+  Future<void> setImageAvartarUrl({required String imageUrl}) async {
+    await _prefs.setString(AppConstants.imageAvartarUrlKey, imageUrl);
+  }
+
+  String getImageAvartarUrl() =>
+      _prefs.getString(AppConstants.imageAvartarUrlKey) ?? '';
+
+  int getUserId() {
+    final String userID = _prefs.getString(AppConstants.userIdKey) ?? '';
+    if (isNullOrEmpty(userID)) {
+      return 0;
+    }
+    return int.parse(userID);
+  }
+
+  Future<String> getUserEmail() async =>
+      await _secureStorage.readSecureData(AppConstants.emailKey) ?? '';
+
+  String getUserName() => _prefs.getString(AppConstants.usernameKey) ?? '';
 
   Future<String> getAccessToken() async {
     final token = await _secureStorage.readSecureData(
@@ -73,11 +149,12 @@ class SharedPreferencesStorage {
   }
 
   void resetDataWhenLogout() {
-    _prefs.remove(AppConstants.accessTokenExpiredKey);
-    _prefs.remove(AppConstants.refreshTokenExpiredKey);
-    _prefs.remove(AppConstants.usernameKey);
-    _prefs.setBool(AppConstants.isLoggedOut, false);
-    _prefs.setBool(AppConstants.rememberInfo, false);
+    // _prefs.remove(AppConstants.accessTokenExpiredKey);
+    // _prefs.remove(AppConstants.refreshTokenExpiredKey);
+    // _prefs.remove(AppConstants.usernameKey);
+    _prefs.remove(AppConstants.userIdKey);
+    _prefs.setBool(AppConstants.isLoggedOut, true);
+    _prefs.setBool(AppConstants.isFillProfileKey, false);
 
     _secureStorage.deleteSecureData(AppConstants.emailKey);
     _secureStorage.deleteSecureData(AppConstants.accessTokenKey);

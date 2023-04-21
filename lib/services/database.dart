@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class DatabaseService{
+class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
 
-  factory DatabaseService(){
+  factory DatabaseService() {
     return _instance;
   }
 
@@ -17,6 +17,4 @@ class DatabaseService{
   bool isShowingTerm = false;
 
   String? gpsInfo;
-
-  bool isUsingOnlineMode = true;
 }

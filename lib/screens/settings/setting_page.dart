@@ -2,10 +2,10 @@ import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/widgets/button_switch_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 
 import '../../utilities/shared_preferences_storage.dart';
 import '../../utilities/utils.dart';
@@ -59,7 +59,7 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _itemWithSwitch(
+              ButtonSwitchIcon(
                 title: 'Night mode',
                 onToggle: (value) {
                   setState(() {
@@ -181,45 +181,6 @@ class _SettingPageState extends State<SettingPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _itemWithSwitch({
-    required String title,
-    required Function(bool) onToggle,
-    bool value = false,
-    Icon? activeIcon,
-    Icon? inActiveIcon,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            maxLines: 1,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          FlutterSwitch(
-            width: 40.0,
-            height: 20.0,
-            toggleSize: 18.0,
-            value: value,
-            borderRadius: 10.0,
-            padding: 1.0,
-            activeColor: const Color(0xFF81c784),
-            inactiveColor: Theme.of(context).primaryColor,
-            activeIcon: activeIcon ?? const SizedBox.shrink(),
-            inactiveIcon: inActiveIcon ?? const SizedBox.shrink(),
-            onToggle: onToggle,
-          ),
-        ],
       ),
     );
   }

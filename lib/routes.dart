@@ -29,7 +29,7 @@ class AppRoutes {
                   child: MainApp(navFromStart: true),
                 )
               : BlocProvider<LoginBloc>(
-                  create: (BuildContext context) => LoginBloc(),
+                  create: (BuildContext context) => LoginBloc(context),
                   child: const LoginPage(),
                 );
         };

@@ -36,7 +36,7 @@ void logout(BuildContext? context) async {
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider<LoginBloc>(
-          create: (BuildContext context) => LoginBloc(),
+          create: (BuildContext context) => LoginBloc(context),
           child: const LoginPage(),
         ),
       ),

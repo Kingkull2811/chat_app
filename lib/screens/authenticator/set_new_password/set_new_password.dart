@@ -206,56 +206,54 @@ class _SetNewPasswordState extends State<SetNewPassword> {
 
   _buttonVerify(SetNewPasswordState state) {
     return PrimaryButton(
-      text: 'Set a password',
-      // isDisable: !checkValidatePassword, //!state.isEnable,
-      onTap:
-      // checkValidatePassword //state.isEnable
-      //     ?
-          () async {
-              ConnectivityResult connectivityResult =
-                  await Connectivity().checkConnectivity();
-              if (connectivityResult == ConnectivityResult.none && mounted) {
-                showMessageNoInternetDialog(context);
-              } else {
-                _newPasswordBloc.add(DisplayLoading());
-                final response = await _authRepository.newPassword(
-                  email: widget.email,
-                  // email: 'truong3@gmail.com',
-                  password: _passwordController.text.trim(),
-                  confirmPassword: _confirmPasswordController.text.trim(),
-                );
-                //todo:::
-                print(response);
+        text: 'Set a password',
+        // isDisable: !checkValidatePassword, //!state.isEnable,
+        onTap:
+            // checkValidatePassword //state.isEnable
+            //     ?
+            () async {
+          ConnectivityResult connectivityResult =
+              await Connectivity().checkConnectivity();
+          if (connectivityResult == ConnectivityResult.none && mounted) {
+            showMessageNoInternetDialog(context);
+          } else {
+            _newPasswordBloc.add(DisplayLoading());
+            final response = await _authRepository.newPassword(
+              email: widget.email,
+              // email: 'truong3@gmail.com',
+              password: _passwordController.text.trim(),
+              confirmPassword: _confirmPasswordController.text.trim(),
+            );
 
-                if (response.isSuccess && mounted) {
-                  _newPasswordBloc.add(OnSuccess());
-                  showSuccessBottomSheet(
+            if (response.isSuccess && mounted) {
+              _newPasswordBloc.add(OnSuccess());
+              showSuccessBottomSheet(
+                context,
+                enableDrag: false,
+                isDismissible: false,
+                titleMessage: 'Successfully!',
+                contentMessage:
+                    'You have successfully set a new password, please login.\n${response.message}',
+                buttonLabel: 'Login',
+                onTap: () {
+                  Navigator.pushReplacement(
                     context,
-                    enableDrag: false,
-                    isDismissible: false,
-                    titleMessage: 'Successfully!',
-                    contentMessage:
-                        'You have successfully set a new password, please login.\n${response.message}',
-                    buttonLabel: 'Login',
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider<LoginBloc>(
-                            create: (context) => LoginBloc(),
-                            child: const LoginPage(),
-                          ),
-                        ),
-                      );
-                    },
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider<LoginBloc>(
+                        create: (context) => LoginBloc(context),
+                        child: const LoginPage(),
+                      ),
+                    ),
                   );
-                } else {
-                  //iSuccess==false
-                }
-              }
+                },
+              );
+            } else {
+              //iSuccess==false
             }
-          // : null,
-    );
+          }
+        }
+        // : null,
+        );
   }
 
   bool _validatePassword() {

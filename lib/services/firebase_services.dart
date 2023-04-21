@@ -1,10 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_app/network/model/user_firebase.dart';
-import 'package:chat_app/screens/chats/on_chatting/on_chatting.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseService {
@@ -20,9 +20,11 @@ class FirebaseService {
   late FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   late SharedPreferences _prefs;
 
-  UploadTask uploadTask(File imagePath, String fileName) {
-    Reference reference = firebaseStorage.ref().child(fileName);
-    UploadTask uploadTask = reference.putFile(imagePath);
+  UploadTask uploadTask(String imagePath, String fileName) {
+    Reference reference =
+        firebaseStorage.ref().child('images').child('/$fileName');
+    UploadTask uploadTask = reference.putFile(File(imagePath));
+    reference.getDownloadURL();
     return uploadTask;
   }
 
@@ -35,6 +37,30 @@ class FirebaseService {
         .collection(collectionPath)
         .doc(path)
         .update(dataNeedUpdate);
+  }
+
+  uploadImageToStorage({
+    required String userId,
+    required File image,
+  }) async {
+    try {
+      String fileName =
+          'image_userid_${userId}_${DateTime.now().microsecondsSinceEpoch}';
+      Reference reference =
+          firebaseStorage.ref().child('images').child('/$fileName');
+      UploadTask uploadTask = reference.putFile(image);
+
+      uploadTask.snapshotEvents.listen((event) {
+        if (kDebugMode) {
+          print('processing ${event.bytesTransferred}/${event.totalBytes}');
+        }
+      });
+      await uploadTask.whenComplete(() => null);
+      String imageUrl = await reference.getDownloadURL();
+      return imageUrl;
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   Future<dynamic> uploadUserData() async {
@@ -61,22 +87,22 @@ class FirebaseService {
     } on FirebaseException catch (_) {}
   }
 
-  Future<DocumentReference> addMessageToGuestBook(String message) async {
-    _prefs = await SharedPreferences.getInstance();
-
-    // if (!_loggedIn) {
-    //   throw Exception('Must be logged in');
-    // }
-
-    return firebaseFirestore.collection('chat').add(<String, dynamic>{
-      'message': message,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      // 'name': FirebaseAuth.instance.currentUser!.displayName,
-      // 'userId': FirebaseAuth.instance.currentUser!.uid,
-      'sender': _prefs.getString(AppConstants.usernameKey),
-      'userId': _prefs.getString(AppConstants.userIdKey),
-      'typeMessage': TypeMessage.text,
-      'status': MessageStatus.notView,
-    });
-  }
+// Future<DocumentReference> addMessageToGuestBook(String message) async {
+//
+//
+//   // if (!_loggedIn) {
+//   //   throw Exception('Must be logged in');
+//   // }
+//
+//   return firebaseFirestore.collection('chat').add(<String, dynamic>{
+//     'message': message,
+//     'timestamp': DateTime.now().millisecondsSinceEpoch,
+//     // 'name': FirebaseAuth.instance.currentUser!.displayName,
+//     // 'userId': FirebaseAuth.instance.currentUser!.uid,
+//     'sender': _prefs.getString(AppConstants.usernameKey),
+//     'userId': _prefs.getString(AppConstants.userIdKey),
+//     'typeMessage': TypeMessage.text,
+//     'status': MessageStatus.notView,
+//   });
+// }
 }

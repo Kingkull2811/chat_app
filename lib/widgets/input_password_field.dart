@@ -102,6 +102,7 @@ class InputPasswordField extends StatelessWidget {
           ),
         ),
         hintText: hint,
+        hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6)),
       ),
     );
   }

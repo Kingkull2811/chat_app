@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
@@ -70,12 +71,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final bool? _isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
+  bool _isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
-    // getUserLoggedInStatus();
+    getUserLoggedInStatus();
   }
 
   @override
@@ -83,15 +84,35 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  // getUserLoggedInStatus() async {
-    // await HelperFunctions.getUserLoggedInStatus().then((value) {
-    //   if (value != null) {
-    //     setState(() {
-    //       _isSignedIn = value;
-    //     });
-    //   }
-    // });
-  // }
+  getUserLoggedInStatus() async {
+    bool isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
+    bool isExpired = true;
+    String passwordExpiredTime =
+        SharedPreferencesStorage().getAccessTokenExpired();
+    if (passwordExpiredTime.isNotEmpty) {
+      try {
+        if (DateTime.parse(passwordExpiredTime).isAfter(DateTime.now())) {
+          isExpired = false;
+        }
+      } catch (_) {}
+
+      if (!isExpired) {
+        if (isLoggedOut) {
+          setState(() {
+            _isLoggedIn = false;
+          });
+        } else {
+          setState(() {
+            _isLoggedIn = true;
+          });
+        }
+      } else {
+        setState(() {
+          _isLoggedIn = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,18 +145,16 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: const [Locale('en'), Locale('vi')],
       routes: {
         AppRoutes.main: (context) {
-          if (_isLoggedOut == null || _isLoggedOut == true) {
-            return BlocProvider<LoginBloc>(
-              create: (BuildContext context) => LoginBloc(),
-              child: const LoginPage(),
-            );
-          } else {
-            return BlocProvider<TabBloc>(
-              create: (BuildContext context) => TabBloc(),
-              child: MainApp(navFromStart: true),
-            );
-          }
-        }
+          return _isLoggedIn
+              ? BlocProvider<TabBloc>(
+                  create: (BuildContext context) => TabBloc(),
+                  child: MainApp(navFromStart: true),
+                )
+              : BlocProvider<LoginBloc>(
+                  create: (BuildContext context) => LoginBloc(context),
+                  child: const LoginPage(),
+                );
+        },
       },
     );
   }

@@ -21,9 +21,14 @@ class AppConstants {
   static const String accessTokenKey = 'ACCESS_TOKEN';
   static const String accessTokenExpiredKey = 'ACCESS_TOKEN_EXPIRED';
   static const String usernameKey = 'USERNAME';
+  static const String userPhoneKey = 'PHONE';
+  static const String fullNameKey = 'FULL_NAME';
   static const String emailKey = 'EMAIL';
   static const String userIdKey = 'USER_ID';
-  static const String userRoleKey = 'USER_ROLE';
+  static const String isAdminRoleKey = 'IS_ADMIN_ROLE';
+  static const String isTeacherRoleKey = 'IS_TEACHER_ROLE';
+  static const String rolesKey = 'ROLES';
+  static const String imageAvartarUrlKey = 'IMAGE_AVARTAR_URL_KEY';
 
   static const String isFillProfileKey = 'IS_FILL_PROFILE_STATUS';
 

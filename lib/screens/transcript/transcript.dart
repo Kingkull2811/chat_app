@@ -2,13 +2,11 @@ import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
-import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:chat_app/widgets/message_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../utilities/enum/user_role.dart';
 import '../../utilities/screen_utilities.dart';
 import '../../utilities/utils.dart';
 import '../../widgets/animation_loading.dart';
@@ -22,13 +20,6 @@ class TranscriptPage extends StatefulWidget {
 
 class TranscriptPageState extends State<TranscriptPage> {
   bool isAdmin = true;
-
-  bool check() {
-    if (SharedPreferencesStorage().getUserRole() == UserRole.admin.name) {
-      return true;
-    }
-    return false;
-  }
 
   @override
   void initState() {
