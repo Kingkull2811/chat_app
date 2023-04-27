@@ -1,9 +1,9 @@
+import 'package:chat_app/screens/transcript/add_student/add_student.dart';
 import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/widgets/app_image.dart';
-import 'package:chat_app/widgets/message_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,7 +23,6 @@ class TranscriptPageState extends State<TranscriptPage> {
 
   @override
   void initState() {
-    // isAdmin = check();
     super.initState();
   }
 
@@ -58,8 +57,6 @@ class TranscriptPageState extends State<TranscriptPage> {
         Widget body = const SizedBox.shrink();
         if (curState.isLoading) {
           body = const Scaffold(body: AnimationLoading());
-        } else if (isAdmin) {
-          body = _bodyAdmin(context, curState);
         } else {
           body = _body(context, curState);
         }
@@ -84,23 +81,83 @@ class TranscriptPageState extends State<TranscriptPage> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (context) => const MessageDialog(
-                  title: AppConstants.calculateFinalPoint,
-                  content:
-                      '${AppConstants.finalPoint}\n${AppConstants.processPoint}',
+          isAdmin
+              ? IconButton(
+                  onPressed: () {
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return CupertinoActionSheet(
+                          actions: <Widget>[
+                            CupertinoActionSheetAction(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddStudent()));
+                              },
+                              child: _itemOption(
+                                icon: Icons.person_outline,
+                                title: 'Add a new student',
+                              ),
+                            ),
+                            CupertinoActionSheetAction(
+                              onPressed: () async {},
+                              child: _itemOption(
+                                icon: Icons.summarize_outlined,
+                                title: 'Enter the points to the transcript',
+                              ),
+                            ),
+                            // CupertinoActionSheetAction(
+                            //   onPressed: () async {
+                            //
+                            //   },
+                            //   child: _itemOption(
+                            //     icon: Icons.delete_outline,
+                            //     title: 'Delete this news',
+                            //   ),
+                            // ),
+                          ],
+                          cancelButton: CupertinoActionSheetAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black.withOpacity(0.7),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  icon: Icon(
+                    Icons.add_circle_outline_outlined,
+                    size: 26,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                )
+              : IconButton(
+                  onPressed: () async {
+                    // showDialog(
+                    //   context: context,
+                    //   builder: (context) => const MessageDialog(
+                    //     title: AppConstants.calculateFinalPoint,
+                    //     content:
+                    //         '${AppConstants.finalPoint}\n${AppConstants.processPoint}',
+                    //   ),
+                    // );
+                  },
+                  icon: Icon(
+                    Icons.info_outline,
+                    size: 24,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
-              );
-            },
-            icon: Icon(
-              Icons.info_outline,
-              size: 24,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
         ],
       ),
       // extendBodyBehindAppBar: true,
@@ -337,6 +394,29 @@ class TranscriptPageState extends State<TranscriptPage> {
         ),
       );
     }).toList();
+  }
+
+  Widget _itemOption({
+    required IconData icon,
+    required String title,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 26, color: Theme.of(context).primaryColor),
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

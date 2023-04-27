@@ -4,6 +4,8 @@ class NewsModel {
   final String? content;
   final String? mediaUrl;
   final int? typeMedia;
+  final String? createTime;
+  final String? createBy;
 
   NewsModel({
     this.id,
@@ -11,6 +13,8 @@ class NewsModel {
     this.content,
     this.mediaUrl,
     this.typeMedia,
+    this.createTime,
+    this.createBy,
   });
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +29,6 @@ class NewsModel {
 
   @override
   String toString() {
-    return 'NewsModel{id: $id, title: $title, content: $content, mediaUrl: $mediaUrl, typeMedia: $typeMedia}';
+    return 'NewsModel{id: $id, title: $title, content: $content, mediaUrl: $mediaUrl, typeMedia: $typeMedia, createTime: $createTime, createBy: $createBy}';
   }
 }

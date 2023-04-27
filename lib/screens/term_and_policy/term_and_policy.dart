@@ -1,8 +1,6 @@
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../utilities/app_constants.dart';
 import '../../widgets/custom_check_box.dart';
@@ -138,10 +136,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BlocProvider<TabBloc>(
-                        create: (BuildContext context) => TabBloc(),
-                        child: MainApp(navFromStart: true),
-                      ),
+                      builder: (context) => MainApp(),
                     ),
                   );
                 }

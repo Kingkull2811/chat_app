@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_bloc.dart';
@@ -180,7 +181,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
             _otpCode = verificationCode;
             _verifyOtpBloc.add(Validate(isValidate: true));
           });
-          print(_otpCode);
         },
       ),
     );
@@ -208,7 +208,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
                   );
 
                   //todo:::
-                  print(response);
                   if (response.isSuccess && mounted) {
                     _verifyOtpBloc.add(OnSuccess());
                     showSuccessBottomSheet(
@@ -264,25 +263,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
       },
     );
 
-    Duration duration = const Duration(minutes: 2);
-    // String countTime = '';
-    // _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-    //   if (duration.inSeconds > 0) {
-
-    //     setState(() {
-    //       final seconds = duration.inSeconds - 1;
-    //       duration = Duration(seconds: seconds);
-    //
-    //       String mm = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    //       String ss = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    //
-    //       countTime = "$mm:$ss";
-    //     });
-    //   } else {
-    //         _timer.cancel();
-    //   }
-    // });
-
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 16),
       child: Row(
@@ -302,9 +282,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 // email: 'truong3@gmail.com',
               );
               if (response.isSuccess) {
-                setState(() {
-                  duration = const Duration(minutes: 2);
-                });
+                setState(() {});
               }
             },
             child: Text(

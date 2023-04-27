@@ -1,11 +1,9 @@
 import 'dart:io';
 
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/screens/news/news.dart';
 import 'package:chat_app/screens/transcript/transcript.dart';
 import 'package:chat_app/services/database.dart';
@@ -17,7 +15,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
@@ -61,8 +58,6 @@ _removeBadgeWhenOpenApp() async {
 class MyApp extends StatefulWidget {
   //final AppTheme appTheme;
   final navigatorKey = GlobalKey<NavigatorState>();
-
-  // final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   MyApp({super.key});
 
@@ -145,15 +140,16 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: const [Locale('en'), Locale('vi')],
       routes: {
         AppRoutes.main: (context) {
-          return _isLoggedIn
-              ? BlocProvider<TabBloc>(
-                  create: (BuildContext context) => TabBloc(),
-                  child: MainApp(navFromStart: true),
-                )
-              : BlocProvider<LoginBloc>(
-                  create: (BuildContext context) => LoginBloc(context),
-                  child: const LoginPage(),
-                );
+          return _isLoggedIn ? MainApp(currentTab: 0) : const LoginPage();
+        },
+        AppRoutes.news: (context) {
+          return MainApp(currentTab: 1);
+        },
+        AppRoutes.transcript: (context) {
+          return MainApp(currentTab: 2);
+        },
+        AppRoutes.setting: (context) {
+          return MainApp(currentTab: 3);
         },
       },
     );

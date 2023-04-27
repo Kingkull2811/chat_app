@@ -5,8 +5,7 @@ import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 String getBiometricsButtonPath({
   BiometricButtonType? buttonType,
@@ -39,7 +38,7 @@ bool isNullOrEmpty(dynamic obj) =>
     obj == null ||
     ((obj is String || obj is List || obj is Map) && obj.isEmpty);
 
-Future<File?> pickPhoto(
+Future<String> pickPhoto(
   BuildContext context,
   ImageSource imageSource,
 ) async {
@@ -52,17 +51,21 @@ Future<File?> pickPhoto(
             maxHeight: 2048,
           )
         : await ImagePicker().pickImage(source: ImageSource.gallery));
-    if (isNullOrEmpty(pickedFile)) {
-      return null;
+    if (pickedFile == null) {
+      return '';
     }
-    final applicationPath = await getApplicationDocumentsDirectory();
 
-    File image = File(pickedFile!.path);
-    File newImage =
-        File('${applicationPath.path}/${basename(pickedFile.name)}');
-    newImage.writeAsBytes(File(pickedFile.path).readAsBytesSync());
+    // final appDocDir = await getApplicationDocumentsDirectory();
+    // final tempDir = await getTemporaryDirectory();
+    //
+    File image = File(pickedFile.path);
+    // File newImage = File(join(appDocDir.path, basename(pickedFile.path)));
+    // newImage.writeAsBytes(File(pickedFile.path).readAsBytesSync());
 
-    return imageSource == ImageSource.camera ? newImage : image;
+    // return imageSource == ImageSource.camera
+    //     ? join(appDocDir.path, basename(newImage.path))
+    //     : image.path;
+    return image.path;
   } on PlatformException catch (e) {
     log(e.toString());
     Navigator.of(context).pop();
@@ -74,58 +77,42 @@ Future<File?> pickPhoto(
         ),
       ),
     );
-    return null;
+    return '';
   }
 }
 
-// Future<File?> cropperPhoto({File? imageFile}) async {
-//   if (imageFile == null) {
-//     return null;
-//   }
-//   CroppedFile? photoCropper =
-//       await ImageCropper().cropImage(sourcePath: imageFile.path);
-//   return isNotNullOrEmpty(photoCropper) ? File(photoCropper!.path) : null;
-// }
-//
-// Future<File?> pickImageFromGallery(BuildContext context) async {
-//   File? imagePath;
-//   try {
-//     final pickImage =
-//         await ImagePicker().pickImage(source: ImageSource.gallery);
-//     if (pickImage != null) {
-//       imagePath = File(pickImage.path);
-//     }
-//   } catch (e) {
-//     log(e.toString());
-//   }
-//   return imagePath;
-// }
-
-Future<File?> pickImageFromCamera(BuildContext context) async {
-  File? imagePath;
+Future<String> pickVideo(BuildContext context, ImageSource source) async {
   try {
-    final pickImage = await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickImage != null) {
-      imagePath = File(pickImage.path);
-    }
-  } catch (e) {
-    log(e.toString());
-  }
-  return imagePath;
-}
-
-Future<File?> pickVideoFromGallery(BuildContext context) async {
-  File? video;
-  try {
-    final pickVideo =
-        await ImagePicker().pickVideo(source: ImageSource.gallery);
+    final pickVideo = await ImagePicker().pickVideo(source: source);
     if (pickVideo != null) {
-      video = File(pickVideo.path);
+      final video = File(pickVideo.path);
+      // final tempDir = await getTemporaryDirectory();
+      // List<String> parts = video.path.split('cache/');
+      // if (parts.length > 1) {
+      //   String pathAfterCache = parts[1];
+      //   print(pathAfterCache);
+      // } else {
+      //   print("Path doesn't contain 'cache/' segment");
+      // }
+      // String videoPath = join(tempDir.path, video.path.split('cache/')[1]);
+
+      return video.path;
+    } else {
+      return '';
     }
-  } catch (e) {
+  } on PlatformException catch (e) {
     log(e.toString());
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Failed to pick video!',
+          style: TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+    return '';
   }
-  return video;
 }
 
 // Future<GiphyGif?> pickGIF(BuildContext context) async {
@@ -155,3 +142,30 @@ List<T> modelBuilder<M, T>(
         .map<int, T>((index, model) => MapEntry(index, builder(index, model)))
         .values
         .toList();
+
+String printDuration(Duration duration) {
+  String twoDigits(int n) => n.toString().padLeft(2, "0");
+  String twoDigitMinutes = twoDigits(
+    duration.inMinutes.remainder(60),
+  );
+  String twoDigitSeconds = twoDigits(
+    duration.inSeconds.remainder(60),
+  );
+  if (duration.inHours > 0) {
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+  return "$twoDigitMinutes:$twoDigitSeconds";
+}
+
+String formatDateString(String? input, {String format = 'yyyy/M/dd'}) {
+  try {
+    if (input == null) {
+      return '';
+    }
+    DateTime inputDate = DateTime.parse(input);
+    final DateFormat formatter = DateFormat(format);
+    return formatter.format(inputDate);
+  } catch (ignore) {
+    return '';
+  }
+}

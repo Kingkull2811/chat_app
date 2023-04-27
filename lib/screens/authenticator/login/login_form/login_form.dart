@@ -6,7 +6,6 @@ import 'package:chat_app/screens/authenticator/login/login_form/login_form_event
 import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
 import 'package:chat_app/theme.dart';
@@ -223,12 +222,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => TabBloc(),
-          child: MainApp(
-            navFromStart: true,
-          ),
-        ),
+        builder: (context) => MainApp(),
       ),
     );
   }

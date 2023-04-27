@@ -1,5 +1,4 @@
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
@@ -81,12 +80,7 @@ class OnBoarding3Page extends StatelessWidget {
 
   _navigateToMainPage(BuildContext context) {
     return MaterialPageRoute(
-      builder: (context) => BlocProvider(
-        create: (context) => TabBloc(),
-        child: MainApp(
-          navFromStart: true,
-        ),
-      ),
+      builder: (context) => MainApp(),
     );
   }
 }

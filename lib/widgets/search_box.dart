@@ -39,14 +39,6 @@ class _SearchBoxState extends State<SearchBox> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 10, right: 10),
-              child: Icon(
-                Icons.search,
-                size: 24,
-                color: Colors.grey,
-              ),
-            ),
             Expanded(
               child: Container(
                 height: 40,
@@ -69,6 +61,11 @@ class _SearchBoxState extends State<SearchBox> {
                     hintStyle: TextStyle(
                       fontSize: 14,
                       color: Colors.grey.withOpacity(0.6),
+                    ),
+                    prefixIcon:const Icon(
+                      Icons.search,
+                      size: 24,
+                      color: Colors.grey,
                     ),
                   ),
                 ),

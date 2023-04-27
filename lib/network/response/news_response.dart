@@ -1,10 +1,11 @@
 import 'package:chat_app/network/model/news_model.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
+import 'package:chat_app/utilities/utils.dart';
 
-class GetListNewResponse extends BaseGetResponse {
+class NewsResponse extends BaseGetResponse {
   final List<NewsModel>? listNews;
 
-  GetListNewResponse({
+  NewsResponse({
     this.listNews,
     int? pageNumber,
     int? pageSize,
@@ -19,15 +20,12 @@ class GetListNewResponse extends BaseGetResponse {
           error: error,
         );
 
-  factory GetListNewResponse.fromJson(Map<String, dynamic> json) {
-    // var contentList = json['content'] ?? [];
-    // List<NewsModel> posts =
-    //     contentList.map((post) => NewsModel.fromJson(post)).toList();
-    return GetListNewResponse(
-      listNews: json['content'] == null
+  factory NewsResponse.fromJson(Map<String, dynamic> json) {
+    return NewsResponse(
+      listNews: isNullOrEmpty(json['content'])
           ? []
           : List.generate(
-              json['content'].lenght,
+              json['content'].length,
               (index) => NewsModel.fromJson(json['content'][index]),
             ),
       pageNumber: json['pageNumber'],

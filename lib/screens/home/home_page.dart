@@ -1,7 +1,5 @@
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,10 +17,7 @@ class _HomePageState extends State<HomePage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => BlocProvider<TabBloc>(
-                create: (BuildContext context) => TabBloc(),
-                child: MainApp(navFromStart: true),
-              ),
+              builder: (context) => MainApp(),
             ),
           );
         },

@@ -3,12 +3,10 @@ import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
 import 'package:chat_app/screens/chats/media_shared/media_shared.dart';
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/widgets/message_dialog_2_action.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatInfoPage extends StatefulWidget {
   final bool isGroup;
@@ -339,10 +337,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => BlocProvider(
-                                    create: (context) => TabBloc(),
-                                    child: MainApp(),
-                                  ),
+                                  builder: (context) => MainApp(),
                                 ),
                               );
                             },
@@ -374,10 +369,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => BlocProvider(
-                                          create: (context) => TabBloc(),
-                                          child: MainApp(),
-                                        ),
+                                        builder: (context) => MainApp(),
                                       ),
                                     );
                                   },

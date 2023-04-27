@@ -1,12 +1,12 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_event.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_state.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:chat_app/widgets/app_image.dart';
 import 'package:chat_app/widgets/search_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,6 @@ import 'package:image_picker/image_picker.dart';
 import '../../../network/model/user_info_model.dart';
 import '../../../services/firebase_services.dart';
 import '../../../theme.dart';
-import '../../../utilities/app_constants.dart';
 import '../../../utilities/enum/api_error_result.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../utilities/utils.dart';
@@ -24,7 +23,6 @@ import '../../../widgets/animation_loading.dart';
 import '../../../widgets/input_field.dart';
 import '../../../widgets/primary_button.dart';
 import '../../main/main_app.dart';
-import '../../main/tab/tab_bloc.dart';
 
 class FillProfilePage extends StatefulWidget {
   const FillProfilePage({Key? key}) : super(key: key);
@@ -53,7 +51,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
   String studentParent = 'Student\'s Parent';
   bool _isShow = false;
 
-  File? _image;
+  String? _image;
 
   @override
   void initState() {
@@ -188,7 +186,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
         userID: SharedPreferencesStorage().getUserId(),
         fullName: _nameController.text.trim(),
         phone: _phoneController.text.trim(),
-        imageUrl: await getUrlImage(file: _image!),
+        imageUrl: await getUrlImage(file: File(_image!)),
       );
       if (response is UserInfoModel) {
         await SharedPreferencesStorage()
@@ -205,12 +203,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => TabBloc(),
-          child: MainApp(
-            navFromStart: true,
-          ),
-        ),
+        builder: (context) => MainApp(),
       ),
     );
   }
@@ -373,6 +366,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
   }
 
   Widget _imageAvt(BuildContext context, FillProfileState state) {
+    bool isOnline = isNotNullOrEmpty(state.userData?.fileUrl);
+
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 0),
       child: SizedBox(
@@ -382,35 +377,18 @@ class _FillProfilePageState extends State<FillProfilePage> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: isNotNullOrEmpty(state.userData?.fileUrl)
-                  ? CachedNetworkImage(
-                      imageUrl: state.userData?.fileUrl ?? '',
-                      alignment: Alignment.center,
-                      placeholder: (context, url) => const AnimationLoading(
-                        strokeWidth: 1,
-                        size: AppConstants.defaultLoadingNetworkImageSize,
-                      ),
-                      errorWidget: (context, url, error) => Image.asset(
-                        'assets/images/ic_account_circle.png',
-                        color: Colors.grey.withOpacity(0.6),
-                        fit: BoxFit.cover,
-                      ),
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    )
-                  : isNullOrEmpty(_image)
-                      ? Image.asset(
-                          'assets/images/ic_account_circle.png',
-                          color: Colors.grey.withOpacity(0.6),
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          _image!,
-                          width: 200,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
+              child: AppImage(
+                isOnline: isOnline,
+                localPathOrUrl: isOnline ? state.userData?.fileUrl! : _image,
+                width: 200,
+                height: 200,
+                boxFit: BoxFit.cover,
+                errorWidget: Image.asset(
+                  'assets/images/ic_account_circle.png',
+                  color: Colors.grey.withOpacity(0.6),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             Positioned(
               right: 0,
@@ -508,7 +486,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
   ///upload image to firebase storage or cloudinary.com for get url
   Future<String> getUrlImage({required File file}) async {
     return await FirebaseService().uploadImageToStorage(
-      userId: SharedPreferencesStorage().getUserId().toString(),
+      titleName:
+          'image_userid_${SharedPreferencesStorage().getUserId().toString()}',
       image: file,
     );
   }

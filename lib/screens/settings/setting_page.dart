@@ -1,13 +1,12 @@
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
+import 'package:chat_app/screens/settings/security/security.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
-import 'package:chat_app/widgets/button_switch_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../utilities/shared_preferences_storage.dart';
 import '../../utilities/utils.dart';
 import 'notification_sound/setting_notification.dart';
 
@@ -59,19 +58,19 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              ButtonSwitchIcon(
-                title: 'Night mode',
-                onToggle: (value) {
-                  setState(() {
-                    SharedPreferencesStorage().setNightMode(value);
-                  });
-                },
-                value: SharedPreferencesStorage().getNightMode() ?? false,
-                activeIcon: const Icon(
-                  Icons.nights_stay_outlined,
-                ),
-                inActiveIcon: const Icon(Icons.sunny),
-              ),
+              // ButtonSwitchIcon(
+              //   title: 'Night mode',
+              //   onToggle: (value) {
+              //     setState(() {
+              //       SharedPreferencesStorage().setNightMode(value);
+              //     });
+              //   },
+              //   value: SharedPreferencesStorage().getNightMode() ?? false,
+              //   activeIcon: const Icon(
+              //     Icons.nights_stay_outlined,
+              //   ),
+              //   inActiveIcon: const Icon(Icons.sunny),
+              // ),
               _itemWithIcon(
                 title: 'Profile',
                 iconPath: '',
@@ -101,16 +100,23 @@ class _SettingPageState extends State<SettingPage> {
                   );
                 },
               ),
-              _itemWithIcon(
-                title: 'Privacy & Safety',
-                iconPath: 'assets/images/ic_shield.png',
-                onTap: () {},
-              ),
+              // _itemWithIcon(
+              //   title: 'Privacy & Safety',
+              //   iconPath: 'assets/images/ic_shield.png',
+              //   onTap: () {},
+              // ),
               _itemWithIcon(
                 title: 'Security',
                 iconPath: '',
                 icon: Icons.lock_outline,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SecurityPage(),
+                    ),
+                  );
+                },
               ),
               _itemWithIcon(
                 title: 'Legal & Policy',

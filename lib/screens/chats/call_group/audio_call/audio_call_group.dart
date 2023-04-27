@@ -237,8 +237,7 @@ class _AudioCallGroupPageState extends State<AudioCallGroupPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              //todo::
-                              print('end audio call. time_call: $countTime');
+                              //todo::print('end audio call. time_call: $countTime');
                               Navigator.pop(context);
                             },
                             child: Container(

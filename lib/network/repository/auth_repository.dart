@@ -1,25 +1,12 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:chat_app/network/model/base_auth_result.dart';
 import 'package:chat_app/network/provider/auth_provider.dart';
 import 'package:chat_app/network/response/login_response.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
-import 'package:flutter/cupertino.dart';
 
 class AuthRepository {
   final _authProvider = AuthProvider();
-
-  Future<void> _saveUserDataToFirebase({
-    required BuildContext context,
-    // required ProviderRef ref,
-    required int? id,
-    required String? username,
-    required String? email,
-    required String? phoneNumber,
-    required String? roles,
-    required File? imageAvt,
-  }) async {}
 
   Future<BaseAuthResult> refreshToken({
     required String refreshToken,
@@ -127,6 +114,19 @@ class AuthRepository {
     };
 
     return await _authProvider.fillProfile(userID: userID, data: data);
+  }
+
+  Future<Object> changePassword({
+    required String oldPass,
+    required String newPass,
+    required String confPass,
+  }) async {
+    final data = {
+      "confirm_password": confPass,
+      "current_password": oldPass,
+      "password": newPass
+    };
+    return _authProvider.changePassword(data);
   }
 
   Future<BaseAuthResult> forgotPassword({

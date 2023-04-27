@@ -1,5 +1,4 @@
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
-import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -10,8 +9,6 @@ import 'package:local_auth_android/types/auth_messages_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
 import '../screens/authenticator/login/login_bloc.dart';
-import '../screens/main/main_app.dart';
-import '../services/database.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/primary_button.dart';
 
@@ -68,30 +65,6 @@ clearFocus(BuildContext context) {
   } else {
     FocusScope.of(context).requestFocus(FocusNode());
   }
-}
-
-void backToChat(BuildContext context) {
-  // Reset app mode
-  //resetSwitchAppMode();
-  Navigator.popUntil(context, (route) => route.isFirst);
-  DatabaseService().gpsInfo = null;
-  try {
-    (DatabaseService().chatKey?.currentState as MainAppState).changeTabToChat();
-    (DatabaseService().chatKey?.currentState as MainAppState).reloadPage();
-  } catch (_) {}
-  try {
-    (DatabaseService().chatKey?.currentState as ChatsPageState).reloadPage();
-  } catch (_) {}
-}
-
-void backToNews(BuildContext context) {
-  try {
-    (DatabaseService().mainKey?.currentState as MainAppState).changeTabToNews();
-    (DatabaseService().mainKey?.currentState as MainAppState).reloadPage();
-  } catch (_) {}
-  try {
-    (DatabaseService().mainKey?.currentState as ChatsPageState).reloadPage();
-  } catch (_) {}
 }
 
 AndroidAuthMessages androidLocalAuthMessage(//BuildContext context,
@@ -154,13 +127,14 @@ Future<void> showMessageNoInternetDialog(
           ),
           actions: <Widget>[
             CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  if (onClose != null) {
-                    onClose();
-                  }
-                },
-                child: Text(buttonLabel ?? 'OK')),
+              onPressed: () {
+                Navigator.pop(context);
+                if (onClose != null) {
+                  onClose();
+                }
+              },
+              child: Text(buttonLabel ?? 'OK'),
+            ),
           ],
         );
       });
@@ -185,6 +159,57 @@ Future<void> showCupertinoMessageDialog(
           content: content,
           buttonLabel: buttonLabel,
           onClose: onCloseDialog,
+        );
+      });
+}
+
+Future<void> showMessageTwoOption(
+  BuildContext context,
+  String? title, {
+  String? content,
+  Function()? onCancel,
+  String? cancelLabel,
+  Function()? onOk,
+  String? okLabel,
+
+  /// false = user must tap button, true = tap outside dialog
+  bool barrierDismiss = false,
+}) async {
+  await showDialog(
+      barrierDismissible: barrierDismiss,
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: title == null ? null : Text(title),
+          content: content == null
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(content),
+                ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                if (onCancel != null) {
+                  onCancel();
+                }
+              },
+              child: Text(cancelLabel ?? 'Cancel'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                if (onOk != null) {
+                  onOk();
+                }
+              },
+              child: Text(
+                okLabel ?? 'OK',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
         );
       });
 }

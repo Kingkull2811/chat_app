@@ -13,8 +13,9 @@ import '../../../utilities/utils.dart';
 
 class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
   final _authRepository = AuthRepository();
+  final BuildContext context;
 
-  FillProfileBloc(BuildContext context) : super(FillProfileState()) {
+  FillProfileBloc(this.context) : super(FillProfileState()) {
     on((event, emit) async {
       if (event is GetUserInfoEvent) {
         final connectivityResult = await Connectivity().checkConnectivity();

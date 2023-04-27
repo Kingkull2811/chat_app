@@ -5,7 +5,6 @@ import 'package:chat_app/network/model/user_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -18,7 +17,6 @@ class FirebaseService {
 
   late FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   late FirebaseStorage firebaseStorage = FirebaseStorage.instance;
-  late SharedPreferences _prefs;
 
   UploadTask uploadTask(String imagePath, String fileName) {
     Reference reference =
@@ -40,12 +38,11 @@ class FirebaseService {
   }
 
   uploadImageToStorage({
-    required String userId,
+    required String titleName,
     required File image,
   }) async {
     try {
-      String fileName =
-          'image_userid_${userId}_${DateTime.now().microsecondsSinceEpoch}';
+      String fileName = '${titleName}_${DateTime.now().microsecondsSinceEpoch}';
       Reference reference =
           firebaseStorage.ref().child('images').child('/$fileName');
       UploadTask uploadTask = reference.putFile(image);
@@ -64,7 +61,6 @@ class FirebaseService {
   }
 
   Future<dynamic> uploadUserData() async {
-    String name = 'id';
     // UploadTask uploadTask = ;
 
     try {

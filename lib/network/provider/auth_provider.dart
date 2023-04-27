@@ -148,8 +148,24 @@ class AuthProvider with ProviderMixin {
       log(response.toString());
 
       return UserInfoModel.fromJson(response.data);
-    } catch (error, stacktrace) {
+    } catch (error) {
       return UserInfoModel();
+    }
+  }
+
+  Future<Object> changePassword(Object data) async {
+    if (await isExpiredToken()) {
+      return ExpiredTokenGetResponse();
+    }
+    try {
+      final response = await dio.post(
+        ApiPath.changePassword,
+        data: data,
+        options: await defaultOptions(url: ApiPath.changePassword),
+      );
+      return BaseResponse.fromJson(response.data);
+    } catch (error, stacktrace) {
+      return errorResponse(error, stacktrace, ApiPath.changePassword);
     }
   }
 

@@ -23,10 +23,8 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
   Widget _body() {
     return Scaffold(
       appBar: AppBar(
-        // elevation: 0.5,
-        // backgroundColor: Colors.grey[50],
-        elevation: 0,
-        backgroundColor: Colors.transparent,
+        elevation: 0.5,
+        backgroundColor: Colors.grey[50],
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);

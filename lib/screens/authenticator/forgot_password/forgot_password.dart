@@ -187,7 +187,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     // email: 'truong3@gmail.com',
                   );
 
-                  print(response);
                   if (response.isSuccess && mounted) {
                     _forgotPasswordBloc.add(OnSuccess());
                     Navigator.push(

@@ -236,8 +236,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              //todo::
-                              print('end audio call. time_call: $countTime');
+                              //todo::print('end audio call. time_call: $countTime');
                               Navigator.pop(context);
                             },
                             child: Container(
