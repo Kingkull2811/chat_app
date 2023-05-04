@@ -1,14 +1,12 @@
 import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
+import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
 import 'package:chat_app/screens/chats/media_shared/media_shared.dart';
-import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/widgets/message_dialog_2_action.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatInfoPage extends StatefulWidget {
   final bool isGroup;
@@ -159,7 +157,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => GroupParticipantPage(),
+                                  builder: (context) =>
+                                      const GroupParticipantPage(),
                                 ),
                               );
                             },
@@ -194,10 +193,10 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                                   onTap: () {
                                     Navigator.pop(context);
                                   },
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.cancel_outlined,
                                     size: 24,
-                                    color: AppConstants().red700,
+                                    color: AppColors.red700,
                                   ),
                                 ),
                               ],
@@ -338,10 +337,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => BlocProvider(
-                                    create: (context) => TabBloc(),
-                                    child: MainApp(),
-                                  ),
+                                  builder: (context) => MainApp(currentTab: 0),
                                 ),
                               );
                             },
@@ -373,10 +369,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => BlocProvider(
-                                          create: (context) => TabBloc(),
-                                          child: MainApp(),
-                                        ),
+                                        builder: (context) =>
+                                            MainApp(currentTab: 0),
                                       ),
                                     );
                                   },
@@ -460,7 +454,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
-                color: isRed ? AppConstants().red700 : Colors.black,
+                color: isRed ? AppColors.red700 : Colors.black,
               ),
             ),
             Container(
@@ -473,7 +467,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
               child: Icon(
                 icon,
                 size: 18,
-                color: isRed ? AppConstants().red700 : Colors.black,
+                color: isRed ? AppColors.red700 : Colors.black,
               ),
             ),
           ],

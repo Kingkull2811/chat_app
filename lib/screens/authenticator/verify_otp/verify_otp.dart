@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_bloc.dart';
@@ -180,7 +181,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
             _otpCode = verificationCode;
             _verifyOtpBloc.add(Validate(isValidate: true));
           });
-          print(_otpCode);
         },
       ),
     );
@@ -202,13 +202,12 @@ class _VerifyOtpState extends State<VerifyOtp> {
                   _verifyOtpBloc.add(DisplayLoading());
 
                   final response = await _authRepository.verifyOtp(
-                    // email: widget.email,
-                    email: 'truong3@gmail.com',
+                    email: widget.email,
+                    // email: 'truong3@gmail.com',
                     otpCode: _otpCode,
                   );
 
                   //todo:::
-                  print(response);
                   if (response.isSuccess && mounted) {
                     _verifyOtpBloc.add(OnSuccess());
                     showSuccessBottomSheet(
@@ -235,6 +234,9 @@ class _VerifyOtpState extends State<VerifyOtp> {
                       },
                     );
                   } else {
+                    // setState(() {
+                    //   state.isLoading = false;
+                    // });
                     _verifyOtpBloc.add(OnFailure(
                       errorMessage: response.errors?.first.errorMessage,
                     ));
@@ -261,25 +263,6 @@ class _VerifyOtpState extends State<VerifyOtp> {
       },
     );
 
-    Duration duration = const Duration(minutes: 2);
-    // String countTime = '';
-    // _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-    //   if (duration.inSeconds > 0) {
-
-    //     setState(() {
-    //       final seconds = duration.inSeconds - 1;
-    //       duration = Duration(seconds: seconds);
-    //
-    //       String mm = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    //       String ss = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    //
-    //       countTime = "$mm:$ss";
-    //     });
-    //   } else {
-    //         _timer.cancel();
-    //   }
-    // });
-
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 16),
       child: Row(
@@ -295,13 +278,11 @@ class _VerifyOtpState extends State<VerifyOtp> {
             onTap: () async {
               //todo: resend OTP code
               final response = await _authRepository.forgotPassword(
-                // email: widget.email,
-                email: 'truong3@gmail.com',
+                email: widget.email,
+                // email: 'truong3@gmail.com',
               );
               if (response.isSuccess) {
-                setState(() {
-                  duration = const Duration(minutes: 2);
-                });
+                setState(() {});
               }
             },
             child: Text(

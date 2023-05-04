@@ -13,22 +13,49 @@ environment:
   sdk: ">=2.17.0 <3.3.8"
 
 dependencies:
-  cloud_firestore: ^4.2.0
-  firebase_auth: ^4.2.1
-  firebase_core: ^2.4.0
+  cloud_firestore: ^4.4.0
+  #firebase_auth: ^4.2.1
+  firebase_core: ^2.4.1
+
+  firebase_storage: ^11.0.11
+
+  #firebase_auth_web: ^5.2.9
+
+  #Flutter library to load and cache network images. Can also be used with placeholder and error widgets.
+  cached_network_image: ^3.2.3
+
   shared_preferences: ^2.0.15
   #firebase_core_platform_interface: 4.5.1
 
   google_fonts: ^3.0.1
 
-  #Rive 2 Flutter Runtime. This package provides runtime functionality for playing back and interacting with animations built with the Rive editor available at https://rive.app.
-  rive: ^0.10.0
+  # A string-based path manipulation library.
+  path: ^1.6.4
 
-#  #Utilities for formatting Dart's DateTime object using standard date/time notation or as a relative time offset.
-#  date_time_format: ^2.0.1
+  #Flutter plugin for getting commonly used locations on host platform file systems, such as the temp and app data directories.
+  path_provider: ^2.0.12
+
+  #Flutter plugin for selecting images from the Android and iOS image library, and taking new pictures with the camera.
+  image_picker: ^0.8.6
+  video_thumbnail: ^0.5.3
+  cached_video_player: ^2.0.3
+
+  #  permission_handler: ^10.2.0
+
+  # Flutter library to keep the device screen awake
+  wakelock: ^0.6.2
+
+  #Photo View provides a gesture sensitive zoomable widget. Photo View is largely used to show interactive images and other stuff such as SVG.
+  photo_view: ^0.14.0
+
+  #A Flutter package than allow expand and collapse text dynamically
+  readmore: ^2.0.0
+
+  #Contains code to deal with internationalized/localized messages, date and number formatting and parsing, bi-directional text, and other internationalization issues.
+  intl: ^0.17.0
 
   #Flutter Secure Storage provides API to store data in secure storage. Keychain is used in iOS, KeyStore based solution is used in Android.
-  flutter_secure_storage: ^6.0.0
+  flutter_secure_storage: ^8.0.0
 
   #iOS implementation of the local_auth plugin.
   local_auth_ios: ^1.0.13
@@ -51,9 +78,6 @@ dependencies:
   #A cookie manager for Dio, which supports persistent cookies in RAM and file.
   dio_cookie_manager: ^2.1.1
 
-  #This small library helps you to decode Json Web Tokens, you can also know if a JWT is a
-  jwt_decoder: ^2.0.1
-
   #A package for creating badges. Badges can be used for an additional marker for any widget, e.g. show a number of items in a shopping cart.
   badges: ^3.0.2
 
@@ -67,7 +91,7 @@ dependencies:
   equatable: ^2.0.5
 
   #the framework will help localize Flutter application without the headache
-  l10n_flutter: ^1.0.6
+  #l10n_flutter: ^1.0.6
 
   #Customizable animated page indicator with a set of built-in effects.
   smooth_page_indicator: ^1.0.1
@@ -75,22 +99,17 @@ dependencies:
   #A custom switch widget that can have a custom height and width, borders, border radius, colors, toggle size, custom text and icons inside the toggle.
   flutter_switch: ^0.3.2
 
-  #A custom navigation bar with bubble click effect. Inspired by The Boring Flutter Development Show EP. 35.
-  custom_navigation_bar: ^0.8.2
-
-  #A package that simplifies the access most of used properties/fuctions right in the BuildContext.
-  #build_context: ^3.0.0
-
   #Fully customizable OTP Entry TextField for flutter, Widget accepts pin of any length. Its written in pure dart, no extra dependency.
   flutter_otp_text_field: ^1.1.1
 
   flutter_plugin_android_lifecycle: ^2.0.8
 
+  flutter_datetime_picker: ^1.5.1
+
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-
 
   cupertino_icons: ^1.0.2
 
@@ -100,11 +119,18 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
 
+  flutter_launcher_icons: ^0.11.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_logo.png"
+  min_sdk_android: 26
+
 flutter:
 
   uses-material-design: true
 
   assets:
     - assets/images/
-    - assets/RiveAssets/
     #- i18n/

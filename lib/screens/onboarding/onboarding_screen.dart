@@ -1,9 +1,9 @@
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import './onboarding_2.dart';
 import './onboarding_1.dart';
+import './onboarding_2.dart';
 import './onboarding_3.dart';
 
 class OnBoardingPage extends StatefulWidget {
@@ -51,7 +51,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                   controller: _pageController,
                   effect: ExpandingDotsEffect(
                     activeDotColor: Theme.of(context).primaryColor,
-                    dotColor: AppConstants().grey130,
+                    dotColor: AppColors.grey130,
                     expansionFactor: 2,
                     dotHeight: 15,
                     dotWidth: 15,

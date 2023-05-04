@@ -1,4 +1,3 @@
-import 'package:chat_app/network/response/error_data_response.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class LoginFormEvent extends Equatable {
@@ -14,20 +13,6 @@ class ValidateForm extends LoginFormEvent {
   });
 }
 
-class DisplayLoading extends LoginFormEvent {
-  final bool isLoading;
-
-  DisplayLoading({
-    this.isLoading = false,
-  });
-}
-
-class OnSuccess extends LoginFormEvent {}
-
-class OnFailure extends LoginFormEvent {
-  final String? errorMessage;
-
-  OnFailure({this.errorMessage});
-}
+class DisplayLoading extends LoginFormEvent {}
 
 class LoginWithBiometrics extends LoginFormEvent {}

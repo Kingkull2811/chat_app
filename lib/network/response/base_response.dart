@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:chat_app/utilities/utils.dart';
 
-import 'error_data_response.dart';
+import '../model/error.dart';
 
 class BaseResponse {
  final int? httpStatus;

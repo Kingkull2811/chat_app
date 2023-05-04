@@ -1,3 +1,4 @@
+import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
@@ -6,23 +7,23 @@ import 'package:chat_app/screens/authenticator/login/login_form/login_form_event
 import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/main/tab/tab_bloc.dart';
+import 'package:chat_app/screens/settings/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
-import 'package:chat_app/services/database.dart';
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
-import 'package:chat_app/widgets/custom_check_box.dart';
 import 'package:chat_app/widgets/input_field.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../settings/fill_profile/fill_profile.dart';
+import '../../../settings/fill_profile/fill_profile_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormPage extends StatefulWidget {
@@ -41,7 +42,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
   final focusNode = FocusNode();
   final _inputUsernameController = TextEditingController();
   final _inputPasswordController = TextEditingController();
-  bool _rememberInfo = false;
+
+  // bool _rememberInfo = false;
   bool _isShowPassword = false;
 
   late LoginFormBloc _loginFormBloc;
@@ -85,101 +87,97 @@ class _LoginFormPageState extends State<LoginFormPage> {
             clearFocus(context);
           },
           child: Scaffold(
-            resizeToAvoidBottomInset: true,
+            // resizeToAvoidBottomInset: true,
             body: Padding(
               padding: const EdgeInsets.fromLTRB(16, 40, 16, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: SingleChildScrollView(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50, bottom: 32),
                       child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16, bottom: 32),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Image.asset(
-                                  'assets/images/app_logo_light.png',
-                                  height: 150,
-                                  width: 150,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 20),
-                                  child: Text(
-                                    'Welcome to \'app name\'',
-                                    style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w900,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Image.asset(
+                            'assets/images/app_logo_light.png',
+                            height: 150,
+                            width: 150,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            child: SizedBox(
-                              height: 50,
-                              child: Input(
-                                keyboardType: TextInputType.text,
-                                controller: _inputUsernameController,
-                                onChanged: (text) {
-                                  _validateForm();
-                                },
-                                textInputAction: TextInputAction.next,
-                                onSubmit: (_) => focusNode.requestFocus(),
-                                hint: 'Enter your username',
-                                prefixIcon: Icons.person_outline,
+                          const Padding(
+                            padding: EdgeInsets.only(top: 20),
+                            child: Text(
+                              'Welcome to \'app name\'',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black,
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            child: SizedBox(
-                              height: 50,
-                              child: InputPasswordField(
-                                inputError: false,
-                                obscureText: !_isShowPassword,
-                                onTapSuffixIcon: () {
-                                  setState(() {
-                                    _isShowPassword = !_isShowPassword;
-                                  });
-                                },
-                                keyboardType: TextInputType.text,
-                                controller: _inputPasswordController,
-                                onChanged: (text) {},
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) =>
-                                    focusNode.requestFocus(),
-                                hint: 'Enter your password',
-                                prefixIcon: Icons.lock_outline,
-                              ),
-                            ),
-                          ),
-                          _rememberOrForgot(),
                         ],
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                    child: Column(
-                      children: [
-                        _buildBiometricsButton(state),
-                        _buttonLogin(state),
-                        _goToSignUpPage(),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: SizedBox(
+                        height: 50,
+                        child: Input(
+                          keyboardType: TextInputType.text,
+                          controller: _inputUsernameController,
+                          onChanged: (text) {
+                            _validateForm();
+                          },
+                          textInputAction: TextInputAction.next,
+                          onSubmit: (_) => focusNode.requestFocus(),
+                          hint: 'Enter your username',
+                          prefixIcon: Icons.person_outline,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      child: SizedBox(
+                        height: 50,
+                        child: InputPasswordField(
+                          inputError: false,
+                          obscureText: !_isShowPassword,
+                          onTapSuffixIcon: () {
+                            setState(() {
+                              _isShowPassword = !_isShowPassword;
+                            });
+                          },
+                          keyboardType: TextInputType.text,
+                          controller: _inputPasswordController,
+                          onChanged: (text) {},
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) {
+                            focusNode.requestFocus();
+                            _validateForm();
+                          },
+                          hint: 'Enter your password',
+                          prefixIcon: Icons.lock_outline,
+                        ),
+                      ),
+                    ),
+                    _rememberOrForgot(),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 90, 0, 16),
+                      child: Column(
+                        children: [
+                          _buildBiometricsButton(state),
+                          _buttonLogin(state),
+                          _goToSignUpPage(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -189,10 +187,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   Future<void> _goToTermPolicy() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool(AppConstants.isLoggedOut, false);
-    bool agreedWithTerms =
-        prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
+    SharedPreferencesStorage().setLoggedOutStatus(false);
+    bool agreedWithTerms = SharedPreferencesStorage().getAgreedWithTerms();
     if (mounted) {
       if (!agreedWithTerms) {
         Navigator.pushReplacement(
@@ -203,8 +199,29 @@ class _LoginFormPageState extends State<LoginFormPage> {
         );
       } else {
         showLoading(context);
-        _navigateToMainPage();
+        SharedPreferencesStorage().getAdminRole()
+            ? _navigateToMainPage
+            : SharedPreferencesStorage().getFillProfileStatus()
+                ? _navigateToMainPage()
+                : _navigateToFillProfilePage(context);
       }
+    }
+  }
+
+  _navigateToFillProfilePage(BuildContext context) async {
+    final userInfo = await AuthRepository().getUserInfo(
+      userId: SharedPreferencesStorage().getUserId(),
+    );
+    if (userInfo is UserInfoModel) {
+      Navigator.pushReplacement(
+        this.context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<FillProfileBloc>(
+            create: (context) => FillProfileBloc(context)..add(FillInit()),
+            child: FillProfilePage(userInfo: userInfo),
+          ),
+        ),
+      );
     }
   }
 
@@ -212,12 +229,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider(
-          create: (context) => TabBloc(),
-          child: MainApp(
-            navFromStart: true,
-          ),
-        ),
+        builder: (context) => MainApp(currentTab: 0),
       ),
     );
   }
@@ -239,48 +251,46 @@ class _LoginFormPageState extends State<LoginFormPage> {
               height: 80,
               color: currentState.buttonStatus == HighlightStatus.active
                   ? Theme.of(context).primaryColor
-                  : AppConstants().greyLight,
+                  : AppColors.greyLight,
             ),
           ),
         ),
       );
     }
-    return const SizedBox.shrink();
+    return const SizedBox(height: 142);
   }
 
   _validateForm() {
-    _loginFormBloc.add(ValidateForm(
-      isValidate: (_inputUsernameController.text.isNotEmpty &&
-          _inputPasswordController.text.isNotEmpty),
-    ));
+    setState(() {
+      _loginFormBloc.add(ValidateForm(
+        isValidate: (_inputUsernameController.text.isNotEmpty &&
+            _inputPasswordController.text.isNotEmpty),
+      ));
+    });
   }
 
   Widget _buttonLogin(LoginFormState currentState) {
     return PrimaryButton(
-        text: 'Login',
-        // isDisable: !currentState.isEnable,
-        onTap:
-            //currentState.isEnable ?
-            () async {
+      text: 'Login',
+      onTap: () async {
+        if (_inputUsernameController.text.isEmpty) {
+          showCupertinoMessageDialog(context, 'Username cannot be empty');
+        } else if (_inputPasswordController.text.isEmpty) {
+          showCupertinoMessageDialog(context, 'Password cannot be empty');
+        } else {
           ConnectivityResult connectivityResult =
               await Connectivity().checkConnectivity();
           if (connectivityResult == ConnectivityResult.none && mounted) {
             showMessageNoInternetDialog(context);
           } else {
-            _loginFormBloc.add(DisplayLoading(isLoading: true));
+            _loginFormBloc.add(DisplayLoading());
             final loginResult = await _authRepository.login(
-              username: 'truong3', password: '123456',
-              // username: _inputUsernameController.text.trim(),
-              // password: _inputPasswordController.text.trim(),
+              username: _inputUsernameController.text,
+              password: _inputPasswordController.text,
             );
-            //todo:::::
-            print(loginResult);
 
             if (loginResult.isSuccess && mounted) {
-              SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
-              await preferences.setBool(
-                  AppConstants.rememberInfo, _rememberInfo);
+              await SharedPreferencesStorage().setRememberInfo(true);
 
               await _goToTermPolicy();
             } else {
@@ -293,7 +303,9 @@ class _LoginFormPageState extends State<LoginFormPage> {
               );
             }
           }
-        });
+        }
+      },
+    );
   }
 
   Widget _goToSignUpPage() {
@@ -338,56 +350,58 @@ class _LoginFormPageState extends State<LoginFormPage> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _rememberInfo = !_rememberInfo;
-                });
-              },
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CustomCheckBox(
-                      value: _rememberInfo,
-                      onChanged: (value) {
-                        setState(() {
-                          _rememberInfo = value;
-                        });
-                      },
-                    ),
-                  ),
-                  const Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Remember password',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Expanded(
+          //   child: GestureDetector(
+          //     onTap: () {
+          //       setState(() {
+          //         _rememberInfo = !_rememberInfo;
+          //       });
+          //     },
+          //     child: Row(
+          //       children: <Widget>[
+          //         SizedBox(
+          //           width: 20,
+          //           height: 20,
+          //           child: CustomCheckBox(
+          //             value: _rememberInfo,
+          //             onChanged: (value) {
+          //               setState(() {
+          //                 _rememberInfo = value;
+          //               });
+          //             },
+          //           ),
+          //         ),
+          //         const Expanded(
+          //           child: Padding(
+          //             padding: EdgeInsets.only(left: 10),
+          //             child: Text(
+          //               'Remember password',
+          //               style: TextStyle(
+          //                 fontSize: 14,
+          //                 fontWeight: FontWeight.w400,
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.only(left: 10, right: 5),
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => BlocProvider<ForgotPasswordBloc>(
-                              create: (context) => ForgotPasswordBloc(context),
-                              child: const ForgotPasswordPage(),
-                            )));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider<ForgotPasswordBloc>(
+                      create: (context) => ForgotPasswordBloc(context),
+                      child: const ForgotPasswordPage(),
+                    ),
+                  ),
+                );
               },
               child: Text(
                 'Forgot password?',

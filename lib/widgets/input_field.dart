@@ -1,4 +1,4 @@
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +15,8 @@ class Input extends StatelessWidget {
   final String? initText;
   final IconData? prefixIcon;
   final bool isInputError;
+  final bool enable;
+  final int? maxText;
 
   const Input({
     Key? key,
@@ -29,6 +31,8 @@ class Input extends StatelessWidget {
     this.initText,
     this.prefixIcon,
     this.isInputError = false,
+    this.enable = true,
+    this.maxText,
   }) : super(key: key);
 
   @override
@@ -43,12 +47,13 @@ class Input extends StatelessWidget {
 
     return useCupertinoTextField
         ? CupertinoTextField(
+            enabled: enable,
             textInputAction: textInputAction,
             onSubmitted: onSubmit,
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            // inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
+            inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
             style: const TextStyle(
               fontSize: 16,
               color: Color.fromARGB(255, 26, 26, 26),
@@ -57,7 +62,7 @@ class Input extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(
-                color: AppConstants().greyLight,
+                color: AppColors.greyLight,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(15),
@@ -65,19 +70,20 @@ class Input extends StatelessWidget {
             prefix: Icon(
               prefixIcon,
               size: 24,
-              color: AppConstants().greyLight,
+              color: AppColors.greyLight,
             ),
             placeholder: hint,
-            maxLines: 1,
+            // maxLines: 1,
           )
         : TextField(
+            enabled: enable,
             textInputAction: textInputAction,
             onSubmitted: onSubmit,
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
             inputFormatters: [
-              // LengthLimitingTextInputFormatter(maxText),
+              LengthLimitingTextInputFormatter(maxText),
               FilteringTextInputFormatter.allow(whiteList ?? RegExp('([\\S])'))
             ],
             style: const TextStyle(
@@ -85,33 +91,40 @@ class Input extends StatelessWidget {
                 color: Color.fromARGB(255, 26, 26, 26),
                 height: 1.35),
             decoration: InputDecoration(
-              prefixIcon: Icon(
-                prefixIcon,
-                size: 24,
-                color: AppConstants().greyLight,
-              ),
-              prefixIconColor: AppConstants().greyLight,
-              contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-              filled: true,
-              fillColor: const Color.fromARGB(102, 230, 230, 230),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  width: 1,
-                  color: Theme.of(context).primaryColor,
+                prefixIcon: Icon(
+                  prefixIcon,
+                  size: 24,
+                  color: AppColors.greyLight,
                 ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  width: 1,
-                  color: isInputError
-                      ? AppConstants().red700
-                      : const Color.fromARGB(128, 130, 130, 130),
+                prefixIconColor: AppColors.greyLight,
+                contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+                filled: true,
+                fillColor: const Color.fromARGB(102, 230, 230, 230),
+                disabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(
+                    width: 1,
+                    color: Color.fromARGB(128, 130, 130, 130),
+                  ),
                 ),
-              ),
-              hintText: hint,
-            ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(
+                    width: 1,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(
+                    width: 1,
+                    color: isInputError
+                        ? AppColors.red700
+                        : const Color.fromARGB(128, 130, 130, 130),
+                  ),
+                ),
+                hintText: hint,
+                hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6))),
           );
   }
 }

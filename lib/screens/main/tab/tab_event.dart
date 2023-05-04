@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum AppTab { chat, news, transcript, profile }
+enum AppTab { chat, news, transcript, settings }
 
 abstract class TabEvent extends Equatable {
   const TabEvent();

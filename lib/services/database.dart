@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
-class DatabaseService{
+class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
 
-  factory DatabaseService(){
+  factory DatabaseService() {
     return _instance;
   }
 
   DatabaseService._internal();
 
+  GlobalKey? mainKey;
   GlobalKey? chatKey;
   GlobalKey? newsKey;
   GlobalKey? transcriptKey;
@@ -16,5 +17,4 @@ class DatabaseService{
   bool isShowingTerm = false;
 
   String? gpsInfo;
-
 }

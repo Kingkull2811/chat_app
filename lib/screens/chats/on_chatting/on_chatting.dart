@@ -1,10 +1,10 @@
-import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting_bloc.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/custom_app_bar_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../tab/chat_tab.dart';
 import 'on_chatting_state.dart';
 
 class OnChattingPage extends StatefulWidget {
@@ -513,7 +513,6 @@ enum MessageStatus { notSent, notView, viewed }
 List<MessageItem> itemMessage = [
   MessageItem(
     sender: 'Martha',
-    receiver: 'You',
     message: 'Hello',
     typeMessage: TypeMessage.text,
     timestamp: '2023-03-09T10:00:00.000Z',
@@ -521,7 +520,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'Martha',
-    receiver: 'You',
     message: 'assets/images/image_onboarding_1.png',
     typeMessage: TypeMessage.image,
     timestamp: '2023-03-09T10:05:00.000Z',
@@ -529,7 +527,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'Martha',
-    receiver: 'You',
     message: 'assets/images/image_onboarding_1.png',
     typeMessage: TypeMessage.video,
     timestamp: '2023-03-09T10:00:00.000Z',
@@ -537,7 +534,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'Martha',
-    receiver: 'You',
     message: 'sdadasdaddsdasda',
     typeMessage: TypeMessage.audio,
     timestamp: '2023-03-09T10:01:00.000Z',
@@ -545,7 +541,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'You',
-    receiver: 'Martha',
     message: 'Hello MMMMM',
     typeMessage: TypeMessage.text,
     timestamp: '2023-03-09T10:12:00.000Z',
@@ -553,7 +548,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'You',
-    receiver: 'Martha',
     message: 'assets/images/image_onboarding_2.png',
     typeMessage: TypeMessage.image,
     timestamp: '2023-03-09T10:15:00.000Z',
@@ -561,7 +555,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'You',
-    receiver: 'Martha',
     message: 'assets/images/image_onboarding_2.png',
     typeMessage: TypeMessage.video,
     timestamp: '2023-03-09T10:00:00.000Z',
@@ -569,7 +562,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'You',
-    receiver: 'Martha',
     message: 'Hello cccc',
     typeMessage: TypeMessage.audio,
     timestamp: '2023-03-09T10:18:00.000Z',
@@ -577,7 +569,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'Martha',
-    receiver: 'You',
     message: 'Helloooooo',
     typeMessage: TypeMessage.text,
     timestamp: '2023-03-09T10:20:00.000Z',
@@ -585,7 +576,6 @@ List<MessageItem> itemMessage = [
   ),
   MessageItem(
     sender: 'Martha',
-    receiver: 'You',
     message: 'assets/images/image_onboarding_3.png',
     typeMessage: TypeMessage.image,
     timestamp: '2023-03-09T10:25:00.000Z',
@@ -595,7 +585,6 @@ List<MessageItem> itemMessage = [
 
 class MessageItem {
   final String sender;
-  final String receiver;
   final dynamic message;
   final MessageStatus status;
   final TypeMessage typeMessage;
@@ -603,7 +592,6 @@ class MessageItem {
 
   MessageItem(
       {required this.sender,
-      required this.receiver,
       required this.message,
       required this.status,
       required this.typeMessage,

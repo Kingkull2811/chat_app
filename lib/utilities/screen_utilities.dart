@@ -1,28 +1,37 @@
-import 'package:chat_app/screens/authenticator/login/login_page.dart';
-import 'package:chat_app/screens/chats/chat.dart';
+import 'package:chat_app/routes.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:chat_app/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:local_auth_android/types/auth_messages_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
-import '../screens/authenticator/login/login_bloc.dart';
-import '../screens/main/main_app.dart';
-import '../services/database.dart';
 import '../widgets/message_dialog.dart';
 import '../widgets/primary_button.dart';
+
+void showBlankPage(BuildContext context) {
+  showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return Container();
+      });
+}
 
 void showLoading(BuildContext context) {
   showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return Center(
-          child: CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+        return Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+            ),
           ),
         );
       });
@@ -31,16 +40,8 @@ void showLoading(BuildContext context) {
 void logout(BuildContext? context) async {
   SharedPreferencesStorage().resetDataWhenLogout();
   if (context != null) {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider<LoginBloc>(
-          create: (BuildContext context) => LoginBloc(),
-          child: const LoginPage(),
-        ),
-      ),
-      (route) => false,
-    );
+    Navigator.pushNamedAndRemoveUntil(
+        context, AppRoutes.login, (route) => false);
   }
 }
 
@@ -69,22 +70,7 @@ clearFocus(BuildContext context) {
   }
 }
 
-void backToChat(BuildContext context) {
-  // Reset app mode
-  //resetSwitchAppMode();
-  Navigator.popUntil(context, (route) => route.isFirst);
-  DatabaseService().gpsInfo = null;
-  try {
-    (DatabaseService().chatKey?.currentState as MainAppState).changeTabToChat();
-    (DatabaseService().chatKey?.currentState as MainAppState).reloadPage();
-  } catch (_) {}
-  try {
-    (DatabaseService().chatKey?.currentState as ChatsPageState).reloadPage();
-  } catch (_) {}
-}
-
-AndroidAuthMessages androidLocalAuthMessage(
-        //BuildContext context,
+AndroidAuthMessages androidLocalAuthMessage(//BuildContext context,
         ) =>
     const AndroidAuthMessages(
       cancelButton: 'OK',
@@ -93,8 +79,7 @@ AndroidAuthMessages androidLocalAuthMessage(
           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
     );
 
-IOSAuthMessages iosLocalAuthMessages(
-        //BuildContext context,
+IOSAuthMessages iosLocalAuthMessages(//BuildContext context,
         ) =>
     const IOSAuthMessages(
       cancelButton: 'OK',
@@ -145,13 +130,14 @@ Future<void> showMessageNoInternetDialog(
           ),
           actions: <Widget>[
             CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  if (onClose != null) {
-                    onClose();
-                  }
-                },
-                child: Text(buttonLabel ?? 'OK')),
+              onPressed: () {
+                Navigator.pop(context);
+                if (onClose != null) {
+                  onClose();
+                }
+              },
+              child: Text(buttonLabel ?? 'OK'),
+            ),
           ],
         );
       });
@@ -180,6 +166,57 @@ Future<void> showCupertinoMessageDialog(
       });
 }
 
+Future<void> showMessageTwoOption(
+  BuildContext context,
+  String? title, {
+  String? content,
+  Function()? onCancel,
+  String? cancelLabel,
+  Function()? onOk,
+  String? okLabel,
+
+  /// false = user must tap button, true = tap outside dialog
+  bool barrierDismiss = false,
+}) async {
+  await showDialog(
+      barrierDismissible: barrierDismiss,
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: title == null ? null : Text(title),
+          content: content == null
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(content),
+                ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                if (onCancel != null) {
+                  onCancel();
+                }
+              },
+              child: Text(cancelLabel ?? 'Cancel'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                if (onOk != null) {
+                  onOk();
+                }
+              },
+              child: Text(
+                okLabel ?? 'OK',
+                style: const TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      });
+}
+
 Future<void> showSuccessBottomSheet(
   BuildContext context, {
   bool isDismissible = false,
@@ -199,7 +236,7 @@ Future<void> showSuccessBottomSheet(
       },
       child: Container(
         height: 350,
-        color: AppConstants().grey630,
+        color: AppColors.grey630,
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -214,12 +251,12 @@ Future<void> showSuccessBottomSheet(
               Expanded(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
                       child: Icon(
                         Icons.verified_outlined,
                         size: 150,
-                        color: AppConstants().green600,
+                        color: AppColors.green600,
                       ),
                     ),
                     Padding(
@@ -260,4 +297,56 @@ Future<void> showSuccessBottomSheet(
       ),
     ),
   );
+}
+
+Future<String?> pickImage(BuildContext context) async {
+  String? imagePath;
+  showCupertinoModalPopup(
+    context: context,
+    builder: (context) {
+      return CupertinoActionSheet(
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.pop(context);
+              imagePath = await pickPhoto(ImageSource.camera);
+            },
+            child: Text(
+              'Take a photo from camera',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () async {
+              Navigator.pop(context);
+              imagePath = await pickPhoto(ImageSource.gallery);
+            },
+            child: Text(
+              'Choose a photo from gallery',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black.withOpacity(0.7),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+  return imagePath;
 }

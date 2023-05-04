@@ -4,12 +4,12 @@ import 'package:chat_app/screens/authenticator/login/login_form/login_form.dart'
 import 'package:chat_app/screens/authenticator/login/login_form/login_form_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_state.dart';
 import 'package:chat_app/services/database.dart';
-import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../term_and_policy/term_and_policy.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -49,8 +49,9 @@ class _LoginPageState extends State<LoginPage> {
         return Scaffold(
           body: Center(
             child: CircularProgressIndicator(
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).primaryColor,
+              ),
             ),
           ),
         );
@@ -59,11 +60,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _checkAuthenticateState() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool rememberInfo = preferences.getBool(AppConstants.rememberInfo) ?? false;
-    bool isLoggedOut = preferences.getBool(AppConstants.isLoggedOut) ?? false;
+    bool rememberInfo = SharedPreferencesStorage().getRememberInfo();
+    bool isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
     bool isExpired = true;
-    String passwordExpireTime = preferences.getString(AppConstants.refreshTokenExpiredKey) ?? '';
+    String passwordExpireTime =
+        SharedPreferencesStorage().getAccessTokenExpired();
 
     if (passwordExpireTime.isNotEmpty) {
       try {
@@ -90,14 +91,14 @@ class _LoginPageState extends State<LoginPage> {
         if (isExpired) {
           _loginBloc.add(CheckAuthenticationFailed());
         } else {
-          preferences.setBool(AppConstants.isLoggedOut, false);
+          SharedPreferencesStorage().setLoggedOutStatus(false);
           if (mounted) {
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => TermAndPolicy(),
-            //   ),
-            // );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TermPolicyPage(),
+              ),
+            );
           }
           DatabaseService().isShowingTerm = true;
         }
@@ -113,4 +114,3 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
-

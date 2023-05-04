@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../theme.dart';
 
 class AudioCallPage extends StatefulWidget {
   final String imageUrl;
   final String name;
+
   const AudioCallPage({
     Key? key,
     required this.imageUrl,
@@ -37,7 +39,6 @@ class _AudioCallPageState extends State<AudioCallPage> {
       countTime = "$hh:$mm:$ss";
     });
   }
-
 
   @override
   void initState() {
@@ -72,7 +73,6 @@ class _AudioCallPageState extends State<AudioCallPage> {
       backgroundColor: Colors.grey.withOpacity(0.45),
       body: Stack(
         children: [
-
           Align(
             alignment: Alignment.center,
             child: Padding(
@@ -178,8 +178,7 @@ class _AudioCallPageState extends State<AudioCallPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        //todo::
-                        print('end audio call. time_call: $countTime');
+                        //todo: print('end audio call. time_call: $countTime');
                         Navigator.pop(context);
                       },
                       child: Container(
@@ -187,7 +186,7 @@ class _AudioCallPageState extends State<AudioCallPage> {
                         width: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
-                          color: AppConstants().red700,
+                          color: AppColors.red700,
                         ),
                         child: const Icon(
                           Icons.call_end_outlined,
