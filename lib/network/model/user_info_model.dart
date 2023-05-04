@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:chat_app/network/model/role_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../utilities/utils.dart';
 
 class UserInfoModel {
@@ -9,6 +14,7 @@ class UserInfoModel {
   final String? phone;
   final bool isFillProfileKey;
   final String? fileUrl;
+  final String? parentOf;
 
   UserInfoModel({
     this.id,
@@ -19,6 +25,7 @@ class UserInfoModel {
     this.phone,
     this.isFillProfileKey = false,
     this.fileUrl,
+    this.parentOf,
   });
 
   factory UserInfoModel.fromJson(Map<String, dynamic> json) {
@@ -35,33 +42,77 @@ class UserInfoModel {
       phone: json['phone'],
       isFillProfileKey: json['isFillProfileKey'] ?? false,
       fileUrl: isNullOrEmpty(json['fileUrl']) ? null : json['fileUrl'],
+      parentOf: json['parentOf'],
     );
   }
 
-  @override
-  String toString() {
-    return 'UserInfoModel{id: $id, username: $username, email: $email, roles: $roles, fullName: $fullName, phone: $phone, isFillProfileKey: $isFillProfileKey, fileUrl: $fileUrl}';
+  factory UserInfoModel.fromFirebase(Map<String, dynamic> data) {
+    // if (isNullOrEmpty(querySnapshot.data())) {
+    //   return UserInfoModel();
+    // }
+    // final data = querySnapshot.data();
+    return UserInfoModel(
+      id: data['id'],
+      username: data['username'],
+      email: data['email'],
+      roles: List<Role>.from(
+        json.decode(data['roles']).map((e) => Role.fromFirebase(e)),
+      ),
+      fullName: data['fullName'],
+      phone: data['phone'],
+      isFillProfileKey: data['isFillProfileKey'] ?? false,
+      fileUrl: data['fileUrl'],
+      parentOf: data['parentOf'],
+    );
   }
-}
 
-class Role {
-  final int? id;
-  final String? name;
+  factory UserInfoModel.fromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    if (isNullOrEmpty(snapshot)) {
+      return UserInfoModel();
+    }
+    final data = snapshot.data()!;
+    return UserInfoModel(
+      id: data['id'],
+      username: data['username'],
+      email: data['email'],
+      roles: List<Role>.from(
+        json.decode(data['roles']).map((e) => Role.fromFirebase(e)),
+      ),
+      fullName: data['fullName'],
+      phone: data['phone'],
+      isFillProfileKey: data['isFillProfileKey'] ?? false,
+      fileUrl: data['fileUrl'],
+      parentOf: data['parentOf'],
+    );
+  }
 
-  Role({
-    this.id,
-    this.name,
-  });
-
-  factory Role.fromJson(Map<String, dynamic> json) {
-    return Role(
+  factory UserInfoModel.fromFire(Map<String, dynamic> json) {
+    return UserInfoModel(
+      phone: json['phone'],
+      roles: [],
+      fullName: json['fullName'],
+      fileUrl: json['fileUrl'],
+      parentOf: json['parentOf'],
       id: json['id'],
-      name: json['name'],
+      isFillProfileKey: true,
+      email: json['email'],
+      username: json['username'],
     );
   }
 
+  Map<String, dynamic> toFirestore() => {
+        'id': id,
+        'username': username,
+        'email': email,
+        'fullName': fullName,
+        'phone': phone,
+        'fileUrl': fileUrl,
+        'parentOf': parentOf,
+      };
+
   @override
   String toString() {
-    return 'Role{id: $id, name: $name}';
+    return 'UserInfoModel{id: $id, username: $username, email: $email, roles: $roles, fullName: $fullName, phone: $phone, isFillProfileKey: $isFillProfileKey, fileUrl: $fileUrl, parentOf: $parentOf}';
   }
 }

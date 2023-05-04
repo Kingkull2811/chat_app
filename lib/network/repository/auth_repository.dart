@@ -39,7 +39,6 @@ class AuthRepository {
       username: username,
       password: password,
     );
-    // log('login response: ${loginResponse.toString()}');
 
     if (loginResponse.httpStatus == 200) {
       await SharedPreferencesStorage().setSaveUserInfo(loginResponse.data);
@@ -96,25 +95,9 @@ class AuthRepository {
 
   Future<Object> fillProfile({
     required int userID,
-    required String fullName,
-    required String phone,
-    required String imageUrl,
-  }) async {
-    final data = {
-      // "id": 1,
-      // "username": "string",
-      // "email": "string@gmail.com",
-      // "roles": [
-      //   {"id": 2, "name": "ROLE_USER"}
-      // ],
-      "fullName": fullName,
-      "phone": phone,
-      "isFillProfileKey": true,
-      "fileUrl": imageUrl
-    };
-
-    return await _authProvider.fillProfile(userID: userID, data: data);
-  }
+    required Map<String, dynamic> data,
+  }) async =>
+      await _authProvider.fillProfile(userID: userID, data: data);
 
   Future<Object> changePassword({
     required String oldPass,

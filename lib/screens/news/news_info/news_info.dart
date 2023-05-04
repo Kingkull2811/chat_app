@@ -364,10 +364,7 @@ class _NewsInfoState extends State<NewsInfo> {
             CupertinoActionSheetAction(
               onPressed: () async {
                 Navigator.pop(context);
-                final image = await pickPhoto(
-                  context,
-                  ImageSource.camera,
-                );
+                final image = await pickPhoto(ImageSource.camera);
                 if (isNotNullOrEmpty(image)) {
                   setState(() {
                     mediaUrl = image;
@@ -387,10 +384,7 @@ class _NewsInfoState extends State<NewsInfo> {
             CupertinoActionSheetAction(
               onPressed: () async {
                 Navigator.pop(context);
-                final image = await pickPhoto(
-                  context,
-                  ImageSource.gallery,
-                );
+                final image = await pickPhoto(ImageSource.gallery);
                 if (isNotNullOrEmpty(image)) {
                   setState(() {
                     mediaUrl = image;

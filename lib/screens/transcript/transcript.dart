@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/transcript/add_student/add_student.dart';
+import 'package:chat_app/screens/transcript/add_student/add_student_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
@@ -93,31 +94,35 @@ class TranscriptPageState extends State<TranscriptPage> {
                               onPressed: () async {
                                 Navigator.pop(context);
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => AddStudent()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => BlocProvider(
+                                      create: (context) =>
+                                          AddStudentBloc(context),
+                                      child: const AddStudent(),
+                                    ),
+                                  ),
+                                );
                               },
                               child: _itemOption(
-                                icon: Icons.person_outline,
+                                // icon: Icons.person_outline,
                                 title: 'Add a new student',
                               ),
                             ),
+                            // CupertinoActionSheetAction(
+                            //   onPressed: () async {},
+                            //   child: _itemOption(
+                            //     // icon: Icons.summarize_outlined,
+                            //     title: 'Add a new class',
+                            //   ),
+                            // ),
                             CupertinoActionSheetAction(
                               onPressed: () async {},
                               child: _itemOption(
-                                icon: Icons.summarize_outlined,
+                                // icon: Icons.summarize_outlined,
                                 title: 'Enter the points to the transcript',
                               ),
                             ),
-                            // CupertinoActionSheetAction(
-                            //   onPressed: () async {
-                            //
-                            //   },
-                            //   child: _itemOption(
-                            //     icon: Icons.delete_outline,
-                            //     title: 'Delete this news',
-                            //   ),
-                            // ),
                           ],
                           cancelButton: CupertinoActionSheetAction(
                             onPressed: () {
@@ -397,7 +402,7 @@ class TranscriptPageState extends State<TranscriptPage> {
   }
 
   Widget _itemOption({
-    required IconData icon,
+    IconData? icon,
     required String title,
   }) {
     return Row(

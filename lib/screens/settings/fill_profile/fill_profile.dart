@@ -1,7 +1,6 @@
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:chat_app/network/repository/auth_repository.dart';
+import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_event.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_state.dart';
@@ -13,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../network/model/user_info_model.dart';
 import '../../../services/firebase_services.dart';
 import '../../../theme.dart';
 import '../../../utilities/enum/api_error_result.dart';
@@ -25,18 +23,18 @@ import '../../../widgets/primary_button.dart';
 import '../../main/main_app.dart';
 
 class FillProfilePage extends StatefulWidget {
-  const FillProfilePage({Key? key}) : super(key: key);
+  final UserInfoModel userInfo;
+
+  const FillProfilePage({Key? key, required this.userInfo}) : super(key: key);
 
   @override
   State<FillProfilePage> createState() => _FillProfilePageState();
 }
 
 class _FillProfilePageState extends State<FillProfilePage> {
-  final AuthRepository _authRepository = AuthRepository();
-
   late FillProfileBloc _fillProfileBloc;
 
-  bool isVideo = false;
+  final bool isUserRoll = SharedPreferencesStorage().getUserRole();
 
   final _searchController = TextEditingController();
   final _usernameController = TextEditingController();
@@ -51,14 +49,15 @@ class _FillProfilePageState extends State<FillProfilePage> {
   String studentParent = 'Student\'s Parent';
   bool _isShow = false;
 
+  bool _isOnline = true;
+
   String? _image;
 
   @override
   void initState() {
     _fillProfileBloc = BlocProvider.of<FillProfileBloc>(context);
-    _fillProfileBloc.add(
-      GetUserInfoEvent(SharedPreferencesStorage().getUserId()),
-    );
+    _fillProfileBloc.add(FillInit());
+    _image = widget.userInfo.fileUrl;
     super.initState();
   }
 
@@ -80,131 +79,147 @@ class _FillProfilePageState extends State<FillProfilePage> {
         return false;
       },
       child: BlocConsumer<FillProfileBloc, FillProfileState>(
-          listenWhen: (preState, curState) {
-        return curState.apiError != ApiError.noError;
-      }, listener: (context, curState) {
-        log(curState.toString());
-        if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(context, 'Error!',
-              content: 'Internal_server_error');
-        }
-        if (curState.apiError == ApiError.noInternetConnection) {
-          showCupertinoMessageDialog(context, 'Error!',
-              content: 'No_internet_connection');
-        }
-      }, builder: (context, curState) {
-        Widget body = const SizedBox.shrink();
-        if (curState.isLoading) {
-          body = const AnimationLoading();
-        } else {
-          body = _body(context, curState);
-        }
-
-        return Scaffold(body: body);
-      }),
+        listenWhen: (preState, curState) {
+          return curState.apiError == ApiError.noError;
+        },
+        listener: (context, curState) {
+          if (curState.apiError == ApiError.internalServerError) {
+            showCupertinoMessageDialog(
+              context,
+              'Error!',
+              content: 'Internal_server_error',
+            );
+          }
+          if (curState.apiError == ApiError.noInternetConnection) {
+            showMessageNoInternetDialog(context);
+          }
+          if (curState.fillSuccess) {
+            showCupertinoMessageDialog(
+              context,
+              'Your profile has been successfully updated',
+              onCloseDialog: () {
+                _navigateToMainPage();
+              },
+            );
+          }
+          if (curState.userData == null) {
+            logoutIfNeed(context);
+          }
+        },
+        builder: (context, state) {
+          Widget body = const SizedBox.shrink();
+          if (state.isLoading) {
+            body = const Scaffold(body: AnimationLoading());
+          } else {
+            body = _body(context, state);
+          }
+          return body;
+        },
+      ),
     );
   }
 
   Widget _body(BuildContext context, FillProfileState state) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: Colors.grey[50],
-        centerTitle: true,
-        title: const Text(
-          'Fill Your Profile',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0.5,
+          backgroundColor: Colors.grey[50],
+          centerTitle: true,
+          title: const Text(
+            'Fill Your Profile',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              _imageAvt(context, state),
-              _itemTextInput(
-                controller: _usernameController,
-                enable: false,
-                initText: state.userData?.username,
-                prefixIcon: Icons.person_outline,
-              ),
-              _fullNameInputField(
-                context,
-                controller: _nameController,
-                initText: state.userData?.fullName,
-              ),
-              _itemTextInput(
-                enable: false,
-                controller: _emailController,
-                initText: state.userData?.email,
-                prefixIcon: Icons.email_outlined,
-              ),
-              _itemTextInput(
-                enable: true,
-                controller: _phoneController,
-                prefixIcon: Icons.phone,
-                initText: state.userData?.phone,
-                hint: 'Phone number',
-                keyboardType: TextInputType.phone,
-                maxText: 10,
-              ),
-              state.isUserRole ? _selectStudent() : const SizedBox.shrink(),
-              Padding(
-                padding: const EdgeInsets.only(top: 16, bottom: 32),
-                child: PrimaryButton(
-                  text: 'Save',
-                  onTap: () async {
-                    await onTapButton(context, state);
-                  },
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                _imageAvt(context),
+                _itemTextInput(
+                  controller: _usernameController,
+                  enable: false,
+                  initText: widget.userInfo.username,
+                  prefixIcon: Icons.person_outline,
                 ),
-              ),
-            ],
+                _fullNameInputField(
+                  context,
+                  controller: _nameController,
+                  initText: widget.userInfo.fullName,
+                ),
+                _itemTextInput(
+                  enable: false,
+                  controller: _emailController,
+                  initText: widget.userInfo.email,
+                  prefixIcon: Icons.email_outlined,
+                ),
+                _itemTextInput(
+                  enable: true,
+                  controller: _phoneController,
+                  prefixIcon: Icons.phone,
+                  initText: widget.userInfo.phone,
+                  hint: 'Phone number',
+                  keyboardType: TextInputType.phone,
+                  maxText: 10,
+                ),
+                if (isUserRoll) _selectStudent(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 32),
+                  child: PrimaryButton(
+                    text: 'Save',
+                    onTap: () async {
+                      showLoading(context);
+                      await onTapButton(context, widget.userInfo);
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Future<void> onTapButton(BuildContext context, FillProfileState state) async {
+  Future<void> onTapButton(
+    BuildContext context,
+    UserInfoModel? userInfo,
+  ) async {
     if (_nameController.text.isEmpty && mounted) {
       showCupertinoMessageDialog(context, 'Full name cannot be empty');
     } else if (_phoneController.text.isEmpty) {
       showCupertinoMessageDialog(context, 'Phone number cannot be empty');
-    } else if (_image == null) {
+    } else if (isNullOrEmpty(_image)) {
       showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
     } else {
-      showLoading(context);
-
-      final response = await _authRepository.fillProfile(
-        userID: SharedPreferencesStorage().getUserId(),
-        fullName: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        imageUrl: await getUrlImage(file: File(_image!)),
-      );
-      if (response is UserInfoModel) {
-        await SharedPreferencesStorage()
-            .setImageAvartarUrl(imageUrl: response.fileUrl ?? '');
-      }
-      _navigateToMainPage();
-      // log('fillData ${response.toString()}');
-
-      //todo: send userInfo to firebase
+      final Map<String, dynamic> userData = {
+        "fileUrl": _isOnline
+            ? userInfo?.fileUrl
+            : await getUrlImage(file: File(_image!)),
+        "fullName": _nameController.text.trim(),
+        "isFillProfileKey": true,
+        "phone": _phoneController.text.trim(),
+      };
+      _fillProfileBloc.add(FillProfile(
+        userId: SharedPreferencesStorage().getUserId(),
+        userData: userData,
+      ));
     }
   }
 
-  _navigateToMainPage() {
+  void _navigateToMainPage() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => MainApp(),
-      ),
+      MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)),
     );
   }
 
@@ -268,9 +283,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
                 ),
               ),
             ),
-            _isShow
-                ? SearchBox(controller: _searchController)
-                : const SizedBox.shrink(),
+            if (_isShow) SearchBox(controller: _searchController),
           ],
         ),
       ),
@@ -365,23 +378,25 @@ class _FillProfilePageState extends State<FillProfilePage> {
     );
   }
 
-  Widget _imageAvt(BuildContext context, FillProfileState state) {
-    bool isOnline = isNotNullOrEmpty(state.userData?.fileUrl);
-
+  Widget _imageAvt(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 0),
-      child: SizedBox(
+      child: Container(
         height: 200,
         width: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+        ),
         child: Stack(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(100),
               child: AppImage(
-                isOnline: isOnline,
-                localPathOrUrl: isOnline ? state.userData?.fileUrl! : _image,
-                width: 200,
+                isOnline: _isOnline,
+                // localPathOrUrl: _isOnline ? userData?.fileUrl : _image,
+                localPathOrUrl: _image,
                 height: 200,
+                width: 200,
                 boxFit: BoxFit.cover,
                 errorWidget: Image.asset(
                   'assets/images/ic_account_circle.png',
@@ -394,70 +409,68 @@ class _FillProfilePageState extends State<FillProfilePage> {
               right: 0,
               bottom: 0,
               child: InkWell(
-                onTap: () async {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) {
-                      return CupertinoActionSheet(
-                        actions: <Widget>[
-                          CupertinoActionSheetAction(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              // ope Camera
-
-                              final image = await pickPhoto(
-                                context,
-                                ImageSource.camera,
-                              );
-                              setState(() {
-                                _image = image;
-                              });
-                            },
-                            child: const Text(
-                              'Take a photo from camera',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          CupertinoActionSheetAction(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              // take image from gallery
-                              final image = await pickPhoto(
-                                context,
-                                ImageSource.gallery,
-                              );
-                              setState(() {
-                                _image = image;
-                              });
-                            },
-                            child: const Text(
-                              'Choose a photo from gallery',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                          )
-                        ],
-                        cancelButton: CupertinoActionSheetAction(
-                          onPressed: () {
+                onTap: () async => await showCupertinoModalPopup(
+                  context: context,
+                  builder: (context) {
+                    return CupertinoActionSheet(
+                      actions: <Widget>[
+                        CupertinoActionSheetAction(
+                          onPressed: () async {
                             Navigator.pop(context);
+
+                            final imagePicked = await pickPhoto(
+                              ImageSource.camera,
+                            );
+
+                            setState(() {
+                              _image = imagePicked;
+                              _isOnline = false;
+                            });
                           },
                           child: Text(
-                            'Cancel',
+                            'Take a photo from camera',
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.black.withOpacity(0.7),
+                              color: Theme.of(context).primaryColor,
                             ),
                           ),
                         ),
-                      );
-                    },
-                  );
-                },
+                        CupertinoActionSheetAction(
+                          onPressed: () async {
+                            Navigator.pop(context);
+
+                            final imagePicked =
+                                await pickPhoto(ImageSource.gallery);
+
+                            setState(() {
+                              _image = imagePicked;
+                              _isOnline = false;
+                            });
+                          },
+                          child: Text(
+                            'Choose a photo from gallery',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        )
+                      ],
+                      cancelButton: CupertinoActionSheetAction(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black.withOpacity(0.7),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 child: Container(
                   width: 40,
                   height: 40,
@@ -486,8 +499,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
   ///upload image to firebase storage or cloudinary.com for get url
   Future<String> getUrlImage({required File file}) async {
     return await FirebaseService().uploadImageToStorage(
-      titleName:
-          'image_userid_${SharedPreferencesStorage().getUserId().toString()}',
+      titleName: 'image_userid_${SharedPreferencesStorage().getUserId()}',
       image: file,
     );
   }

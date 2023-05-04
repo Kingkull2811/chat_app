@@ -1,3 +1,4 @@
+import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
@@ -22,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../settings/fill_profile/fill_profile.dart';
+import '../../../settings/fill_profile/fill_profile_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormPage extends StatefulWidget {
@@ -52,7 +54,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   void initState() {
     _loginFormBloc = BlocProvider.of<LoginFormBloc>(context);
     if (widget.isShowLoginBiometrics) {
-      Future.delayed(const Duration(microseconds: 200), () {
+      Future.delayed(const Duration(microseconds: 500), () {
         _loginFormBloc.add(LoginWithBiometrics());
       });
     }
@@ -201,28 +203,33 @@ class _LoginFormPageState extends State<LoginFormPage> {
             ? _navigateToMainPage
             : SharedPreferencesStorage().getFillProfileStatus()
                 ? _navigateToMainPage()
-                : _navigateToFillProfilePage();
+                : _navigateToFillProfilePage(context);
       }
     }
   }
 
-  _navigateToFillProfilePage() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider<FillProfileBloc>(
-          create: (context) => FillProfileBloc(context),
-          child: const FillProfilePage(),
-        ),
-      ),
+  _navigateToFillProfilePage(BuildContext context) async {
+    final userInfo = await AuthRepository().getUserInfo(
+      userId: SharedPreferencesStorage().getUserId(),
     );
+    if (userInfo is UserInfoModel) {
+      Navigator.pushReplacement(
+        this.context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<FillProfileBloc>(
+            create: (context) => FillProfileBloc(context)..add(FillInit()),
+            child: FillProfilePage(userInfo: userInfo),
+          ),
+        ),
+      );
+    }
   }
 
   _navigateToMainPage() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => MainApp(),
+        builder: (context) => MainApp(currentTab: 0),
       ),
     );
   }
@@ -278,14 +285,11 @@ class _LoginFormPageState extends State<LoginFormPage> {
           } else {
             _loginFormBloc.add(DisplayLoading());
             final loginResult = await _authRepository.login(
-              // username: 'truong3', password: '123456',
               username: _inputUsernameController.text,
               password: _inputPasswordController.text,
             );
 
             if (loginResult.isSuccess && mounted) {
-              _loginFormBloc.add(OnSuccess());
-
               await SharedPreferencesStorage().setRememberInfo(true);
 
               await _goToTermPolicy();

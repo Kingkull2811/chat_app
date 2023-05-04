@@ -5,6 +5,6 @@ abstract class ProfileEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class DisplayLoading extends ProfileEvent {}
+class GetUserInfo extends ProfileEvent {}
 
 class EditProfile extends ProfileEvent {}

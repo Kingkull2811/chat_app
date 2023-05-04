@@ -20,11 +20,12 @@ class NewsState implements ApiResultState {
 }
 
 extension NewsStateExtension on NewsState {
-  NewsState copyWith(
-          {ApiError? apiError,
-          bool? isLoading,
-          bool? isUserRole,
-          List<NewsModel>? listNews}) =>
+  NewsState copyWith({
+    ApiError? apiError,
+    bool? isLoading,
+    bool? isUserRole,
+    List<NewsModel>? listNews,
+  }) =>
       NewsState(
         apiError: apiError ?? this.apiError,
         isLoading: isLoading ?? this.isLoading,

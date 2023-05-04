@@ -29,7 +29,7 @@ class NewsPage extends StatefulWidget {
 }
 
 class NewsPageState extends State<NewsPage> {
-  bool isAdmin = SharedPreferencesStorage().getAdminRole() ||
+  final bool isAdmin = SharedPreferencesStorage().getAdminRole() ||
       SharedPreferencesStorage().getTeacherRole();
 
   @override
@@ -45,29 +45,32 @@ class NewsPageState extends State<NewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<NewsBloc, NewsState>(listenWhen: (preState, curState) {
-      return curState.apiError != ApiError.noError;
-    }, listener: (context, curState) {
-      if (curState.apiError == ApiError.internalServerError) {
-        showCupertinoMessageDialog(
-          context,
-          'Error!',
-          content: 'Internal_server_error',
-        );
-      }
-      if (curState.apiError == ApiError.noInternetConnection) {
-        showMessageNoInternetDialog(context);
-      }
-    }, builder: (context, curState) {
-      Widget body = const SizedBox.shrink();
-      if (curState.isLoading) {
-        body = const AnimationLoading();
-      } else {
-        body = _body(context, curState);
-      }
-
-      return Scaffold(body: body);
-    });
+    return BlocConsumer<NewsBloc, NewsState>(
+      listenWhen: (preState, curState) {
+        return curState.apiError != ApiError.noError;
+      },
+      listener: (context, curState) {
+        if (curState.apiError == ApiError.internalServerError) {
+          showCupertinoMessageDialog(
+            context,
+            'Error!',
+            content: 'Internal_server_error',
+          );
+        }
+        if (curState.apiError == ApiError.noInternetConnection) {
+          showMessageNoInternetDialog(context);
+        }
+      },
+      builder: (context, curState) {
+        Widget body = const SizedBox.shrink();
+        if (curState.isLoading) {
+          body = const Scaffold(body: AnimationLoading());
+        } else {
+          body = _body(context, curState);
+        }
+        return body;
+      },
+    );
   }
 
   Widget _body(BuildContext context, NewsState state) {

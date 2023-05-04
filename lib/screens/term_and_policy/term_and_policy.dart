@@ -136,7 +136,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MainApp(),
+                      builder: (context) => MainApp(currentTab: 0),
                     ),
                   );
                 }

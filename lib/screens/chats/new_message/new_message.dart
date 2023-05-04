@@ -1,6 +1,7 @@
-import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
+
+import '../tab/chat_tab.dart';
 
 class CreateNewMessage extends StatefulWidget {
   final TextEditingController searchNewController;

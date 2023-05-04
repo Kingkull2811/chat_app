@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:chat_app/network/model/user_firebase.dart';
+import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+
+import '../network/model/message_model.dart';
+import '../utilities/enum/message_type.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -15,12 +19,12 @@ class FirebaseService {
 
   FirebaseService._internal();
 
-  late FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  late FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
   UploadTask uploadTask(String imagePath, String fileName) {
     Reference reference =
-        firebaseStorage.ref().child('images').child('/$fileName');
+        _firebaseStorage.ref().child('images').child('/$fileName');
     UploadTask uploadTask = reference.putFile(File(imagePath));
     reference.getDownloadURL();
     return uploadTask;
@@ -31,7 +35,7 @@ class FirebaseService {
     String path,
     Map<String, String> dataNeedUpdate,
   ) {
-    return firebaseFirestore
+    return _firestore
         .collection(collectionPath)
         .doc(path)
         .update(dataNeedUpdate);
@@ -44,7 +48,7 @@ class FirebaseService {
     try {
       String fileName = '${titleName}_${DateTime.now().microsecondsSinceEpoch}';
       Reference reference =
-          firebaseStorage.ref().child('images').child('/$fileName');
+          _firebaseStorage.ref().child('images').child('/$fileName');
       UploadTask uploadTask = reference.putFile(image);
 
       uploadTask.snapshotEvents.listen((event) {
@@ -60,45 +64,101 @@ class FirebaseService {
     }
   }
 
-  Future<dynamic> uploadUserData() async {
-    // UploadTask uploadTask = ;
-
+  Future<dynamic> uploadUserData({
+    int? userId,
+    required Map<String, dynamic> data,
+    SetOptions? options,
+  }) async {
+    if (userId == null) {
+      return;
+    }
     try {
-      // TaskSnapshot taskSnapshot  = await uploadTask;
-      // String imageUrl = await taskSnapshot.ref.getDownloadURL();
-
-      UserFirebaseData userData = UserFirebaseData(
-        userId: '',
-        username: '',
-        email: '',
-        phone: '',
-        token: '',
-        role: 'UserRole.user',
-        parentOf: '',
-      );
-
-      uploadDataFireStore('account', 'path', userData.toJson())
-          .then((value) async {})
-          .catchError((onError) {});
+      await _firestore
+          .collection('users')
+          .doc('user_id_$userId')
+          .set(data, options)
+          .whenComplete(
+            () => log('upload userInfo done'),
+          );
     } on FirebaseException catch (_) {}
   }
 
-// Future<DocumentReference> addMessageToGuestBook(String message) async {
-//
-//
-//   // if (!_loggedIn) {
-//   //   throw Exception('Must be logged in');
-//   // }
-//
-//   return firebaseFirestore.collection('chat').add(<String, dynamic>{
-//     'message': message,
-//     'timestamp': DateTime.now().millisecondsSinceEpoch,
-//     // 'name': FirebaseAuth.instance.currentUser!.displayName,
-//     // 'userId': FirebaseAuth.instance.currentUser!.uid,
-//     'sender': _prefs.getString(AppConstants.usernameKey),
-//     'userId': _prefs.getString(AppConstants.userIdKey),
-//     'typeMessage': TypeMessage.text,
-//     'status': MessageStatus.notView,
-//   });
-// }
+  Future<UserInfoModel?> getUserInfoFirebase({required int userId}) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .where('id', isEqualTo: userId.toString())
+        .get();
+
+    final userInfo =
+        snapshot.docs.map((e) => UserInfoModel.fromSnapshot(e)).first;
+    log('data: $userInfo');
+
+    return userInfo;
+  }
+
+  Future<List<UserInfoModel>> getAllUser() async {
+    List<UserInfoModel> listUser = [];
+    try {
+      // final snapshot = await firebaseFirestore.collection('users').get();
+      // listUser =
+      //     snapshot.docs.map((e) => UserInfoModel.fromSnapshot(e)).toList();
+
+      final data = await _firestore.collection('users').get();
+      log("data: ${data.docs.toString()}");
+
+      data.docs.forEach((element) {
+        return listUser.add(UserInfoModel.fromFirebase(element.data()));
+      });
+      return listUser;
+    } on FirebaseException catch (e) {
+      log(e.toString());
+      return listUser;
+    } catch (e) {
+      throw Exception(e.toString());
+    }
+  }
+
+  Future<List<UserInfoModel>> getAllProfile() async {
+    Completer<List<UserInfoModel>> completer = Completer<List<UserInfoModel>>();
+    final List<UserInfoModel> profiles = [];
+    await _firestore
+        .collection('users')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var element in querySnapshot.docChanges) {
+        final doc = element.doc;
+        if (doc.exists) {
+          if (doc.data() is Map<String, dynamic>) {
+            log('data: ${doc.data() as Map<String, dynamic>}');
+            final profile =
+                UserInfoModel.fromFire(doc.data() as Map<String, dynamic>);
+            profiles.add(profile);
+          }
+        }
+      }
+      log('list user: $profiles');
+      completer.complete(profiles);
+    });
+    return completer.future;
+    // return profiles;
+  }
+
+  Future<DocumentReference> sendMessageToFirebase(
+    String receiverId,
+    MessageModel message,
+  ) async {
+    return await _firestore
+        .collection('message')
+        .doc('receiver_id_$receiverId')
+        .collection('listMessage')
+        .add(<String, dynamic>{
+      'message': message,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+      // 'name': FirebaseAuth.instance.currentUser!.displayName,
+      // 'userId': FirebaseAuth.instance.currentUser!.uid,
+      'sender': '',
+      'userId': '',
+      'typeMessage': MessageType.text,
+    });
+  }
 }

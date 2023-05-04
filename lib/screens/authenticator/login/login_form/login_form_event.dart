@@ -15,12 +15,4 @@ class ValidateForm extends LoginFormEvent {
 
 class DisplayLoading extends LoginFormEvent {}
 
-class OnSuccess extends LoginFormEvent {}
-
-class OnFailure extends LoginFormEvent {
-  final String? errorMessage;
-
-  OnFailure({this.errorMessage});
-}
-
 class LoginWithBiometrics extends LoginFormEvent {}

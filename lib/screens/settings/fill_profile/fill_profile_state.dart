@@ -3,16 +3,19 @@ import '../../../network/model/user_info_model.dart';
 import '../../../utilities/enum/api_error_result.dart';
 
 class FillProfileState implements ApiResultState {
+//   @override
+//   List<Object?> get props => [];
+// }
   final bool isLoading;
   final ApiError _apiError;
   final UserInfoModel? userData;
-  final bool isUserRole;
+  final bool fillSuccess;
 
   FillProfileState({
     this.isLoading = false,
     ApiError apiError = ApiError.noError,
     this.userData,
-    this.isUserRole = false,
+    this.fillSuccess = false,
   }) : _apiError = apiError;
 
   @override
@@ -29,12 +32,29 @@ extension FillProfileStateEx on FillProfileState {
     ApiError? apiError,
     bool? isLoading,
     UserInfoModel? userData,
-    bool? isUserRole,
+    bool? fillSuccess,
   }) =>
       FillProfileState(
         apiError: apiError ?? this.apiError,
         isLoading: isLoading ?? this.isLoading,
         userData: userData ?? this.userData,
-        isUserRole: isUserRole ?? this.isUserRole,
+        fillSuccess: fillSuccess ?? this.fillSuccess,
       );
 }
+
+// class FillProfileInit extends FillProfileState {}
+//
+// class DisplayLoading extends FillProfileState {}
+//
+// class ErrorState extends FillProfileState {
+//   final bool isNoInternet;
+//
+//   ErrorState({this.isNoInternet = false});
+// }
+//
+// class SuccessState extends FillProfileState {
+//   final bool fillSuccess;
+//   final UserInfoModel? userData;
+//
+//   SuccessState({this.fillSuccess = false, this.userData});
+// }

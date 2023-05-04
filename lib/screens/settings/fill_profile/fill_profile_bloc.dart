@@ -1,15 +1,12 @@
 import 'package:chat_app/network/repository/auth_repository.dart';
-import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_event.dart';
 import 'package:chat_app/screens/settings/fill_profile/fill_profile_state.dart';
+import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
-import 'package:chat_app/utilities/screen_utilities.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../network/model/user_info_model.dart';
-import '../../../utilities/utils.dart';
 
 class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
   final _authRepository = AuthRepository();
@@ -17,54 +14,55 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
 
   FillProfileBloc(this.context) : super(FillProfileState()) {
     on((event, emit) async {
-      if (event is GetUserInfoEvent) {
-        final connectivityResult = await Connectivity().checkConnectivity();
-        emit(state.copyWith(
-          isLoading: true,
-          apiError: ApiError.noError,
-        ));
+      if (event is FillInit) {
+        // emit(DisplayLoading());
+        // final connectivityResult = await Connectivity().checkConnectivity();
+        // if (connectivityResult == ConnectivityResult.none) {
+        //   emit(ErrorState(isNoInternet: true));
+        // } else {
+        //   final response = await _authRepository.getUserInfo(
+        //     userId: SharedPreferencesStorage().getUserId(),
+        //   );
+        //   if (response is UserInfoModel) {
+        //     emit(SuccessState(fillSuccess: false, userData: response));
+        //   } else {
+        //     emit(ErrorState(isNoInternet: false));
+        //   }
+        // }
+      }
+      if (event is FillProfile) {
+        emit(state.copyWith(isLoading: true));
 
-        if (connectivityResult == ConnectivityResult.none) {
+        final response = await _authRepository.fillProfile(
+          userID: event.userId,
+          data: event.userData,
+        );
+        if (response is UserInfoModel) {
+          await FirebaseService().uploadUserData(
+              userId: event.userId,
+              data: UserInfoModel(
+                id: response.id,
+                username: response.username,
+                email: response.email,
+                phone: response.phone,
+                fullName: response.fullName,
+                fileUrl: response.fileUrl,
+                parentOf: response.parentOf,
+              ).toFirestore());
           emit(state.copyWith(
             isLoading: false,
-            apiError: ApiError.noInternetConnection,
+            fillSuccess: true,
+            userData: response,
+            apiError: ApiError.noError,
           ));
         } else {
-          final response = await _authRepository.getUserInfo(
-            userId: event.userId,
-          );
-          // log('getUserInfo: ${response.toString()}');
-          if (response is UserInfoModel) {
-            emit(state.copyWith(
-              isLoading: false,
-              apiError: ApiError.noError,
-              userData: response,
-              isUserRole: isUserRoles(listRole: response.roles),
-            ));
-          } else if (response is ExpiredTokenResponse) {
-            emit(state.copyWith(
-              isLoading: false,
-              apiError: ApiError.noError,
-            ));
-            logoutIfNeed(context);
-          } else {
-            emit(state.copyWith(
-              isLoading: false,
-              apiError: ApiError.internalServerError,
-            ));
-          }
+          emit(state.copyWith(
+            isLoading: false,
+            userData: null,
+            apiError: ApiError.internalServerError,
+          ));
         }
       }
-      if (event is FillEvent) {
-        emit(state.copyWith());
-      }
     });
-  }
-
-  bool isUserRoles({required List<Role>? listRole}) {
-    if (isNullOrEmpty(listRole)) {
-      return true;
-    }
-    return listRole!.any((role) => role.id == 1 && role.name == 'ROLE_USER');
   }
 }

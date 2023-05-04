@@ -1,3 +1,5 @@
+import 'package:chat_app/network/model/user_info_model.dart';
+import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../settings/fill_profile/fill_profile.dart';
 import '../settings/fill_profile/fill_profile_bloc.dart';
+import '../settings/fill_profile/fill_profile_event.dart';
 
 class OnBoarding3Page extends StatelessWidget {
   const OnBoarding3Page({
@@ -69,18 +72,25 @@ class OnBoarding3Page extends StatelessWidget {
     );
   }
 
-  _navigateToFillProfilePage() {
-    return MaterialPageRoute(
-      builder: (context) => BlocProvider<FillProfileBloc>(
-        create: (context) => FillProfileBloc(context),
-        child: const FillProfilePage(),
-      ),
+  _navigateToFillProfilePage() async {
+    final userInfo = await AuthRepository().getUserInfo(
+      userId: SharedPreferencesStorage().getUserId(),
     );
+    if (userInfo is UserInfoModel) {
+      return MaterialPageRoute(
+        builder: (context) => BlocProvider<FillProfileBloc>(
+          create: (context) => FillProfileBloc(context)..add(FillInit()),
+          child: FillProfilePage(
+            userInfo: userInfo,
+          ),
+        ),
+      );
+    }
   }
 
   _navigateToMainPage(BuildContext context) {
     return MaterialPageRoute(
-      builder: (context) => MainApp(),
+      builder: (context) => MainApp(currentTab: 0),
     );
   }
 }

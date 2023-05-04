@@ -27,4 +27,8 @@ class ApiPath {
   static const String listNews = '$domain/api/v1/news';
 
   static const String upLoadImageToCloud = '$domain/api/v1/news/upload';
+
+  static const String listClass = '$domain/api/v1/classes';
+
+  static const String listStudent = '$domain/api/v1/students';
 }

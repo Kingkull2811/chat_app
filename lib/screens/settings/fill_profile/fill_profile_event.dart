@@ -1,16 +1,15 @@
 import 'package:equatable/equatable.dart';
 
 abstract class FillProfileEvent extends Equatable {
-  const FillProfileEvent();
-
   @override
   List<Object> get props => [];
 }
 
-class GetUserInfoEvent extends FillProfileEvent {
+class FillInit extends FillProfileEvent {}
+
+class FillProfile extends FillProfileEvent {
   final int userId;
+  final Map<String, dynamic> userData;
 
-  const GetUserInfoEvent(this.userId);
+  FillProfile({required this.userId, required this.userData});
 }
-
-class FillEvent extends FillProfileEvent {}

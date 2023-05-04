@@ -26,28 +26,8 @@ class LoginFormBloc extends Bloc<LoginFormEvent, LoginFormState> {
       }
 
       if (event is DisplayLoading) {
-        emit(
-          state.copyWith(
-            isLoading: true,
-          ),
-        );
+        emit(state.copyWith(isLoading: true));
       }
-      if (event is OnSuccess) {
-        emit(
-          state.copyWith(
-            isLoading: false,
-          ),
-        );
-      }
-      if (event is OnFailure) {
-        emit(
-          state.copyWith(
-            isLoading: false,
-            errorMessage: event.errorMessage,
-          ),
-        );
-      }
-
       if (event is LoginWithBiometrics) {
         final LocalAuthentication auth = LocalAuthentication();
         final bool canAuthenticate =

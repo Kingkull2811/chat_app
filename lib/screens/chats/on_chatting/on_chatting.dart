@@ -1,10 +1,10 @@
-import 'package:chat_app/screens/chats/chat.dart';
 import 'package:chat_app/screens/chats/on_chatting/on_chatting_bloc.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/custom_app_bar_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../tab/chat_tab.dart';
 import 'on_chatting_state.dart';
 
 class OnChattingPage extends StatefulWidget {

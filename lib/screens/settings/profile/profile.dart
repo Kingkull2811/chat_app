@@ -1,4 +1,5 @@
 import 'package:chat_app/network/model/user_firebase.dart';
+import 'package:chat_app/screens/settings/profile/profile_event.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +23,7 @@ class ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    BlocProvider.of<ProfileBloc>(context).add(GetUserInfo());
     super.initState();
   }
 
@@ -47,11 +48,7 @@ class ProfilePageState extends State<ProfilePage> {
           );
         }
         if (curState.apiError == ApiError.noInternetConnection) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'no_internet_connection',
-          );
+          showMessageNoInternetDialog(context);
         }
       },
       builder: (context, curState) {

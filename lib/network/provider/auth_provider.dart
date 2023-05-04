@@ -75,8 +75,6 @@ class AuthProvider with ProviderMixin {
         data: {"password": password, "username": username},
         // options: AppConstants.options,
       );
-      log(response.toString());
-
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);
@@ -131,7 +129,7 @@ class AuthProvider with ProviderMixin {
 
   Future<Object> fillProfile({
     required int userID,
-    required Object data,
+    required Map<String, dynamic> data,
   }) async {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();

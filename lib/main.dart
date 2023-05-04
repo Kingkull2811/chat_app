@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/chats/chat.dart';
-import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/news/news.dart';
 import 'package:chat_app/screens/transcript/transcript.dart';
 import 'package:chat_app/services/database.dart';
@@ -138,20 +136,7 @@ class _MyAppState extends State<MyApp> {
         DefaultCupertinoLocalizations.delegate
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
-      routes: {
-        AppRoutes.main: (context) {
-          return _isLoggedIn ? MainApp(currentTab: 0) : const LoginPage();
-        },
-        AppRoutes.news: (context) {
-          return MainApp(currentTab: 1);
-        },
-        AppRoutes.transcript: (context) {
-          return MainApp(currentTab: 2);
-        },
-        AppRoutes.setting: (context) {
-          return MainApp(currentTab: 3);
-        },
-      },
+      routes: AppRoutes().routes(context, isLoggedIn: _isLoggedIn),
     );
   }
 }

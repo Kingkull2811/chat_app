@@ -1,9 +1,7 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -38,79 +36,29 @@ bool isNullOrEmpty(dynamic obj) =>
     obj == null ||
     ((obj is String || obj is List || obj is Map) && obj.isEmpty);
 
-Future<String> pickPhoto(
-  BuildContext context,
-  ImageSource imageSource,
-) async {
-  try {
-    final pickedFile = (imageSource == ImageSource.camera
-        ? await ImagePicker().pickImage(
-            source: ImageSource.camera,
-            imageQuality: 50,
-            maxWidth: 2048,
-            maxHeight: 2048,
-          )
-        : await ImagePicker().pickImage(source: ImageSource.gallery));
-    if (pickedFile == null) {
-      return '';
-    }
-
-    // final appDocDir = await getApplicationDocumentsDirectory();
-    // final tempDir = await getTemporaryDirectory();
-    //
-    File image = File(pickedFile.path);
-    // File newImage = File(join(appDocDir.path, basename(pickedFile.path)));
-    // newImage.writeAsBytes(File(pickedFile.path).readAsBytesSync());
-
-    // return imageSource == ImageSource.camera
-    //     ? join(appDocDir.path, basename(newImage.path))
-    //     : image.path;
-    return image.path;
-  } on PlatformException catch (e) {
-    log(e.toString());
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Failed to pick image!',
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-    );
+Future<String> pickPhoto(ImageSource imageSource) async {
+  final pickedFile = (imageSource == ImageSource.camera
+      ? await ImagePicker().pickImage(
+          source: ImageSource.camera,
+          imageQuality: 50,
+          maxWidth: 2048,
+          maxHeight: 2048,
+        )
+      : await ImagePicker().pickImage(source: ImageSource.gallery));
+  if (pickedFile == null) {
     return '';
   }
+  File image = File(pickedFile.path);
+
+  return image.path;
 }
 
-Future<String> pickVideo(BuildContext context, ImageSource source) async {
-  try {
-    final pickVideo = await ImagePicker().pickVideo(source: source);
-    if (pickVideo != null) {
-      final video = File(pickVideo.path);
-      // final tempDir = await getTemporaryDirectory();
-      // List<String> parts = video.path.split('cache/');
-      // if (parts.length > 1) {
-      //   String pathAfterCache = parts[1];
-      //   print(pathAfterCache);
-      // } else {
-      //   print("Path doesn't contain 'cache/' segment");
-      // }
-      // String videoPath = join(tempDir.path, video.path.split('cache/')[1]);
-
-      return video.path;
-    } else {
-      return '';
-    }
-  } on PlatformException catch (e) {
-    log(e.toString());
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Failed to pick video!',
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
-    );
+Future<String> pickVideo(ImageSource source) async {
+  final pickVideo = await ImagePicker().pickVideo(source: source);
+  if (pickVideo != null) {
+    final video = File(pickVideo.path);
+    return video.path;
+  } else {
     return '';
   }
 }
@@ -157,7 +105,7 @@ String printDuration(Duration duration) {
   return "$twoDigitMinutes:$twoDigitSeconds";
 }
 
-String formatDateString(String? input, {String format = 'yyyy/M/dd'}) {
+String formatDateString(String? input, {String format = 'yyyy/MM/dd'}) {
   try {
     if (input == null) {
       return '';
@@ -167,5 +115,29 @@ String formatDateString(String? input, {String format = 'yyyy/M/dd'}) {
     return formatter.format(inputDate);
   } catch (ignore) {
     return '';
+  }
+}
+
+MessageType getMessageType(int? type) {
+  if (type == 0) {
+    return MessageType.text;
+  } else if (type == 1) {
+    return MessageType.image;
+  } else if (type == 2) {
+    return MessageType.video;
+  } else {
+    return MessageType.audio;
+  }
+}
+
+int setMessageType(MessageType? type) {
+  if (type == MessageType.text) {
+    return 0;
+  } else if (type == MessageType.image) {
+    return 1;
+  } else if (type == MessageType.audio) {
+    return 2;
+  } else {
+    return 3;
   }
 }

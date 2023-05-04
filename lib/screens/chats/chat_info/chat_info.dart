@@ -337,7 +337,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MainApp(),
+                                  builder: (context) => MainApp(currentTab: 0),
                                 ),
                               );
                             },
@@ -369,7 +369,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => MainApp(),
+                                        builder: (context) =>
+                                            MainApp(currentTab: 0),
                                       ),
                                     );
                                   },
