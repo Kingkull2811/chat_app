@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/transcript/add_student/add_student.dart';
 import 'package:chat_app/screens/transcript/add_student/add_student_bloc.dart';
+import 'package:chat_app/screens/transcript/class_management/class_management.dart';
 import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utilities/screen_utilities.dart';
 import '../../utilities/utils.dart';
 import '../../widgets/animation_loading.dart';
+import 'class_management/class_management_bloc.dart';
 
 class TranscriptPage extends StatefulWidget {
   const TranscriptPage({Key? key}) : super(key: key);
@@ -93,33 +95,20 @@ class TranscriptPageState extends State<TranscriptPage> {
                             CupertinoActionSheetAction(
                               onPressed: () async {
                                 Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BlocProvider(
-                                      create: (context) =>
-                                          AddStudentBloc(context),
-                                      child: const AddStudent(),
-                                    ),
-                                  ),
-                                );
+                                _navToAddStudent();
                               },
-                              child: _itemOption(
-                                // icon: Icons.person_outline,
-                                title: 'Add a new student',
-                              ),
+                              child: _itemOption(title: 'Add a new student'),
                             ),
-                            // CupertinoActionSheetAction(
-                            //   onPressed: () async {},
-                            //   child: _itemOption(
-                            //     // icon: Icons.summarize_outlined,
-                            //     title: 'Add a new class',
-                            //   ),
-                            // ),
+                            CupertinoActionSheetAction(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                _navToClassManagement();
+                              },
+                              child: _itemOption(title: 'Class management'),
+                            ),
                             CupertinoActionSheetAction(
                               onPressed: () async {},
                               child: _itemOption(
-                                // icon: Icons.summarize_outlined,
                                 title: 'Enter the points to the transcript',
                               ),
                             ),
@@ -182,6 +171,26 @@ class TranscriptPageState extends State<TranscriptPage> {
     );
   }
 
+  _navToClassManagement() => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<ClassManagementBloc>(
+            create: (context) => ClassManagementBloc(context),
+            child: const ClassManagement(),
+          ),
+        ),
+      );
+
+  _navToAddStudent() => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider(
+            create: (context) => AddStudentBloc(context),
+            child: const AddStudent(),
+          ),
+        ),
+      );
+
   Widget _bodyAdmin(BuildContext context, TranscriptState state) {
     return Scaffold(
       appBar: AppBar(
@@ -223,10 +232,6 @@ class TranscriptPageState extends State<TranscriptPage> {
   }
 
   Widget _cardStudent() {
-    //todo::
-    String urlImage =
-        'https://images.pexels.com/photos/1758531/pexels-photo-1758531.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260';
-
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Container(
@@ -243,7 +248,7 @@ class TranscriptPageState extends State<TranscriptPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: AppImage(
-                  localPathOrUrl: urlImage,
+                  localPathOrUrl: 'urlImage',
                   boxFit: BoxFit.cover,
                   width: 100,
                   height: 150,

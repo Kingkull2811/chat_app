@@ -31,30 +31,34 @@ class AuthRepository {
     );
   }
 
-  Future<BaseAuthResult> login({
+  Future<LoginResponse> login({
     required String username,
     required String password,
-  }) async {
-    LoginResponse loginResponse = await _authProvider.login(
+  }) async => await _authProvider.login(
       username: username,
       password: password,
     );
-
-    if (loginResponse.httpStatus == 200) {
-      await SharedPreferencesStorage().setSaveUserInfo(loginResponse.data);
-
-      return BaseAuthResult(
-        isSuccess: true,
-        message: loginResponse.message,
-        errors: null,
-      );
-    }
-    return BaseAuthResult(
-      isSuccess: false,
-      message: null,
-      errors: loginResponse.errors,
-    );
-  }
+  // {
+  //   LoginResponse loginResponse = await _authProvider.login(
+  //     username: username,
+  //     password: password,
+  //   );
+  //
+  //   if (loginResponse.httpStatus == 200) {
+  //     await SharedPreferencesStorage().setSaveUserInfo(loginResponse.data);
+  //
+  //     return BaseAuthResult(
+  //       isSuccess: true,
+  //       message: loginResponse.message,
+  //       errors: null,
+  //     );
+  //   }
+  //   return BaseAuthResult(
+  //     isSuccess: false,
+  //     message: null,
+  //     errors: loginResponse.errors,
+  //   );
+  // }
 
   Future<BaseAuthResult> signUp({
     required String username,

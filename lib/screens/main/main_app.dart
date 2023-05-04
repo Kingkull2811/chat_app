@@ -12,7 +12,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../services/database.dart';
 import '../chats/chat.dart';
 import '../chats/chat_bloc.dart';
-import '../chats/chat_event.dart';
 import '../news/news.dart';
 import '../news/news_bloc.dart';
 import '../settings/setting_page.dart';
@@ -254,7 +253,7 @@ class MainAppState extends State<MainApp>
     switch (index) {
       case 0:
         currentTab = BlocProvider(
-          create: (context) => ChatsBloc(context)..add(ChatInit()),
+          create: (context) => ChatsBloc(context), //..add(ChatInit()),
           child: ChatsPage(
             key: DatabaseService().chatKey,
           ),

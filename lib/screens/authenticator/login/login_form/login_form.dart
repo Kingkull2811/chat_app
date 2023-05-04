@@ -171,7 +171,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                       child: Column(
                         children: [
                           _buildBiometricsButton(state),
-                          _buttonLogin(state),
+                          _buttonLogin(context, state),
                           _goToSignUpPage(),
                         ],
                       ),
@@ -191,30 +191,23 @@ class _LoginFormPageState extends State<LoginFormPage> {
     bool agreedWithTerms = SharedPreferencesStorage().getAgreedWithTerms();
     if (mounted) {
       if (!agreedWithTerms) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const TermPolicyPage(),
-          ),
-        );
+        _navigateToTerm();
       } else {
         showLoading(context);
-        SharedPreferencesStorage().getAdminRole()
-            ? _navigateToMainPage
-            : SharedPreferencesStorage().getFillProfileStatus()
-                ? _navigateToMainPage()
-                : _navigateToFillProfilePage(context);
+        final userInfo = await _authRepository.getUserInfo(
+            userId: SharedPreferencesStorage().getUserId());
+        if (userInfo is UserInfoModel) {
+          userInfo.isFillProfileKey
+              ? _navigateToMainPage()
+              : _navigateToFillProfilePage(userInfo);
+        }
       }
     }
   }
 
-  _navigateToFillProfilePage(BuildContext context) async {
-    final userInfo = await AuthRepository().getUserInfo(
-      userId: SharedPreferencesStorage().getUserId(),
-    );
-    if (userInfo is UserInfoModel) {
+  _navigateToFillProfilePage(UserInfoModel userInfo) =>
       Navigator.pushReplacement(
-        this.context,
+        context,
         MaterialPageRoute(
           builder: (context) => BlocProvider<FillProfileBloc>(
             create: (context) => FillProfileBloc(context)..add(FillInit()),
@@ -222,17 +215,12 @@ class _LoginFormPageState extends State<LoginFormPage> {
           ),
         ),
       );
-    }
-  }
 
-  _navigateToMainPage() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MainApp(currentTab: 0),
-      ),
-    );
-  }
+  _navigateToTerm() => Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (context) => const TermPolicyPage()));
+
+  _navigateToMainPage() => Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)));
 
   _buildBiometricsButton(LoginFormState currentState) {
     if (currentState.buttonStatus != HighlightStatus.notAvailable) {
@@ -269,7 +257,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
     });
   }
 
-  Widget _buttonLogin(LoginFormState currentState) {
+  Widget _buttonLogin(BuildContext context, LoginFormState currentState) {
     return PrimaryButton(
       text: 'Login',
       onTap: () async {
@@ -284,24 +272,35 @@ class _LoginFormPageState extends State<LoginFormPage> {
             showMessageNoInternetDialog(context);
           } else {
             _loginFormBloc.add(DisplayLoading());
-            final loginResult = await _authRepository.login(
+            final response = await _authRepository.login(
               username: _inputUsernameController.text,
               password: _inputPasswordController.text,
             );
-
-            if (loginResult.isSuccess && mounted) {
+            if (response.httpStatus == 200) {
+              const Duration(milliseconds: 300);
               await SharedPreferencesStorage().setRememberInfo(true);
-
               await _goToTermPolicy();
             } else {
-              _loginFormBloc.add(ValidateForm(isValidate: true));
               showCupertinoMessageDialog(
-                context,
+                this.context,
                 'Error',
-                content: loginResult.errors?.first.errorMessage,
-                barrierDismiss: false,
+                content: response.errors?.first.errorMessage,
               );
             }
+
+            // if (loginResult.isSuccess && mounted) {
+            //   await SharedPreferencesStorage().setRememberInfo(true);
+            //
+            //   await _goToTermPolicy();
+            // } else {
+            //   _loginFormBloc.add(ValidateForm(isValidate: true));
+            //   showCupertinoMessageDialog(
+            //     context,
+            //     'Error',
+            //     content: loginResult.errors?.first.errorMessage,
+            //     barrierDismiss: false,
+            //   );
+            // }
           }
         }
       },

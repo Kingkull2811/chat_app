@@ -35,7 +35,7 @@ class ChatsPageState extends State<ChatsPage>
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _chatsBloc = BlocProvider.of<ChatsBloc>(context);
-    _chatsBloc.add(ChatInit());
+    // _chatsBloc.add(ChatInit());
     super.initState();
   }
 

@@ -126,7 +126,7 @@ class _AddStudentState extends State<AddStudent> {
                     color: Colors.grey.withOpacity(0.15),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -143,7 +143,7 @@ class _AddStudentState extends State<AddStudent> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.only(top: 16.0),
                           child: _inputText(
                             context,
                             // readOnly: true,
@@ -173,7 +173,7 @@ class _AddStudentState extends State<AddStudent> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.only(top: 16.0),
                           child: _inputText(
                             context,
                             readOnly: true,
@@ -193,7 +193,7 @@ class _AddStudentState extends State<AddStudent> {
                         ),
                         if (_showClass) _listItemClass(state.listClass),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.only(top: 16.0),
                           child: _inputText(
                             context,
                             readOnly: true,
@@ -214,7 +214,7 @@ class _AddStudentState extends State<AddStudent> {
                         ),
                         if (_showYear) _listSemesterYear(listSemesterYear),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.only(top: 16),
                           child: Text(
                             'Student Image',
                             style: TextStyle(
