@@ -70,4 +70,17 @@ class AppConstants {
       'final_point = 0.6 x final_exam_point + 0.4 x process_point';
   static const String processPoint =
       'process_point = (first_point + second_point)/2';
+
+  static const List<String> listSemesterYear = [
+    'semester 1 2021-2022',
+    'semester 2 2021-2022',
+    'semester 1 2022-2023',
+    'semester 2 2022-2023',
+    'semester 1 2023-2024',
+    'semester 2 2023-2024',
+    'semester 1 2024-2025',
+    'semester 2 2024-2025',
+    'semester 1 2025-2026',
+    'semester 2 2025-2026',
+  ];
 }

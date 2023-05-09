@@ -1,9 +1,13 @@
 import 'package:chat_app/screens/transcript/add_student/add_student.dart';
 import 'package:chat_app/screens/transcript/add_student/add_student_bloc.dart';
 import 'package:chat_app/screens/transcript/class_management/class_management.dart';
+import 'package:chat_app/screens/transcript/subject_management/subject_management.dart';
+import 'package:chat_app/screens/transcript/subject_management/subject_management_bloc.dart';
+import 'package:chat_app/screens/transcript/subject_management/subject_management_event.dart';
 import 'package:chat_app/screens/transcript/transcript_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utilities/screen_utilities.dart';
 import '../../utilities/utils.dart';
 import '../../widgets/animation_loading.dart';
+import '../../widgets/message_dialog.dart';
 import 'class_management/class_management_bloc.dart';
 
 class TranscriptPage extends StatefulWidget {
@@ -22,7 +27,7 @@ class TranscriptPage extends StatefulWidget {
 }
 
 class TranscriptPageState extends State<TranscriptPage> {
-  bool isAdmin = true;
+  final bool _isUser = SharedPreferencesStorage().getUserRole();
 
   @override
   void initState() {
@@ -72,100 +77,178 @@ class TranscriptPageState extends State<TranscriptPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.5,
-        backgroundColor: Colors.grey[50],
+        backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Transcript',
-          style: TextStyle(
-            fontSize: 24,
+        title: Text(
+          _isUser ? 'Transcript' : 'Manage',
+          style: const TextStyle(
+            fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         actions: [
-          isAdmin
-              ? IconButton(
-                  onPressed: () {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) {
-                        return CupertinoActionSheet(
-                          actions: <Widget>[
-                            CupertinoActionSheetAction(
-                              onPressed: () async {
-                                Navigator.pop(context);
-                                _navToAddStudent();
-                              },
-                              child: _itemOption(title: 'Add a new student'),
-                            ),
-                            CupertinoActionSheetAction(
-                              onPressed: () async {
-                                Navigator.pop(context);
-                                _navToClassManagement();
-                              },
-                              child: _itemOption(title: 'Class management'),
-                            ),
-                            CupertinoActionSheetAction(
-                              onPressed: () async {},
-                              child: _itemOption(
-                                title: 'Enter the points to the transcript',
-                              ),
-                            ),
-                          ],
-                          cancelButton: CupertinoActionSheetAction(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black.withOpacity(0.7),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  icon: Icon(
-                    Icons.add_circle_outline_outlined,
-                    size: 26,
-                    color: Theme.of(context).primaryColor,
+          if (_isUser)
+            IconButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (context) => const MessageDialog(
+                    title: 'formula for calculating average score',
+                    content: '',
                   ),
-                )
-              : IconButton(
-                  onPressed: () async {
-                    // showDialog(
-                    //   context: context,
-                    //   builder: (context) => const MessageDialog(
-                    //     title: AppConstants.calculateFinalPoint,
-                    //     content:
-                    //         '${AppConstants.finalPoint}\n${AppConstants.processPoint}',
-                    //   ),
-                    // );
-                  },
-                  icon: Icon(
-                    Icons.info_outline,
-                    size: 24,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
+                );
+              },
+              icon: const Icon(
+                Icons.info_outline,
+                size: 24,
+                color: Colors.white,
+              ),
+            ),
         ],
       ),
       // extendBodyBehindAppBar: true,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          scrollDirection: Axis.vertical,
-          child: Column(
-            children: <Widget>[
-              _cardStudent(),
-              _cardSubject(),
-            ],
-          ),
+      body: _isUser ? _userView() : _teacherView(),
+    );
+  }
+
+  Widget _userView() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+            _cardStudent(),
+            _cardSubject(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _teacherView() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                child: InkWell(
+                  overlayColor: const MaterialStatePropertyAll(Colors.white),
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () {
+                    _navToClassManagement();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Class Management',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.navigate_next,
+                          size: 24,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                child: InkWell(
+                  overlayColor: const MaterialStatePropertyAll(Colors.white),
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () {
+                    _navToSubjectManagement();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Subjects Management',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.navigate_next,
+                          size: 24,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.grey.withOpacity(0.2),
+                ),
+                child: InkWell(
+                  overlayColor: const MaterialStatePropertyAll(Colors.white),
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () {},
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Students Management',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          Icons.navigate_next,
+                          size: 24,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -181,6 +264,19 @@ class TranscriptPageState extends State<TranscriptPage> {
         ),
       );
 
+  _navToSubjectManagement() => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<SubjectManagementBloc>(
+            create: (context) => SubjectManagementBloc(context)
+              ..add(
+                InitSubjectEvent(),
+              ),
+            child: const SubjectManagementPage(),
+          ),
+        ),
+      );
+
   _navToAddStudent() => Navigator.push(
         context,
         MaterialPageRoute(
@@ -190,46 +286,6 @@ class TranscriptPageState extends State<TranscriptPage> {
           ),
         ),
       );
-
-  Widget _bodyAdmin(BuildContext context, TranscriptState state) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: Colors.grey[50],
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Transcript',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () async {},
-            icon: Icon(
-              Icons.add_circle_outline_outlined,
-              size: 26,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ],
-      ),
-      // extendBodyBehindAppBar: true,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          scrollDirection: Axis.vertical,
-          child: Container(
-            color: Colors.red,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _cardStudent() {
     return Padding(
@@ -404,29 +460,6 @@ class TranscriptPageState extends State<TranscriptPage> {
         ),
       );
     }).toList();
-  }
-
-  Widget _itemOption({
-    IconData? icon,
-    required String title,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, size: 26, color: Theme.of(context).primaryColor),
-        Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }
 

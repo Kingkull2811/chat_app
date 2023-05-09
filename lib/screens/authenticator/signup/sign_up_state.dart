@@ -4,18 +4,18 @@ import 'package:chat_app/utilities/enum/api_error_result.dart';
 
 class SignUpState implements ApiResultState {
   final bool isLoading;
-  final bool isEnable;
+  final bool isSuccess;
   final String? message;
   final List<Errors>? errors;
   final ApiError _apiError;
 
   SignUpState({
     this.isLoading = false,
-    this.isEnable = false,
+    this.isSuccess = false,
     this.message,
     this.errors,
     ApiError apiError = ApiError.noError,
-  }): _apiError = apiError;
+  }) : _apiError = apiError;
 
   @override
   ApiError get apiError => _apiError;
@@ -25,14 +25,14 @@ extension SignUpStateEx on SignUpState {
   SignUpState copyWith({
     ApiError? apiError,
     bool? isLoading,
-    bool? isEnable,
+    bool? isSuccess,
     String? message,
     List<Errors>? errors,
   }) =>
       SignUpState(
         apiError: apiError ?? this.apiError,
         isLoading: isLoading ?? this.isLoading,
-        isEnable: isEnable ?? this.isEnable,
+        isSuccess: isSuccess ?? this.isSuccess,
         message: message ?? this.message,
         errors: errors ?? this.errors,
       );

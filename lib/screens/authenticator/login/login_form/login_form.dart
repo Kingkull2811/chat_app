@@ -277,8 +277,9 @@ class _LoginFormPageState extends State<LoginFormPage> {
               password: _inputPasswordController.text,
             );
             if (response.httpStatus == 200) {
-              const Duration(milliseconds: 300);
               await SharedPreferencesStorage().setRememberInfo(true);
+              await SharedPreferencesStorage().setSaveUserInfo(response.data);
+              const Duration(milliseconds: 300);
               await _goToTermPolicy();
             } else {
               showCupertinoMessageDialog(
@@ -287,20 +288,6 @@ class _LoginFormPageState extends State<LoginFormPage> {
                 content: response.errors?.first.errorMessage,
               );
             }
-
-            // if (loginResult.isSuccess && mounted) {
-            //   await SharedPreferencesStorage().setRememberInfo(true);
-            //
-            //   await _goToTermPolicy();
-            // } else {
-            //   _loginFormBloc.add(ValidateForm(isValidate: true));
-            //   showCupertinoMessageDialog(
-            //     context,
-            //     'Error',
-            //     content: loginResult.errors?.first.errorMessage,
-            //     barrierDismiss: false,
-            //   );
-            // }
           }
         }
       },
@@ -320,17 +307,15 @@ class _LoginFormPageState extends State<LoginFormPage> {
             ),
           ),
           GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider<SignUpBloc>(
-                    create: (context) => SignUpBloc(context),
-                    child: const SignUpPage(),
-                  ),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider<SignUpBloc>(
+                  create: (context) => SignUpBloc(context),
+                  child: const SignUpPage(),
                 ),
-              );
-            },
+              ),
+            ),
             child: Text(
               'Sign up',
               style: TextStyle(

@@ -6,13 +6,16 @@ abstract class SignUpEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class Validate extends SignUpEvent {
-  final bool isValidated;
+class ValidateForm extends SignUpEvent {}
 
-  Validate({this.isValidated = false});
+class WaitingSignUp extends SignUpEvent {
+  final Map<String, dynamic> userInfo;
+
+  WaitingSignUp({required this.userInfo});
+
+  @override
+  List<Object?> get props => [userInfo];
 }
-
-class SignUpLoading extends SignUpEvent {}
 
 class SignUpSuccess extends SignUpEvent {
   final String? message;

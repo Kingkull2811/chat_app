@@ -34,7 +34,7 @@ class _ContactTabState extends State<ContactTab> {
       children: [
         _searchBox(context),
         Expanded(
-          child: _showSearchResult ? _searchResult() : Container(),
+          child: _showSearchResult ? _searchResult() : _listView(),
         ),
       ],
     );
@@ -43,7 +43,9 @@ class _ContactTabState extends State<ContactTab> {
   Widget _listView() {
     return ListView.builder(
       itemCount: widget.listUser?.length,
+      // itemCount: 2,
       itemBuilder: (context, index) => _createItemUser(widget.listUser?[index]),
+      // itemBuilder: (context, index) => Container(),
     );
   }
 

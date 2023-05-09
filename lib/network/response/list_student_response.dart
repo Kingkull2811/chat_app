@@ -1,13 +1,12 @@
-import 'package:chat_app/network/model/class_model.dart';
-import 'package:chat_app/network/response/base_get_response.dart';
-
 import '../../utilities/utils.dart';
+import '../model/student.dart';
+import 'base_get_response.dart';
 
-class ClassResponse extends BaseGetResponse {
-  final List<ClassModel>? listClass;
+class ListStudentResponse extends BaseGetResponse {
+  final List<Student>? listStudent;
 
-  ClassResponse({
-    this.listClass,
+  ListStudentResponse({
+    this.listStudent,
     int? pageNumber,
     int? pageSize,
     int? totalRecord,
@@ -21,12 +20,13 @@ class ClassResponse extends BaseGetResponse {
           error: error,
         );
 
-  factory ClassResponse.fromJson(Map<String, dynamic> json) => ClassResponse(
-        listClass: isNullOrEmpty(json['content'])
+  factory ListStudentResponse.fromJson(Map<String, dynamic> json) =>
+      ListStudentResponse(
+        listStudent: isNullOrEmpty(json['content'])
             ? []
             : List.generate(
                 json['content'].length,
-                (index) => ClassModel.fromJson(json['content'][index]),
+                (index) => Student.fromJson(json['content'][index]),
               ),
         pageNumber: json['pageNumber'],
         pageSize: json['pageSize'],
@@ -34,9 +34,4 @@ class ClassResponse extends BaseGetResponse {
         status: json['status'],
         error: json['error'],
       );
-
-  @override
-  String toString() {
-    return 'ClassResponse{listClass: $listClass}';
-  }
 }

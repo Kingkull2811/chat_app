@@ -1,13 +1,13 @@
-import 'package:chat_app/network/model/class_model.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 
 import '../../utilities/utils.dart';
+import '../model/subject_model.dart';
 
-class ClassResponse extends BaseGetResponse {
-  final List<ClassModel>? listClass;
+class SubjectResponse extends BaseGetResponse {
+  final List<SubjectModel>? listSubject;
 
-  ClassResponse({
-    this.listClass,
+  SubjectResponse({
+    this.listSubject,
     int? pageNumber,
     int? pageSize,
     int? totalRecord,
@@ -21,12 +21,13 @@ class ClassResponse extends BaseGetResponse {
           error: error,
         );
 
-  factory ClassResponse.fromJson(Map<String, dynamic> json) => ClassResponse(
-        listClass: isNullOrEmpty(json['content'])
+  factory SubjectResponse.fromJson(Map<String, dynamic> json) =>
+      SubjectResponse(
+        listSubject: isNullOrEmpty(json['content'])
             ? []
             : List.generate(
                 json['content'].length,
-                (index) => ClassModel.fromJson(json['content'][index]),
+                (index) => SubjectModel.fromJson(json['content'][index]),
               ),
         pageNumber: json['pageNumber'],
         pageSize: json['pageSize'],
@@ -37,6 +38,6 @@ class ClassResponse extends BaseGetResponse {
 
   @override
   String toString() {
-    return 'ClassResponse{listClass: $listClass}';
+    return 'SubjectResponse{listSubject: $listSubject}';
   }
 }

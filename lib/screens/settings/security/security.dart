@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/repository/auth_repository.dart';
+import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -171,8 +170,32 @@ class _SecurityPageState extends State<SecurityPage> {
         newPass: _newPassController.text.trim(),
         confPass: _confPassController.text.trim(),
       );
-
-      log(response.toString());
+      if (response is BaseResponse) {
+        if (response.httpStatus == 200) {
+          showCupertinoMessageDialog(
+            this.context,
+            'Change password successfully',
+            onCloseDialog: () {
+              _oldPassController.clear();
+              _newPassController.clear();
+              _confPassController.clear();
+              Navigator.pop(context);
+            },
+          );
+        } else {
+          showCupertinoMessageDialog(
+            this.context,
+            'Error!',
+            content: response.message,
+          );
+        }
+      } else {
+        showCupertinoMessageDialog(
+          this.context,
+          'Error!',
+          content: 'Internal_server_error',
+        );
+      }
     }
   }
 

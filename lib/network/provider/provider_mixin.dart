@@ -47,7 +47,7 @@ mixin ProviderMixin {
     showErrorLog(error, stacktrace, apiPath);
     return BaseGetResponse.withHttpError(
       status: error.response?.statusCode,
-      error: error,
+      error: error.toString(),
       pageNumber: null,
       pageSize: null,
       totalRecord: null,

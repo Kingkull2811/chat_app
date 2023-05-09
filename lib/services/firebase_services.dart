@@ -83,43 +83,16 @@ class FirebaseService {
     } on FirebaseException catch (_) {}
   }
 
-  Future<UserInfoModel?> getUserInfoFirebase({required int userId}) async {
-    final snapshot = await _firestore
-        .collection('users')
-        .where('id', isEqualTo: userId.toString())
-        .get();
-
-    final userInfo =
-        snapshot.docs.map((e) => UserInfoModel.fromSnapshot(e)).first;
-    log('data: $userInfo');
-
-    return userInfo;
-  }
-
-  Future<List<UserInfoModel>> getAllUser() async {
-    List<UserInfoModel> listUser = [];
-    try {
-      // final snapshot = await firebaseFirestore.collection('users').get();
-      // listUser =
-      //     snapshot.docs.map((e) => UserInfoModel.fromSnapshot(e)).toList();
-
-      final data = await _firestore.collection('users').get();
-      log("data: ${data.docs.toString()}");
-
-      data.docs.forEach((element) {
-        return listUser.add(UserInfoModel.fromFirebase(element.data()));
-      });
-      return listUser;
-    } on FirebaseException catch (e) {
-      log(e.toString());
-      return listUser;
-    } catch (e) {
-      throw Exception(e.toString());
+  Future<UserInfoModel?> getUserDetails({required int userId}) async {
+    final snapshot =
+        await _firestore.collection('users').doc('user_id_$userId').get();
+    if (snapshot.data() == null) {
+      return null;
     }
+    return UserInfoModel.fromFirebase(snapshot.data()!);
   }
 
   Future<List<UserInfoModel>> getAllProfile() async {
-    Completer<List<UserInfoModel>> completer = Completer<List<UserInfoModel>>();
     final List<UserInfoModel> profiles = [];
     await _firestore
         .collection('users')
@@ -129,18 +102,15 @@ class FirebaseService {
         final doc = element.doc;
         if (doc.exists) {
           if (doc.data() is Map<String, dynamic>) {
-            log('data: ${doc.data() as Map<String, dynamic>}');
-            final profile =
-                UserInfoModel.fromFire(doc.data() as Map<String, dynamic>);
+            final profile = UserInfoModel.fromFire(
+              doc.data() as Map<String, dynamic>,
+            );
             profiles.add(profile);
           }
         }
       }
-      log('list user: $profiles');
-      completer.complete(profiles);
     });
-    return completer.future;
-    // return profiles;
+    return profiles;
   }
 
   Future<DocumentReference> sendMessageToFirebase(

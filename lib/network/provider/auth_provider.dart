@@ -51,8 +51,7 @@ class AuthProvider with ProviderMixin {
         data: {"refreshToken": refreshToken},
         // options: AppConstants.options,
       );
-
-      log("new token data: ${response.data.toString()}");
+      // log("new token data: ${response.data.toString()}");
 
       return RefreshTokenResponse.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -86,7 +85,7 @@ class AuthProvider with ProviderMixin {
   }
 
   Future<BaseResponse> signUp({
-    required Object data,
+    required Map<String, dynamic> data,
   }) async {
     try {
       final response = await dio.post(
@@ -94,14 +93,15 @@ class AuthProvider with ProviderMixin {
         data: data,
         options: AppConstants.options,
       );
+      log('signUp: $response');
+
       return BaseResponse.fromJson(response.data);
     } catch (error, stacktrace) {
-      // showErrorLog(error, stacktrace, ApiPath.signup);
-      // if (error is DioError) {
-      //   return BaseResponse.fromJson(error.response?.data);
-      // }
-      // return BaseResponse();
-      return errorResponse(error, stacktrace, ApiPath.forgotPassword);
+      if (error is DioError) {
+        return BaseResponse.fromJson(error.response?.data);
+      }
+      // return errorResponse(error, stacktrace, ApiPath.signup);
+      return BaseResponse();
     }
   }
 

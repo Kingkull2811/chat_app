@@ -2,18 +2,14 @@ import 'package:chat_app/bloc/api_result_state.dart';
 import 'package:chat_app/network/model/subject_model.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 
-import '../../../network/model/class_model.dart';
-
-class ClassManagementState implements ApiResultState {
+class SubjectManagementState implements ApiResultState {
   final bool isLoading;
   final ApiError _apiError;
-  final List<ClassModel>? listClass;
   final List<SubjectModel>? listSubject;
 
-  ClassManagementState({
+  SubjectManagementState({
     this.isLoading = true,
     ApiError apiError = ApiError.noError,
-    this.listClass,
     this.listSubject,
   }) : _apiError = apiError;
 
@@ -21,17 +17,15 @@ class ClassManagementState implements ApiResultState {
   ApiError get apiError => _apiError;
 }
 
-extension NewsStateExtension on ClassManagementState {
-  ClassManagementState copyWith({
+extension SubjectManagementStateEx on SubjectManagementState {
+  SubjectManagementState copyWith({
     ApiError? apiError,
     bool? isLoading,
-    List<ClassModel>? listClass,
     List<SubjectModel>? listSubject,
   }) =>
-      ClassManagementState(
+      SubjectManagementState(
         isLoading: isLoading ?? this.isLoading,
         apiError: apiError ?? this.apiError,
-        listClass: listClass ?? this.listClass,
         listSubject: listSubject ?? this.listSubject,
       );
 }

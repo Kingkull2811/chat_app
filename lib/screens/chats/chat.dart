@@ -1,3 +1,4 @@
+import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/chats/chat_bloc.dart';
 import 'package:chat_app/screens/chats/chat_event.dart';
@@ -5,13 +6,15 @@ import 'package:chat_app/screens/chats/chat_state.dart';
 import 'package:chat_app/screens/chats/tab/chat_tab.dart';
 import 'package:chat_app/screens/chats/tab/contact_tab.dart';
 import 'package:chat_app/theme.dart';
-import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../utilities/screen_utilities.dart';
 
 class ChatsPage extends StatefulWidget {
   const ChatsPage({Key? key}) : super(key: key);
@@ -31,11 +34,22 @@ class ChatsPageState extends State<ChatsPage>
 
   late ChatsBloc _chatsBloc;
 
+  // final _firebaseService = FirebaseService();
+  // UserInfoModel? _userInfoModel = UserInfoModel();
+  //
+  // Future<void> getUserInfo() async {
+  //   final UserInfoModel? userInfoModel = await _firebaseService.getUserDetails(
+  //     userId: SharedPreferencesStorage().getUserId(),
+  //   );
+  //   setState(() {
+  //     _userInfoModel = userInfoModel;
+  //   });
+  // }
+
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    _chatsBloc = BlocProvider.of<ChatsBloc>(context);
-    // _chatsBloc.add(ChatInit());
+    _chatsBloc = BlocProvider.of<ChatsBloc>(context)..add(ChatInit());
     super.initState();
   }
 
@@ -49,40 +63,42 @@ class ChatsPageState extends State<ChatsPage>
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ChatsBloc, ChatsState>(
+    return BlocConsumer<ChatsBloc, ChatsState>(
+      listenWhen: (preState, curState) {
+        return curState.apiError != ApiError.noError;
+      },
+      listener: (context, curState) {
+        if (curState.apiError == ApiError.noInternetConnection) {
+          showMessageNoInternetDialog(context);
+        }
+        if (curState.apiError == ApiError.internalServerError) {
+          showCupertinoMessageDialog(
+            context,
+            'Error!',
+            content: 'Internal Server Error',
+            // onCloseDialog: () {
+            //   reloadPage();
+            // },
+          );
+        }
+      },
       builder: (context, state) {
         Widget body = const SizedBox.shrink();
-
-        if (state is LoadingState) {
-          body = const Scaffold(body: AnimationLoading());
-        }
-        if (state is SuccessState) {
+        if (state.isLoading) {
+          body = const AnimationLoading();
+        } else {
           body = _body(context, state);
-        }
-        if (state is ErrorState) {
-          if (state.isNoInternet) {
-            showMessageNoInternetDialog(context);
-          } else {
-            showCupertinoMessageDialog(
-              context,
-              'Error!',
-              content: 'Internal Server Error',
-              onCloseDialog: () {
-                reloadPage();
-              },
-            );
-          }
         }
         return body;
       },
     );
   }
 
-  Widget _body(BuildContext context, SuccessState state) {
+  Widget _body(BuildContext context, ChatsState state) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: _appBar(state.userData?.fileUrl),
+        appBar: _appBar(state.userData),
         body: TabBarView(
           controller: _tabController,
           children: [
@@ -368,7 +384,7 @@ class ChatsPageState extends State<ChatsPage>
     );
   }
 
-  PreferredSizeWidget _appBar(String? imageUrl) {
+  PreferredSizeWidget _appBar(UserInfoModel? userData) {
     return AppBar(
       elevation: 0.5,
       backgroundColor: Colors.grey[50],
@@ -392,7 +408,7 @@ class ChatsPageState extends State<ChatsPage>
                 },
                 child: AppImage(
                   isOnline: true,
-                  localPathOrUrl: imageUrl,
+                  localPathOrUrl: userData?.fileUrl,
                   boxFit: BoxFit.cover,
                   alignment: Alignment.center,
                   errorWidget: Image.asset(

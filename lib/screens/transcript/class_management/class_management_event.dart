@@ -5,10 +5,10 @@ abstract class ClassManagementEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class InitEvent extends ClassManagementEvent {}
+class InitClassEvent extends ClassManagementEvent {}
 
 class AddClassEvent extends ClassManagementEvent {}
 
-class AddSuccess extends ClassManagementEvent {}
+class EditClassEvent extends ClassManagementEvent {}
 
-class AddFailure extends ClassManagementEvent {}
+class DeleteClassEvent extends ClassManagementEvent {}

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:badges/badges.dart';
 import 'package:chat_app/theme.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../services/database.dart';
 import '../chats/chat.dart';
 import '../chats/chat_bloc.dart';
+import '../chats/chat_event.dart';
 import '../news/news.dart';
 import '../news/news_bloc.dart';
 import '../settings/setting_page.dart';
@@ -34,6 +36,8 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp>
     with TickerProviderStateMixin, WidgetsBindingObserver {
+  final bool _isUser = SharedPreferencesStorage().getUserRole();
+
   StreamSubscription<ConnectivityResult>? _networkSubscription;
 
   int newChatBadge = 1;
@@ -166,58 +170,77 @@ class MainAppState extends State<MainApp>
           label: 'News',
         ),
         BottomNavigationBarItem(
-          icon: Badge(
-            showBadge: (newTranscriptBadge > 0),
-            badgeContent: Text(
-              newTranscriptBadge.toString(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            badgeStyle: const BadgeStyle(
-              badgeColor: Colors.red,
-              padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
-            ),
-            position: BadgePosition.topEnd(top: -5, end: -8),
-            child: Container(
-              width: 24,
-              height: 24,
-              padding: const EdgeInsets.all(2),
-              child: Image.asset(
-                'assets/images/ic_transcript.png',
-                width: 22,
-                height: 22,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-          activeIcon: Badge(
-            showBadge: (newTranscriptBadge > 0),
-            badgeContent: Text(
-              newTranscriptBadge.toString(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            badgeStyle: const BadgeStyle(
-              badgeColor: Colors.red,
-              padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
-            ),
-            position: BadgePosition.topEnd(top: -5, end: -8),
-            child: Image.asset(
-              'assets/images/ic_transcript.png',
-              width: 30,
-              height: 30,
-              color: Colors.black,
-            ),
-          ),
-          label: 'Transcript',
+          icon: _isUser
+              ? Badge(
+                  showBadge: (newTranscriptBadge > 0),
+                  badgeContent: Text(
+                    newTranscriptBadge.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  badgeStyle: const BadgeStyle(
+                    badgeColor: Colors.red,
+                    padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
+                  ),
+                  position: BadgePosition.topEnd(top: -5, end: -8),
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    padding: const EdgeInsets.all(2),
+                    child: Image.asset(
+                      'assets/images/ic_transcript.png',
+                      width: 22,
+                      height: 22,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                )
+              : Container(
+                  width: 24,
+                  height: 24,
+                  padding: const EdgeInsets.all(2),
+                  child: Image.asset(
+                    'assets/images/ic_transcript.png',
+                    width: 22,
+                    height: 22,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+          activeIcon: _isUser
+              ? Badge(
+                  showBadge: (newTranscriptBadge > 0),
+                  badgeContent: Text(
+                    newTranscriptBadge.toString(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  badgeStyle: const BadgeStyle(
+                    badgeColor: Colors.red,
+                    padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
+                  ),
+                  position: BadgePosition.topEnd(top: -5, end: -8),
+                  child: Image.asset(
+                    'assets/images/ic_transcript.png',
+                    width: 30,
+                    height: 30,
+                    color: Colors.black,
+                  ),
+                )
+              : Image.asset(
+                  'assets/images/ic_transcript.png',
+                  width: 30,
+                  height: 30,
+                  color: Colors.black,
+                ),
+          label: _isUser ? 'Transcript' : 'Manage',
         ),
         BottomNavigationBarItem(
           icon: Container(
@@ -253,7 +276,7 @@ class MainAppState extends State<MainApp>
     switch (index) {
       case 0:
         currentTab = BlocProvider(
-          create: (context) => ChatsBloc(context), //..add(ChatInit()),
+          create: (context) => ChatsBloc(context)..add(ChatInit()),
           child: ChatsPage(
             key: DatabaseService().chatKey,
           ),

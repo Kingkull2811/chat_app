@@ -7,6 +7,9 @@ class StudentRepository {
   Future<BaseGetResponse> getListStudent() async =>
       await _studentProvider.getListStudent();
 
+  Future<Object> getStudentBySSID({required String studentSSID}) async =>
+      await _studentProvider.getStudentBySSID(studentSSID: studentSSID);
+
   Future<Object> addStudent({
     required String studentName,
     required int classId,

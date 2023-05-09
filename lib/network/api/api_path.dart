@@ -30,5 +30,9 @@ class ApiPath {
 
   static const String listClass = '$domain/api/v1/classes';
 
+  static const String listSubject = '$domain/api/v1/subjects';
+
   static const String listStudent = '$domain/api/v1/students';
+
+  static const String getStudentInfo = '$domain/api/v1/students/detail';
 }

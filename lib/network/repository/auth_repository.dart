@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:chat_app/network/model/base_auth_result.dart';
 import 'package:chat_app/network/provider/auth_provider.dart';
+import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/login_response.dart';
-import 'package:chat_app/utilities/shared_preferences_storage.dart';
 
 class AuthRepository {
   final _authProvider = AuthProvider();
@@ -34,65 +34,11 @@ class AuthRepository {
   Future<LoginResponse> login({
     required String username,
     required String password,
-  }) async => await _authProvider.login(
-      username: username,
-      password: password,
-    );
-  // {
-  //   LoginResponse loginResponse = await _authProvider.login(
-  //     username: username,
-  //     password: password,
-  //   );
-  //
-  //   if (loginResponse.httpStatus == 200) {
-  //     await SharedPreferencesStorage().setSaveUserInfo(loginResponse.data);
-  //
-  //     return BaseAuthResult(
-  //       isSuccess: true,
-  //       message: loginResponse.message,
-  //       errors: null,
-  //     );
-  //   }
-  //   return BaseAuthResult(
-  //     isSuccess: false,
-  //     message: null,
-  //     errors: loginResponse.errors,
-  //   );
-  // }
+  }) async =>
+      await _authProvider.login(username: username, password: password);
 
-  Future<BaseAuthResult> signUp({
-    required String username,
-    required String email,
-    required String password,
-    required String confirmPassword,
-    required List<String> roles,
-  }) async {
-    final data = {
-      "confirmPassword": confirmPassword,
-      "email": email,
-      "fullName": null,
-      "isFillProfileKey": false,
-      "password": password,
-      "phone": null,
-      "roles": [roles],
-      "username": username
-    };
-
-    final signUpResponse = await _authProvider.signUp(data: data);
-    // log("sign_up response: ${signUpResponse.toString()}");
-    if (signUpResponse.httpStatus == 200) {
-      return BaseAuthResult(
-        isSuccess: true,
-        message: signUpResponse.message,
-        errors: null,
-      );
-    }
-    return BaseAuthResult(
-      isSuccess: false,
-      message: null,
-      errors: signUpResponse.errors,
-    );
-  }
+  Future<BaseResponse> signUp({required Map<String, dynamic> data}) async =>
+      await _authProvider.signUp(data: data);
 
   Future<Object> getUserInfo({required int userId}) async =>
       await _authProvider.getUserInfo(userId: userId);

@@ -1,7 +1,4 @@
-import 'package:chat_app/network/model/error.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
-import 'package:chat_app/screens/authenticator/login/login_form/login_form.dart';
-import 'package:chat_app/screens/authenticator/login/login_form/login_form_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_event.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_state.dart';
@@ -18,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../login/login_bloc.dart';
+import '../login/login_form/login_form.dart';
+import '../login/login_form/login_form_bloc.dart';
 import '../login/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -48,11 +47,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
   late SignUpBloc _signUpBloc;
 
-  final AuthRepository _authRepository = AuthRepository();
-
   @override
   void initState() {
     _signUpBloc = BlocProvider.of<SignUpBloc>(context);
+    _signUpBloc.add(ValidateForm());
     super.initState();
   }
 
@@ -117,9 +115,24 @@ class _SignUpPageState extends State<SignUpPage> {
               content: 'Internal_server_error');
         }
         if (curState.apiError == ApiError.noInternetConnection) {
-          showCupertinoMessageDialog(context, 'Error!',
-              content: 'No_internet_connection');
+          showMessageNoInternetDialog(context);
         }
+        // if (curState.isSuccess) {
+        //   showSuccessBottomSheet(
+        //     context,
+        //     titleMessage: 'Sign Up Successfully!',
+        //     contentMessage: 'Please login!',
+        //     buttonLabel: 'Login',
+        //     onTap: () => _navigateToLogin(),
+        //   );
+        // }
+        // if (!curState.isSuccess) {
+        //   showCupertinoMessageDialog(
+        //     context,
+        //     'Error!',
+        //     content: curState.message,
+        //   );
+        // }
       },
       builder: (context, curState) {
         Widget body = const SizedBox.shrink();
@@ -133,6 +146,16 @@ class _SignUpPageState extends State<SignUpPage> {
       },
     );
   }
+
+  _navigateToLogin() => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<LoginFormBloc>(
+            create: (context) => LoginFormBloc(context),
+            child: const LoginFormPage(),
+          ),
+        ),
+      );
 
   Widget _body(SignUpState state) {
     return SingleChildScrollView(
@@ -222,7 +245,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
-              _buttonSignUp(state)
+              _buttonSignUp(context)
             ],
           ),
         ),
@@ -230,7 +253,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buttonSignUp(SignUpState state) {
+  Widget _buttonSignUp(BuildContext context) {
     return Container(
       height: 100,
       padding: const EdgeInsets.only(top: 0.0, bottom: 16),
@@ -239,58 +262,68 @@ class _SignUpPageState extends State<SignUpPage> {
           PrimaryButton(
             text: 'Sign Up',
             onTap: () async {
-              ConnectivityResult connectivityResult =
-                  await Connectivity().checkConnectivity();
-              if (connectivityResult == ConnectivityResult.none && mounted) {
-                showMessageNoInternetDialog(context);
-              } else {
-                String roles = isTeacher ? 'ROLE_USER' : 'ROLE_TEACHER';
-
-                _signUpBloc.add(SignUpLoading());
-                final response = await _authRepository.signUp(
-                  username: _userNameController.text.trim(),
-                  email: _emailController.text.trim(),
-                  password: _passwordController.text.trim(),
-                  confirmPassword: _confirmPasswordController.text.trim(),
-                  roles: [roles],
+              if (_userNameController.text.isEmpty) {
+                showCupertinoMessageDialog(
+                  context,
+                  'Error!',
+                  content: 'Username can\'t be empty',
                 );
-                if (response.isSuccess && mounted) {
-                  _signUpBloc.add(SignUpSuccess(message: response.message));
-
-                  showSuccessBottomSheet(
-                    context,
-                    titleMessage: 'Sign Up Successfully!',
-                    contentMessage: response.message ?? 'Please login!',
-                    buttonLabel: 'Login',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider<LoginFormBloc>(
-                            create: (context) => LoginFormBloc(context),
-                            child: const LoginFormPage(),
-                          ),
-                        ),
-                      );
-                    },
-                  );
+              } else if (_emailController.text.isEmpty) {
+                showCupertinoMessageDialog(
+                  context,
+                  'Error!',
+                  content: 'Email can\'t be empty',
+                );
+              } else if (_confirmPasswordController.text.isEmpty) {
+                showCupertinoMessageDialog(
+                  context,
+                  'Error!',
+                  content: 'Password can\'t be empty',
+                );
+              } else if (_passwordController.text.isEmpty) {
+                showCupertinoMessageDialog(
+                  context,
+                  'Error!',
+                  content: 'Password can\'t be empty',
+                );
+              } else if (_confirmPasswordController.text !=
+                  _passwordController.text) {
+                showCupertinoMessageDialog(
+                  context,
+                  'Error!',
+                  content: 'Password and confirmation password must match',
+                );
+              } else {
+                // showLoading(context);
+                final Map<String, dynamic> data = {
+                  "confirmPassword": _confirmPasswordController.text.trim(),
+                  "email": _emailController.text.trim(),
+                  "isFillProfileKey": false,
+                  "password": _passwordController.text.trim(),
+                  "roles": [isTeacher ? 'ROLE_USER' : 'ROLE_TEACHER'],
+                  "username": _userNameController.text.trim()
+                };
+                // _signUpBloc.add(WaitingSignUp(userInfo: data));
+                // setState(() {});
+                final connectivity = await Connectivity().checkConnectivity();
+                if (connectivity == ConnectivityResult.none) {
                 } else {
-                  _signUpBloc.add(
-                    SignUpFailure(errors: response.errors),
-                  );
-                  String? errorMessage = '';
-                  List<Errors>? errors = response.errors;
-                  for (var error in errors!) {
-                    errorMessage = '$errorMessage\n${error.errorMessage}';
+                  final response = await AuthRepository().signUp(data: data);
+                  if (response.isOK()) {
+                    showSuccessBottomSheet(
+                      this.context,
+                      titleMessage: 'Sign Up Successfully!',
+                      contentMessage: 'Please login!',
+                      buttonLabel: 'Login',
+                      onTap: () => _navigateToLogin(),
+                    );
+                  } else {
+                    showCupertinoMessageDialog(
+                      this.context,
+                      'Error!',
+                      content: response.errors?.first.errorMessage,
+                    );
                   }
-                  showCupertinoMessageDialog(
-                    context,
-                    errorMessage,
-                    buttonLabel: 'OK',
-                    onCloseDialog: () {
-                      Navigator.pop(context);
-                    },
-                  );
                 }
               }
             },

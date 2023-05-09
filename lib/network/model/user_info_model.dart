@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chat_app/network/model/role_model.dart';
+import 'package:chat_app/network/model/student.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../utilities/utils.dart';
@@ -14,7 +15,7 @@ class UserInfoModel {
   final String? phone;
   final bool isFillProfileKey;
   final String? fileUrl;
-  final String? parentOf;
+  final List<Student>? parentOf;
 
   UserInfoModel({
     this.id,
@@ -42,22 +43,20 @@ class UserInfoModel {
       phone: json['phone'],
       isFillProfileKey: json['isFillProfileKey'] ?? false,
       fileUrl: isNullOrEmpty(json['fileUrl']) ? null : json['fileUrl'],
-      parentOf: json['parentOf'],
+      parentOf: isNullOrEmpty(json['students'])
+          ? []
+          : List.generate(
+              json['students'].length,
+              (index) => Student.fromJson(json['students'][index]),
+            ),
     );
   }
 
   factory UserInfoModel.fromFirebase(Map<String, dynamic> data) {
-    // if (isNullOrEmpty(querySnapshot.data())) {
-    //   return UserInfoModel();
-    // }
-    // final data = querySnapshot.data();
     return UserInfoModel(
       id: data['id'],
       username: data['username'],
       email: data['email'],
-      roles: List<Role>.from(
-        json.decode(data['roles']).map((e) => Role.fromFirebase(e)),
-      ),
       fullName: data['fullName'],
       phone: data['phone'],
       isFillProfileKey: data['isFillProfileKey'] ?? false,

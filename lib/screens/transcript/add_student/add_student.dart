@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/transcript/add_student/add_student_bloc.dart';
 import 'package:chat_app/screens/transcript/add_student/add_student_state.dart';
+import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -11,7 +12,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../../network/model/class_model.dart';
-import '../../../theme.dart';
 import '../../../utilities/enum/api_error_result.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/animation_loading.dart';
@@ -133,23 +133,23 @@ class _AddStudentState extends State<AddStudent> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 0.0),
-                          child: _inputText(
+                          child: inputTextWithLabel(
                             context,
                             controller: _nameController,
                             inputAction: TextInputAction.next,
-                            icon: Icons.badge_outlined,
+                            prefixIcon: Icons.badge_outlined,
                             labelText: 'Student name',
                             hintText: 'Enter student name',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
-                          child: _inputText(
+                          child: inputTextWithLabel(
                             context,
                             // readOnly: true,
                             controller: _calendarController,
                             inputAction: TextInputAction.next,
-                            icon: Icons.calendar_month,
+                            prefixIcon: Icons.calendar_month,
                             labelText: 'Date of birth',
                             hintText: 'yyyy/MM/dd',
                             onTapSuffix: () async {
@@ -174,7 +174,7 @@ class _AddStudentState extends State<AddStudent> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
-                          child: _inputText(
+                          child: inputTextWithLabel(
                             context,
                             readOnly: true,
                             controller: _classController,
@@ -194,7 +194,7 @@ class _AddStudentState extends State<AddStudent> {
                         if (_showClass) _listItemClass(state.listClass),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
-                          child: _inputText(
+                          child: inputTextWithLabel(
                             context,
                             readOnly: true,
                             controller: _semesterYearController,
@@ -212,7 +212,8 @@ class _AddStudentState extends State<AddStudent> {
                             },
                           ),
                         ),
-                        if (_showYear) _listSemesterYear(listSemesterYear),
+                        if (_showYear)
+                          _listSemesterYear(AppConstants.listSemesterYear),
                         Padding(
                           padding: const EdgeInsets.only(top: 16),
                           child: Text(
@@ -537,103 +538,4 @@ class _AddStudentState extends State<AddStudent> {
       ),
     );
   }
-
-  Widget _inputText(
-    BuildContext context, {
-    TextEditingController? controller,
-    TextInputAction? inputAction,
-    String? initText,
-    String? labelText,
-    String? hintText,
-    IconData? icon,
-    bool showSuffix = false,
-    bool isShow = false,
-    Function()? onTap,
-    Function()? onTapSuffix,
-    bool readOnly = false,
-    String? iconPath,
-  }) {
-    if (initText != null) {
-      controller?.text = initText;
-      controller?.selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: initText.length,
-      );
-    }
-    return SizedBox(
-      height: 50,
-      child: TextFormField(
-        onTap: onTap,
-        readOnly: readOnly,
-        controller: controller,
-        textAlign: TextAlign.start,
-        textAlignVertical: TextAlignVertical.center,
-        textInputAction: inputAction ?? TextInputAction.done,
-        onFieldSubmitted: (value) {},
-        onChanged: (_) {},
-        keyboardType: TextInputType.text,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Color.fromARGB(255, 26, 26, 26),
-        ),
-        decoration: InputDecoration(
-            labelText: labelText,
-            labelStyle: TextStyle(color: Theme.of(context).primaryColor),
-            prefixIcon: isNotNullOrEmpty(icon)
-                ? Icon(icon, size: 24, color: AppColors.greyLight)
-                : isNotNullOrEmpty(iconPath)
-                    ? Padding(
-                        padding: const EdgeInsets.all(13.0),
-                        child: Image.asset(
-                          '$iconPath',
-                          height: 24,
-                          width: 24,
-                          fit: BoxFit.cover,
-                          color: AppColors.greyLight,
-                        ),
-                      )
-                    : null,
-            prefixIconColor: AppColors.greyLight,
-            suffixIcon: showSuffix
-                ? InkWell(
-                    onTap: onTapSuffix,
-                    child: Icon(
-                      isShow ? Icons.expand_more : Icons.navigate_next,
-                      size: 24,
-                      color: AppColors.greyLight,
-                    ),
-                  )
-                : null,
-            suffixIconColor: AppColors.greyLight,
-            contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-            filled: true,
-            fillColor: const Color.fromARGB(102, 230, 230, 230),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(
-                width: 1,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
-              ),
-            ),
-            hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6))),
-      ),
-    );
-  }
-
-  List<String> listSemesterYear = [
-    'semester 1 2021-2022',
-    'semester 2 2021-2022',
-    'semester 1 2022-2023',
-    'semester 2 2022-2023',
-    'semester 1 2023-2024',
-    'semester 2 2023-2024',
-  ];
 }

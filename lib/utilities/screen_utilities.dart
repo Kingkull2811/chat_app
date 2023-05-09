@@ -5,6 +5,7 @@ import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth_android/types/auth_messages_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
@@ -295,6 +296,99 @@ Future<void> showSuccessBottomSheet(
           ),
         ),
       ),
+    ),
+  );
+}
+
+Widget inputTextWithLabel(
+  BuildContext context, {
+  TextEditingController? controller,
+  TextInputAction? inputAction,
+  String? initText,
+  String? labelText,
+  String? hintText,
+  IconData? prefixIcon,
+  bool showSuffix = false,
+  bool isShow = false,
+  Function()? onTap,
+  Function()? onTapSuffix,
+  bool readOnly = false,
+  String? iconPath,
+  int? maxText,
+  TextInputType? keyboardType,
+}) {
+  if (initText != null) {
+    controller?.text = initText;
+    controller?.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: initText.length,
+    );
+  }
+  return SizedBox(
+    height: 50,
+    child: TextFormField(
+      onTap: onTap,
+      readOnly: readOnly,
+      controller: controller,
+      inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
+      textAlign: TextAlign.start,
+      textAlignVertical: TextAlignVertical.center,
+      textInputAction: inputAction ?? TextInputAction.done,
+      onFieldSubmitted: (value) {},
+      onChanged: (_) {},
+      keyboardType: keyboardType ?? TextInputType.text,
+      style: const TextStyle(
+        fontSize: 16,
+        color: Color.fromARGB(255, 26, 26, 26),
+      ),
+      decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: TextStyle(color: Theme.of(context).primaryColor),
+          prefixIcon: isNotNullOrEmpty(prefixIcon)
+              ? Icon(prefixIcon, size: 24, color: AppColors.greyLight)
+              : isNotNullOrEmpty(iconPath)
+                  ? Padding(
+                      padding: const EdgeInsets.all(13.0),
+                      child: Image.asset(
+                        '$iconPath',
+                        height: 24,
+                        width: 24,
+                        fit: BoxFit.cover,
+                        color: AppColors.greyLight,
+                      ),
+                    )
+                  : null,
+          prefixIconColor: AppColors.greyLight,
+          suffixIcon: showSuffix
+              ? InkWell(
+                  onTap: onTapSuffix,
+                  child: Icon(
+                    isShow ? Icons.expand_more : Icons.navigate_next,
+                    size: 24,
+                    color: AppColors.greyLight,
+                  ),
+                )
+              : null,
+          suffixIconColor: AppColors.greyLight,
+          contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+          filled: true,
+          fillColor: const Color.fromARGB(102, 230, 230, 230),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide(
+              width: 1,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(
+              width: 1,
+              color: Color.fromARGB(128, 130, 130, 130),
+            ),
+          ),
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6))),
     ),
   );
 }
