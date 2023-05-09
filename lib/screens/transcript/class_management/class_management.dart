@@ -1,7 +1,7 @@
 import 'package:chat_app/network/model/class_model.dart';
 import 'package:chat_app/screens/transcript/class_management/class_management_state.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/utils.dart';
+import 'package:chat_app/widgets/data_not_found.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,12 +25,6 @@ class ClassManagement extends StatefulWidget {
 
 class _ClassManagementState extends State<ClassManagement> {
   final Map<int, bool> _showInfo = {};
-  final Map<int, bool> _isChecked = {};
-  List<int> listSubjectSelected = [];
-
-  final _codeController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _yearController = TextEditingController();
 
   late ClassManagementBloc _classManagementBloc;
 
@@ -43,9 +37,6 @@ class _ClassManagementState extends State<ClassManagement> {
 
   @override
   void dispose() {
-    _codeController.dispose();
-    _nameController.dispose();
-    _yearController.dispose();
     _classManagementBloc.close();
     super.dispose();
   }
@@ -81,30 +72,7 @@ class _ClassManagementState extends State<ClassManagement> {
 
   Widget _body(BuildContext context, List<ClassModel>? listClass) {
     if (isNullOrEmpty(listClass)) {
-      return Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/image_wrong.png',
-              width: 200,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text(
-                'Class data not found',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+      return const DataNotFoundPage(title: 'Class data not found');
     }
     return ListView.builder(
       scrollDirection: Axis.vertical,
@@ -125,205 +93,6 @@ class _ClassManagementState extends State<ClassManagement> {
         }
         return _createItemClass(index, listClass[index - 1]);
       },
-    );
-  }
-
-  Widget _selectSubjectInClass(List<SubjectModel>? listSubject) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.9,
-      child: GestureDetector(
-        onTap: () => clearFocus(context),
-        child: Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            leading: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                size: 24,
-                color: Colors.white,
-              ),
-            ),
-            title: const Text(
-              'Add new class',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 0),
-                    child: _inputText(
-                      context,
-                      controller: _codeController,
-                      inputAction: TextInputAction.done,
-                      labelText: 'Class Code',
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: _inputText(
-                      context,
-                      controller: _nameController,
-                      inputAction: TextInputAction.done,
-                      labelText: 'Class Name',
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: _inputText(
-                      context,
-                      readOnly: true,
-                      controller: _yearController,
-                      inputAction: TextInputAction.done,
-                      labelText: 'Select year',
-                    ),
-                  ),
-                  _listSemesterYear(AppConstants.listSemesterYear),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Select subject in class',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: isNullOrEmpty(listSubject)
-                        ? Center(
-                            child: Text(
-                              'Subject data not found',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: listSubject!.length,
-                            itemBuilder: (context, index) {
-                              final isChecked = _isChecked[index] ?? false;
-
-                              return SizedBox(
-                                height: 50,
-                                child: CheckboxListTile(
-                                  value: isChecked,
-                                  onChanged: (v) {
-                                    if (v == true) {
-                                      listSubjectSelected.add(
-                                        listSubject[index].subjectId!,
-                                      );
-                                    } else {
-                                      listSubjectSelected.remove(
-                                        listSubject[index].subjectId!,
-                                      );
-                                    }
-                                    setState(() {
-                                      _isChecked[index] = v ?? false;
-                                    });
-                                  },
-                                  title: Text(
-                                    '${listSubject[index].code} - ${listSubject[index].subjectName}',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _listSemesterYear(List<String> listSemesterYear) {
-    return Container(
-      height: 40 * listSemesterYear.length.toDouble(),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.grey.withOpacity(0.1),
-      ),
-      child: isNotNullOrEmpty(listSemesterYear)
-          ? ListView.builder(
-              itemCount: listSemesterYear.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      _yearController.text = listSemesterYear[index];
-                    });
-                  },
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: (_yearController.text == listSemesterYear[index])
-                          ? Colors.grey.withOpacity(0.25)
-                          : null,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              listSemesterYear[index],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          if (_yearController.text == listSemesterYear[index])
-                            const Padding(
-                              padding: EdgeInsets.only(left: 10),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            )
-          : Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                'List semester not found',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
     );
   }
 
@@ -376,8 +145,19 @@ class _ClassManagementState extends State<ClassManagement> {
                                 context,
                                 'Do you want to delete this class?',
                                 okLabel: 'Delete',
-                                onOk: () {
+                                onOk: () async {
                                   Navigator.pop(context);
+                                  if (classInfo.classId == null) {
+                                    showCupertinoMessageDialog(
+                                      context,
+                                      'Error!',
+                                      content: 'Clas not found',
+                                    );
+                                  }
+
+                                  _classManagementBloc.add(DeleteClassEvent(
+                                    classId: classInfo.classId ?? 0,
+                                  ));
                                   _classManagementBloc.add(InitClassEvent());
                                   setState(() {});
                                 },
@@ -552,65 +332,6 @@ class _ClassManagementState extends State<ClassManagement> {
     );
   }
 
-  Widget _inputText(
-    BuildContext context, {
-    TextEditingController? controller,
-    TextInputAction? inputAction,
-    String? initText,
-    String? labelText,
-    String? hintText,
-    Function()? onTap,
-    bool readOnly = false,
-  }) {
-    if (initText != null) {
-      controller?.text = initText;
-      controller?.selection = TextSelection(
-        baseOffset: 0,
-        extentOffset: initText.length,
-      );
-    }
-    return SizedBox(
-      height: 50,
-      child: TextFormField(
-        onTap: onTap,
-        readOnly: readOnly,
-        controller: controller,
-        textAlign: TextAlign.start,
-        textAlignVertical: TextAlignVertical.center,
-        textInputAction: inputAction ?? TextInputAction.done,
-        onFieldSubmitted: (value) {},
-        onChanged: (_) {},
-        keyboardType: TextInputType.text,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Color.fromARGB(255, 26, 26, 26),
-        ),
-        decoration: InputDecoration(
-            labelText: labelText,
-            labelStyle: TextStyle(color: Theme.of(context).primaryColor),
-            contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-            filled: true,
-            fillColor: const Color.fromARGB(102, 230, 230, 230),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(
-                width: 1,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
-              ),
-            ),
-            hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6))),
-      ),
-    );
-  }
-
   PreferredSizeWidget _appBar(List<SubjectModel>? listSubject) => AppBar(
         elevation: 0.5,
         backgroundColor: Theme.of(context).primaryColor,
@@ -643,16 +364,16 @@ class _ClassManagementState extends State<ClassManagement> {
                     actions: <Widget>[
                       CupertinoActionSheetAction(
                         onPressed: () async {
-                          Navigator.pop(context);
-                          await showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) =>
-                                _selectSubjectInClass(listSubject),
-                          ).whenComplete(() {
-                            setState(() {});
-                          });
+                          // Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BlocProvider<ClassInfoBloc>(
+                                create: (context) => ClassInfoBloc(context),
+                                child: const ClassInfoPage(isEdit: false),
+                              ),
+                            ),
+                          );
                         },
                         child: Text(
                           'Add new class',

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -34,8 +32,8 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
               await _firebaseService.getAllProfile();
           listUser.removeWhere((user) => user.id == userInfo?.id);
 
-          log('user: $userInfo');
-          log('list user: $listUser');
+          // log('user: $userInfo');
+          // log('list user: $listUser');
 
           if (userInfo != null) {
             emit(state.copyWith(

@@ -5,9 +5,21 @@ import '../response/base_get_response.dart';
 class ClassRepository {
   final _classProvider = ClassProvider();
 
+  ///class
   Future<BaseGetResponse> getListClass() async =>
       await _classProvider.getListClass();
 
+  Future<Object> addClass({required Map<String, dynamic> data}) async =>
+      await _classProvider.addClass(data: data);
+
+  Future<Object> editClass(
+          {required int classId, required Map<String, dynamic> data}) async =>
+      await _classProvider.editClass(classId: classId, data: data);
+
+  Future<Object> deleteClass({required int classId}) async =>
+      await _classProvider.deleteClass(classId: classId);
+
+  ///subject
   Future<BaseGetResponse> getListSubject() async =>
       await _classProvider.getListSubject();
 

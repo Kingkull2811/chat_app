@@ -83,4 +83,11 @@ class AppConstants {
     'semester 1 2025-2026',
     'semester 2 2025-2026',
   ];
+  static const List<String> listSchoolYear = [
+    '2021-2022',
+    '2022-2023',
+    '2023-2024',
+    '2024-2025',
+    '2025-2026',
+  ];
 }

@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/transcript/subject_management/subject_management_state.dart';
+import 'package:chat_app/widgets/data_not_found.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -152,33 +153,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
         ],
       ),
       body: isNullOrEmpty(listSubject)
-          ? Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/image_wrong.png',
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: Text(
-                        'Subject data not found',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
+          ? const DataNotFoundPage(title: 'Subject data not found')
           : ListView.builder(
               itemCount: listSubject!.length + 1,
               itemBuilder: (context, index) {

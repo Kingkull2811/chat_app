@@ -22,19 +22,19 @@ class AddClassEvent extends ClassInfoEvent {
 }
 
 class EditClassEvent extends ClassInfoEvent {
-  final int subjectId;
+  final int classId;
   final Map<String, dynamic> data;
 
-  EditClassEvent({required this.subjectId, required this.data});
+  EditClassEvent({required this.classId, required this.data});
 
   @override
-  List<Object?> get props => [subjectId, data];
+  List<Object?> get props => [classId, data];
 }
 
-class DeleteClassEvent extends ClassInfoEvent {
+class DeleteClassEv extends ClassInfoEvent {
   final int classId;
 
-  DeleteClassEvent(this.classId);
+  DeleteClassEv(this.classId);
 
   @override
   List<Object?> get props => [classId];

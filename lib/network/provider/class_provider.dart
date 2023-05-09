@@ -1,3 +1,4 @@
+import 'package:chat_app/network/model/class_model.dart';
 import 'package:chat_app/network/model/subject_model.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/network/response/class_response.dart';
@@ -20,6 +21,59 @@ class ClassProvider with ProviderMixin {
       return ClassResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorGetResponse(error, stacktrace, ApiPath.listClass);
+    }
+  }
+
+  Future<Object> addClass({required Map<String, dynamic> data}) async {
+    if (await isExpiredToken()) {
+      return ExpiredTokenGetResponse();
+    }
+    try {
+      final response = await dio.post(
+        ApiPath.listClass,
+        data: data,
+        options: await defaultOptions(url: ApiPath.listClass),
+      );
+      return ClassModel.fromJson(response.data);
+    } catch (error, stacktrace) {
+      return errorGetResponse(error, stacktrace, ApiPath.listSubject);
+    }
+  }
+
+  Future<Object> editClass({
+    required int classId,
+    required Map<String, dynamic> data,
+  }) async {
+    if (await isExpiredToken()) {
+      return ExpiredTokenGetResponse();
+    }
+    final apiEditClass = join(ApiPath.listClass, classId.toString());
+    try {
+      final response = await dio.put(
+        apiEditClass,
+        data: data,
+        options: await defaultOptions(url: apiEditClass),
+      );
+      return ClassModel.fromJson(response.data);
+    } catch (error, stacktrace) {
+      return errorGetResponse(error, stacktrace, apiEditClass);
+    }
+  }
+
+  Future<Object> deleteClass({
+    required int classId,
+  }) async {
+    if (await isExpiredToken()) {
+      return ExpiredTokenGetResponse();
+    }
+    final apiDeleteClass = join(ApiPath.listClass, classId.toString());
+    try {
+      return await dio.delete(
+        apiDeleteClass,
+        options: await defaultOptions(url: apiDeleteClass),
+      );
+    } catch (error, stacktrace) {
+      return errorGetResponse(error, stacktrace, apiDeleteClass);
     }
   }
 

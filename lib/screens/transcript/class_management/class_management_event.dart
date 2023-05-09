@@ -11,4 +11,10 @@ class AddClassEvent extends ClassManagementEvent {}
 
 class EditClassEvent extends ClassManagementEvent {}
 
-class DeleteClassEvent extends ClassManagementEvent {}
+class DeleteClassEvent extends ClassManagementEvent {
+  final int classId;
+
+  DeleteClassEvent({required this.classId});
+  @override
+  List<Object?> get props => [classId];
+}
