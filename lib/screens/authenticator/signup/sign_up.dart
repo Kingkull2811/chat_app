@@ -2,7 +2,6 @@ import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_event.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_state.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
@@ -14,6 +13,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../utilities/app_constants.dart';
 import '../login/login_bloc.dart';
 import '../login/login_form/login_form.dart';
 import '../login/login_form/login_form_bloc.dart';
@@ -47,6 +47,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   late SignUpBloc _signUpBloc;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     _signUpBloc = BlocProvider.of<SignUpBloc>(context);
@@ -64,45 +66,6 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  bool _validatePassword() {
-    if (_passwordController.text.isEmpty &&
-        _confirmPasswordController.text.isEmpty) {
-      messageValidate = 'Password cannot be empty';
-      return false;
-    }
-    if (_passwordController.text.length < 6 &&
-        _confirmPasswordController.text.length < 6 &&
-        _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty) {
-      messageValidate = 'Passwords must be at least 6 characters';
-      return false;
-    }
-
-    if (_passwordController.text.trim() !=
-            _confirmPasswordController.text.trim() &&
-        _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty) {
-      messageValidate = 'Password and confirm password do not match';
-      return false;
-    }
-
-    return true;
-  }
-
-  bool _validateEmail(value) {
-    focusNode.requestFocus();
-    if (value == null || value.isEmpty) {
-      messageValidateEmail = 'Email is required';
-      return false;
-    }
-
-    if (!AppConstants.emailExp.hasMatch(value)) {
-      messageValidateEmail = AppConstants.emailNotMatch;
-      return false;
-    }
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SignUpBloc, SignUpState>(
@@ -117,22 +80,6 @@ class _SignUpPageState extends State<SignUpPage> {
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
         }
-        // if (curState.isSuccess) {
-        //   showSuccessBottomSheet(
-        //     context,
-        //     titleMessage: 'Sign Up Successfully!',
-        //     contentMessage: 'Please login!',
-        //     buttonLabel: 'Login',
-        //     onTap: () => _navigateToLogin(),
-        //   );
-        // }
-        // if (!curState.isSuccess) {
-        //   showCupertinoMessageDialog(
-        //     context,
-        //     'Error!',
-        //     content: curState.message,
-        //   );
-        // }
       },
       builder: (context, curState) {
         Widget body = const SizedBox.shrink();
@@ -142,7 +89,10 @@ class _SignUpPageState extends State<SignUpPage> {
           body = _body(curState);
         }
 
-        return Scaffold(body: body);
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(body: body),
+        );
       },
     );
   }
@@ -168,56 +118,91 @@ class _SignUpPageState extends State<SignUpPage> {
               Expanded(
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height - 100,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 40, bottom: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Image.asset(
-                              'assets/images/app_logo_light.png',
-                              height: 150,
-                              width: 150,
-                            ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 10),
-                              child: Text(
-                                'Welcome sign up to \'app name\'',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.black,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 40, bottom: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Image.asset(
+                                'assets/images/app_logo_light.png',
+                                height: 200,
+                                width: 200,
+                                fit: BoxFit.cover,
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 10),
+                                child: Text(
+                                  'Welcome sign up to \'app name\'',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      _inputTextField(
-                        hintText: 'Enter username',
-                        controller: _userNameController,
-                        onSubmit: (_) => focusNode.requestFocus(),
-                        prefixIcon: Icons.person_outline,
-                      ),
-                      _inputTextField(
+                        _inputTextField(
+                          labelText: 'Username',
+                          hintText: 'Enter username',
+                          controller: _userNameController,
+                          onSubmit: (_) => focusNode.requestFocus(),
+                          prefixIcon: Icons.person_outline,
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter username';
+                            }
+                            return null;
+                          },
+                        ),
+                        _inputTextField(
+                          labelText: 'Email',
                           hintText: 'Enter email',
                           controller: _emailController,
                           prefixIcon: Icons.mail_outline,
-                          onSubmit: (value) {}),
-                      _inputPasswordField(
-                        hintText: 'Enter password',
-                        controller: _passwordController,
-                        obscureText: !_isShowPassword,
-                        onSubmitted: (_) => focusNode.requestFocus(),
-                        onTapSuffixIcon: () {
-                          setState(() {
-                            _isShowPassword = !_isShowPassword;
-                          });
-                        },
-                      ),
-                      _inputPasswordField(
-                          hintText: 'Confirm password',
+                          onSubmit: (value) {},
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter email';
+                            } else if (!AppConstants.emailExp.hasMatch(value)) {
+                              return 'Please enter valid email';
+                            }
+                            return null;
+                          },
+                        ),
+                        _inputPasswordField(
+                          labelText: 'Password',
+                          hintText: 'Enter password',
+                          controller: _passwordController,
+                          obscureText: !_isShowPassword,
+                          onSubmitted: (_) => focusNode.requestFocus(),
+                          onTapSuffixIcon: () {
+                            setState(() {
+                              _isShowPassword = !_isShowPassword;
+                            });
+                          },
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter password';
+                            }
+                            if (value.isNotEmpty && value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            } else if (value.length > 40) {
+                              return 'Password must be more than 40 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                        _inputPasswordField(
+                          labelText: 'Confirm password',
+                          hintText: 'Enter confirm password',
                           controller: _confirmPasswordController,
                           obscureText: !_isShowConfirmPassword,
                           onTapSuffixIcon: () {
@@ -228,20 +213,34 @@ class _SignUpPageState extends State<SignUpPage> {
                               },
                             );
                           },
-                          onSubmitted: (_) {}),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        child: ButtonSwitchIcon(
-                          title: "You are teacher?",
-                          onToggle: (value) {
-                            setState(() {
-                              isTeacher = value;
-                            });
+                          onSubmitted: (_) {},
+                          validator: (String? value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter confirm password';
+                            } else if (value.length < 6) {
+                              return 'Confirm password must be at least 6 characters';
+                            } else if (value.length > 40) {
+                              return 'Confirm new password must be more than 40 characters';
+                            } else if (value != _passwordController.text) {
+                              return 'Password and confirm password do not match';
+                            }
+                            return null;
                           },
-                          value: isTeacher,
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: ButtonSwitchIcon(
+                            title: "You are teacher?",
+                            onToggle: (value) {
+                              setState(() {
+                                isTeacher = value;
+                              });
+                            },
+                            value: isTeacher,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -262,39 +261,7 @@ class _SignUpPageState extends State<SignUpPage> {
           PrimaryButton(
             text: 'Sign Up',
             onTap: () async {
-              if (_userNameController.text.isEmpty) {
-                showCupertinoMessageDialog(
-                  context,
-                  'Error!',
-                  content: 'Username can\'t be empty',
-                );
-              } else if (_emailController.text.isEmpty) {
-                showCupertinoMessageDialog(
-                  context,
-                  'Error!',
-                  content: 'Email can\'t be empty',
-                );
-              } else if (_confirmPasswordController.text.isEmpty) {
-                showCupertinoMessageDialog(
-                  context,
-                  'Error!',
-                  content: 'Password can\'t be empty',
-                );
-              } else if (_passwordController.text.isEmpty) {
-                showCupertinoMessageDialog(
-                  context,
-                  'Error!',
-                  content: 'Password can\'t be empty',
-                );
-              } else if (_confirmPasswordController.text !=
-                  _passwordController.text) {
-                showCupertinoMessageDialog(
-                  context,
-                  'Error!',
-                  content: 'Password and confirmation password must match',
-                );
-              } else {
-                // showLoading(context);
+              if (_formKey.currentState!.validate()) {
                 final Map<String, dynamic> data = {
                   "confirmPassword": _confirmPasswordController.text.trim(),
                   "email": _emailController.text.trim(),
@@ -304,7 +271,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   "username": _userNameController.text.trim()
                 };
                 // _signUpBloc.add(WaitingSignUp(userInfo: data));
-                // setState(() {});
                 final connectivity = await Connectivity().checkConnectivity();
                 if (connectivity == ConnectivityResult.none) {
                 } else {
@@ -334,34 +300,33 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _inputTextField(
-      {required String hintText,
-      required TextEditingController controller,
-      IconData? prefixIcon,
-      bool inputError = false,
-      Function(String)? onSubmit}) {
+  Widget _inputTextField({
+    String? hintText,
+    String? labelText,
+    required TextEditingController controller,
+    IconData? prefixIcon,
+    Function(String)? onSubmit,
+    String? Function(String?)? validator,
+  }) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: SizedBox(
-        height: 50,
-        child: Input(
-          keyboardType: TextInputType.text,
-          controller: controller,
-          onChanged: (text) {
-            //_validateForm();
-          },
-          isInputError: inputError,
-          textInputAction: TextInputAction.next,
-          onSubmit: onSubmit,
-          hint: hintText,
-          prefixIcon: prefixIcon,
-        ),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Input(
+        validator: validator,
+        keyboardType: TextInputType.text,
+        controller: controller,
+        onChanged: (_) {},
+        textInputAction: TextInputAction.next,
+        onSubmit: onSubmit,
+        hint: hintText,
+        labelText: labelText,
+        prefixIcon: prefixIcon,
       ),
     );
   }
 
   Widget _inputPasswordField({
-    required String hintText,
+    String? hintText,
+    String? labelText,
     required TextEditingController controller,
     bool obscureText = false,
     Function()? onTapSuffixIcon,
@@ -369,21 +334,19 @@ class _SignUpPageState extends State<SignUpPage> {
     String? Function(String?)? validator,
   }) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: SizedBox(
-        height: 50,
-        child: InputPasswordField(
-          obscureText: obscureText,
-          onTapSuffixIcon: onTapSuffixIcon,
-          keyboardType: TextInputType.text,
-          controller: controller,
-          onChanged: (text) {},
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => focusNode.requestFocus(),
-          hint: hintText,
-          prefixIcon: Icons.lock_outline,
-          validator: validator,
-        ),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: InputPasswordField(
+        obscureText: obscureText,
+        onTapSuffixIcon: onTapSuffixIcon,
+        keyboardType: TextInputType.text,
+        controller: controller,
+        onChanged: (text) {},
+        textInputAction: TextInputAction.done,
+        onFieldSubmitted: (_) => focusNode.requestFocus(),
+        hint: hintText,
+        labelText: labelText,
+        prefixIcon: Icons.lock_outline,
+        validator: validator,
       ),
     );
   }

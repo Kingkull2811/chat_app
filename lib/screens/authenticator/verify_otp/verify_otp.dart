@@ -115,13 +115,14 @@ class _VerifyOtpState extends State<VerifyOtp> {
                           width: 250,
                           height: 200,
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 0),
+                        Padding(
+                          padding: EdgeInsets.only(top: 10),
                           child: Text(
                             'OTP Verification',
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
                             ),
                           ),
                         ),
@@ -203,12 +204,10 @@ class _VerifyOtpState extends State<VerifyOtp> {
 
                   final response = await _authRepository.verifyOtp(
                     email: widget.email,
-                    // email: 'truong3@gmail.com',
                     otpCode: _otpCode,
                   );
 
-                  //todo:::
-                  if (response.isSuccess && mounted) {
+                  if (response.isOK() && mounted) {
                     _verifyOtpBloc.add(OnSuccess());
                     showSuccessBottomSheet(
                       context,
@@ -216,7 +215,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                       isDismissible: false,
                       titleMessage: 'Verified!',
                       contentMessage:
-                          'You have successfully verified the account.\n${response.message}',
+                          'You have verified verified your account.',
                       buttonLabel: 'Set a new password',
                       onTap: () {
                         Navigator.pushReplacement(
@@ -279,9 +278,8 @@ class _VerifyOtpState extends State<VerifyOtp> {
               //todo: resend OTP code
               final response = await _authRepository.forgotPassword(
                 email: widget.email,
-                // email: 'truong3@gmail.com',
               );
-              if (response.isSuccess) {
+              if (response.isOK()) {
                 setState(() {});
               }
             },

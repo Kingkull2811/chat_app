@@ -41,6 +41,8 @@ class _SetNewPasswordState extends State<SetNewPassword> {
 
   final AuthRepository _authRepository = AuthRepository();
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     _newPasswordBloc = BlocProvider.of<SetNewPasswordBloc>(context);
@@ -95,11 +97,25 @@ class _SetNewPasswordState extends State<SetNewPassword> {
   }
 
   Widget _body(SetNewPasswordState state) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.all(16),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).primaryColor,
+          centerTitle: true,
+          title: const Text(
+            'Set a new password',
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        body: Form(
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
@@ -107,22 +123,15 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                 child: Column(
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 50),
+                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
                       child: Image.asset(
                         'assets/images/app_logo_light.png',
-                        height: 150,
-                        width: 150,
+                        height: 200,
+                        width: 200,
                       ),
                     ),
-                    const Text(
-                      'Set a new password',
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black),
-                    ),
                     _inputPasswordField(
-                      title: 'New password',
+                      labelText: 'New password',
                       hintText: 'Enter your new password',
                       controller: _passwordController,
                       obscureText: !_isShowPassword,
@@ -131,67 +140,42 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                           _isShowPassword = !_isShowPassword;
                         });
                       },
-                      onSubmitted: (_) => focusNode.requestFocus(),
+                      onSubmitted: (_) {},
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter new password';
+                        }
+                        if (value.isNotEmpty && value.length < 6) {
+                          return 'New password  must be at least 6 characters';
+                        } else if (value.length > 40) {
+                          return 'Confirm new password must be more than 40 characters';
+                        }
+                        return null;
+                      },
                     ),
                     _inputPasswordField(
-                        title: 'Confirm new password',
-                        hintText: 'Re-enter your new password',
-                        controller: _confirmPasswordController,
-                        obscureText: !_isShowRePassword,
-                        onTapSuffixIcon: () {
-                          setState(() {
-                            _isShowRePassword = !_isShowRePassword;
-                          });
-                        },
-                        onSubmitted: (_) {
-                          focusNode.requestFocus();
-                          setState(() {
-                            hasCharacter = true;
-                            checkValidatePassword = _validatePassword();
-                          });
-                        }),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 16, top: 16, right: 16),
-                      child: !hasCharacter
-                          ? const SizedBox()
-                          : checkValidatePassword
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: const [
-                                    Icon(
-                                      Icons.task_alt,
-                                      size: 20,
-                                      color: Colors.green,
-                                    ),
-                                  ],
-                                )
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const Icon(
-                                      Icons.cancel_outlined,
-                                      size: 20,
-                                      color: Colors.red,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width -
-                                          16 * 4 -
-                                          20 -
-                                          10,
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: Text(
-                                        messageValidate,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
+                      labelText: 'Confirm new password',
+                      hintText: 'Re-enter your new password',
+                      controller: _confirmPasswordController,
+                      obscureText: !_isShowRePassword,
+                      onTapSuffixIcon: () {
+                        setState(() {
+                          _isShowRePassword = !_isShowRePassword;
+                        });
+                      },
+                      onSubmitted: (_) {},
+                      validator: (String? value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter confirm new password';
+                        } else if (value.length < 6) {
+                          return 'Confirm new password must be at least 6 characters';
+                        } else if (value.length > 40) {
+                          return 'Confirm new password must be more than 40 characters';
+                        } else if (value != _passwordController.text) {
+                          return 'New password and confirm new password do not match';
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
@@ -205,125 +189,85 @@ class _SetNewPasswordState extends State<SetNewPassword> {
   }
 
   _buttonVerify(SetNewPasswordState state) {
-    return PrimaryButton(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: PrimaryButton(
         text: 'Set a password',
-        // isDisable: !checkValidatePassword, //!state.isEnable,
-        onTap:
-            // checkValidatePassword //state.isEnable
-            //     ?
-            () async {
-          ConnectivityResult connectivityResult =
-              await Connectivity().checkConnectivity();
-          if (connectivityResult == ConnectivityResult.none && mounted) {
-            showMessageNoInternetDialog(context);
-          } else {
-            _newPasswordBloc.add(DisplayLoading());
-            final response = await _authRepository.newPassword(
-              email: widget.email,
-              // email: 'truong3@gmail.com',
-              password: _passwordController.text.trim(),
-              confirmPassword: _confirmPasswordController.text.trim(),
-            );
-
-            if (response.isSuccess && mounted) {
-              _newPasswordBloc.add(OnSuccess());
-              showSuccessBottomSheet(
-                context,
-                enableDrag: false,
-                isDismissible: false,
-                titleMessage: 'Successfully!',
-                contentMessage:
-                    'You have successfully set a new password, please login.\n${response.message}',
-                buttonLabel: 'Login',
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider<LoginBloc>(
-                        create: (context) => LoginBloc(context),
-                        child: const LoginPage(),
-                      ),
-                    ),
-                  );
-                },
-              );
-            } else {
-              //iSuccess==false
-            }
+        onTap: () async {
+          if (_formKey.currentState!.validate()) {
+            await _handleButton();
           }
-        }
-        // : null,
-        );
+        },
+      ),
+    );
   }
 
-  bool _validatePassword() {
-    if (_passwordController.text.isEmpty &&
-        _confirmPasswordController.text.isEmpty) {
-      messageValidate = 'Password cannot be empty';
-      return false;
-    }
-    if (_passwordController.text.length < 6 &&
-        _confirmPasswordController.text.length < 6 &&
-        _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty) {
-      messageValidate = 'Passwords must be at least 6 characters';
-      return false;
-    }
+  Future<void> _handleButton() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none && mounted) {
+      showMessageNoInternetDialog(context);
+    } else {
+      _newPasswordBloc.add(DisplayLoading());
+      final response = await _authRepository.newPassword(
+        email: widget.email,
+        password: _passwordController.text.trim(),
+        confirmPassword: _confirmPasswordController.text.trim(),
+      );
 
-    if (_passwordController.text.trim() !=
-            _confirmPasswordController.text.trim() &&
-        _passwordController.text.isNotEmpty &&
-        _confirmPasswordController.text.isNotEmpty) {
-      messageValidate = 'Password and confirm password do not match';
-      return false;
+      if (response.isOK() && mounted) {
+        _newPasswordBloc.add(OnSuccess());
+        showSuccessBottomSheet(
+          context,
+          enableDrag: false,
+          isDismissible: true,
+          // titleMessage: 'Successfully!',
+          contentMessage: '${response.message}',
+          buttonLabel: 'Login',
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider<LoginBloc>(
+                  create: (context) => LoginBloc(context),
+                  child: const LoginPage(),
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        showCupertinoMessageDialog(
+          context,
+          "Error!",
+          content: response.errors?.first.errorMessage,
+        );
+      }
     }
-
-    return true;
   }
 
   Widget _inputPasswordField({
-    required String title,
-    required String hintText,
+    String? labelText,
+    String? hintText,
     required TextEditingController controller,
     Function()? onTapSuffixIcon,
     bool obscureText = false,
-    bool isInputError = false,
     String? Function(String?)? validator,
     Function(String?)? onSubmitted,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 6),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 12,
-                height: 1.2,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 50,
-            child: InputPasswordField(
-              inputError: isInputError,
-              obscureText: obscureText,
-              onTapSuffixIcon: onTapSuffixIcon,
-              keyboardType: TextInputType.text,
-              controller: controller,
-              onChanged: (text) {},
-              validator: validator,
-              textInputAction: TextInputAction.next,
-              onFieldSubmitted: onSubmitted,
-              hint: hintText,
-              prefixIcon: Icons.lock_outline,
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+      child: InputPasswordField(
+        obscureText: obscureText,
+        onTapSuffixIcon: onTapSuffixIcon,
+        keyboardType: TextInputType.text,
+        controller: controller,
+        onChanged: (text) {},
+        validator: validator,
+        textInputAction: TextInputAction.done,
+        onFieldSubmitted: onSubmitted,
+        hint: hintText,
+        prefixIcon: Icons.lock_outline,
+        labelText: labelText,
       ),
     );
   }

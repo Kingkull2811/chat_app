@@ -14,9 +14,9 @@ class InputPasswordField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final String? initText;
+  final String? labelText;
   final IconData? prefixIcon;
   final void Function()? onTapSuffixIcon;
-  final bool inputError;
   final String? Function(String?)? validator;
 
   const InputPasswordField({
@@ -32,9 +32,9 @@ class InputPasswordField extends StatelessWidget {
     this.whiteList,
     this.obscureText = false,
     this.initText,
+    this.labelText,
     this.prefixIcon,
     this.onTapSuffixIcon,
-    this.inputError = false,
     this.validator,
   }) : super(key: key);
 
@@ -64,6 +64,11 @@ class InputPasswordField extends StatelessWidget {
       style: const TextStyle(
           fontSize: 16, color: Color.fromARGB(255, 26, 26, 26), height: 1.35),
       decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(
+          fontSize: 16,
+          color: Theme.of(context).primaryColor,
+        ),
         prefixIcon: Icon(
           prefixIcon,
           size: 24,
@@ -81,25 +86,28 @@ class InputPasswordField extends StatelessWidget {
         suffixIconColor: AppColors.greyLight,
         contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
         filled: true,
-        fillColor: inputError
-            ? AppColors.red700
-            : const Color.fromARGB(102, 230, 230, 230),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(width: 1, color: AppColors.greyLight),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(width: 1, color: AppColors.greyLight),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(width: 1, color: AppColors.greyLight),
+        ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
           borderSide: BorderSide(
             width: 1,
-            color:
-                inputError ? AppColors.red700 : Theme.of(context).primaryColor,
+            color: Theme.of(context).primaryColor,
           ),
         ),
-        enabledBorder: OutlineInputBorder(
+        errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(
-            width: 1,
-            color: inputError
-                ? AppColors.red700
-                : const Color.fromARGB(128, 130, 130, 130),
-          ),
+          borderSide: const BorderSide(width: 1, color: AppColors.red700),
         ),
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6)),

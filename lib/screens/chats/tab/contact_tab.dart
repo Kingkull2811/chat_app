@@ -1,10 +1,9 @@
+import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../network/model/user_info_model.dart';
-
 class ContactTab extends StatefulWidget {
-  final List<UserInfoModel>? listUser;
+  final List<UserFirebaseData>? listUser;
 
   const ContactTab({Key? key, this.listUser}) : super(key: key);
 
@@ -49,7 +48,7 @@ class _ContactTabState extends State<ContactTab> {
     );
   }
 
-  Widget _createItemUser(UserInfoModel? item) {
+  Widget _createItemUser(UserFirebaseData? item) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: SizedBox(
@@ -69,34 +68,63 @@ class _ContactTabState extends State<ContactTab> {
                         width: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            width: 1,
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
-                        child: AppImage(
-                          isOnline: true,
-                          localPathOrUrl: item?.fileUrl,
-                          boxFit: BoxFit.cover,
-                          errorWidget: Image.asset(
-                            'assets/images/ic_account_circle.png',
-                            color: Colors.grey.withOpacity(0.6),
-                            fit: BoxFit.cover,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: AppImage(
+                            isOnline: true,
+                            localPathOrUrl: item?.fileUrl,
+                            boxFit: BoxFit.cover,
+                            errorWidget: Image.asset(
+                              'assets/images/ic_account_circle.png',
+                              color: Colors.grey.withOpacity(0.6),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(child: Container()),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                            item?.fullName ?? '',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            item?.email ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(left: 10),
                       child: InkWell(
                         onTap: () {},
                         child: Container(
-                          height: 40,
-                          width: 40,
+                          height: 35,
+                          width: 35,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: Theme.of(context).primaryColor,
                           ),
                           child: Icon(
                             Icons.message_outlined,
-                            size: 30,
+                            size: 20,
                             color: Colors.white,
                           ),
                         ),
@@ -107,15 +135,15 @@ class _ContactTabState extends State<ContactTab> {
                       child: InkWell(
                         onTap: () {},
                         child: Container(
-                          height: 40,
-                          width: 40,
+                          height: 35,
+                          width: 35,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: Theme.of(context).primaryColor,
                           ),
                           child: Icon(
                             Icons.call,
-                            size: 30,
+                            size: 20,
                             color: Colors.white,
                           ),
                         ),

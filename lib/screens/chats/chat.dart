@@ -1,4 +1,4 @@
-import 'package:chat_app/network/model/user_info_model.dart';
+import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/chats/chat_bloc.dart';
 import 'package:chat_app/screens/chats/chat_event.dart';
@@ -33,18 +33,6 @@ class ChatsPageState extends State<ChatsPage>
       SharedPreferencesStorage().getTeacherRole();
 
   late ChatsBloc _chatsBloc;
-
-  // final _firebaseService = FirebaseService();
-  // UserInfoModel? _userInfoModel = UserInfoModel();
-  //
-  // Future<void> getUserInfo() async {
-  //   final UserInfoModel? userInfoModel = await _firebaseService.getUserDetails(
-  //     userId: SharedPreferencesStorage().getUserId(),
-  //   );
-  //   setState(() {
-  //     _userInfoModel = userInfoModel;
-  //   });
-  // }
 
   @override
   void initState() {
@@ -384,7 +372,7 @@ class ChatsPageState extends State<ChatsPage>
     );
   }
 
-  PreferredSizeWidget _appBar(UserInfoModel? userData) {
+  PreferredSizeWidget _appBar(UserFirebaseData? userData) {
     return AppBar(
       elevation: 0.5,
       backgroundColor: Colors.grey[50],

@@ -1,4 +1,3 @@
-import 'package:chat_app/network/model/user_firebase.dart';
 import 'package:chat_app/screens/settings/profile/profile_event.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
@@ -116,7 +115,7 @@ class ProfilePageState extends State<ProfilePage> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: AppImage(
-                    localPathOrUrl: userData.avartarUrl,
+                    localPathOrUrl: 'userData.avartarUrl',
                     boxFit: BoxFit.cover,
                     width: 200,
                     height: 200,
@@ -130,27 +129,27 @@ class ProfilePageState extends State<ProfilePage> {
               ),
             ),
             _itemView(
-              title: userData.username,
+              title: 'userData.username',
               leading: Icons.person_outline,
               trailing: false,
             ),
             _itemView(
-              title: userData.email,
+              title: 'userData.email',
               leading: Icons.email_outlined,
               trailing: false,
             ),
             _itemView(
-              title: userData.phone,
+              title: 'userData.phone',
               leading: Icons.phone,
               trailing: false,
             ),
             _itemView(
-              title: userData.role,
+              title: 'userData.role',
               leading: Icons.admin_panel_settings_outlined,
               trailing: false,
             ),
             _itemView(
-              title: userData.parentOf,
+              title: 'userData.parentOf',
               leading: Icons.group_outlined,
               trailing: true,
               onPressTrailing: () {
@@ -325,16 +324,4 @@ class ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  UserFirebaseData userData = UserFirebaseData(
-    userId: '001',
-    username: 'Martha Craig',
-    email: 'martha.craig@gmail.com',
-    phone: '+84123456789',
-    avartarUrl:
-        'https://images.pexels.com/photos/1758531/pexels-photo-1758531.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-    role: 'role_User',
-    token: '',
-    parentOf: 'SID_00000 - Student_Name',
-  );
 }

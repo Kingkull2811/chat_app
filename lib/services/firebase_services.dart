@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:chat_app/network/model/user_info_model.dart';
+import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -83,17 +83,17 @@ class FirebaseService {
     } on FirebaseException catch (_) {}
   }
 
-  Future<UserInfoModel?> getUserDetails({required int userId}) async {
+  Future<UserFirebaseData?> getUserDetails({required int userId}) async {
     final snapshot =
         await _firestore.collection('users').doc('user_id_$userId').get();
     if (snapshot.data() == null) {
       return null;
     }
-    return UserInfoModel.fromFirebase(snapshot.data()!);
+    return UserFirebaseData.fromFirebase(snapshot.data()!);
   }
 
-  Future<List<UserInfoModel>> getAllProfile() async {
-    final List<UserInfoModel> profiles = [];
+  Future<List<UserFirebaseData>> getAllProfile() async {
+    final List<UserFirebaseData> profiles = [];
     await _firestore
         .collection('users')
         .get()
@@ -102,7 +102,7 @@ class FirebaseService {
         final doc = element.doc;
         if (doc.exists) {
           if (doc.data() is Map<String, dynamic>) {
-            final profile = UserInfoModel.fromFire(
+            final profile = UserFirebaseData.fromFirebase(
               doc.data() as Map<String, dynamic>,
             );
             profiles.add(profile);

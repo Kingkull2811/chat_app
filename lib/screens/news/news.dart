@@ -62,76 +62,69 @@ class NewsPageState extends State<NewsPage> {
         }
       },
       builder: (context, curState) {
-        Widget body = const SizedBox.shrink();
-        if (curState.isLoading) {
-          body = const Scaffold(body: AnimationLoading());
-        } else {
-          body = _body(context, curState);
-        }
-        return body;
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0.5,
+            backgroundColor: Theme.of(context).primaryColor,
+            centerTitle: true,
+            automaticallyImplyLeading: false,
+            title: const Text(
+              'News',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            actions: [
+              isAdmin
+                  ? IconButton(
+                      onPressed: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NewsInfo(
+                              isEdit: false,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ],
+          ),
+          body: curState.isLoading
+              ? const AnimationLoading()
+              : _body(context, curState.listNews),
+        );
       },
     );
   }
 
-  Widget _body(BuildContext context, NewsState state) {
-    List<NewsModel>? listNews = state.listNews;
-
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.5,
-        backgroundColor: Colors.grey[50],
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'News',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+  Widget _body(BuildContext context, List<NewsModel>? listNews) {
+    if (isNullOrEmpty(listNews)) {
+      return _listNoItem();
+    }
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          await Future.delayed(const Duration(milliseconds: 300));
+          BlocProvider.of<NewsBloc>(this.context).add(GetListNewEvent());
+          setState(() {});
+        },
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          physics: const BouncingScrollPhysics(),
+          itemCount: listNews?.length,
+          itemBuilder: (context, index) => _createItemNews(listNews![index]),
         ),
-        actions: [
-          isAdmin
-              ? IconButton(
-                  onPressed: () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const NewsInfo(
-                          isEdit: false,
-                        ),
-                      ),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.edit_outlined,
-                    size: 30,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                )
-              : const SizedBox.shrink(),
-        ],
       ),
-      body: isNotNullOrEmpty(listNews)
-          ? Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await Future.delayed(const Duration(milliseconds: 300));
-                  BlocProvider.of<NewsBloc>(this.context)
-                      .add(GetListNewEvent());
-                  setState(() {});
-                },
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: listNews?.length,
-                  itemBuilder: (context, index) =>
-                      _createItemNews(listNews![index]),
-                ),
-              ),
-            )
-          : _listNoItem(),
     );
   }
 

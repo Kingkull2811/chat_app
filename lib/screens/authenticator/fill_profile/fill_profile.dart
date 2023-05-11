@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:chat_app/network/model/student_firebase.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
-import 'package:chat_app/screens/settings/fill_profile/fill_profile_bloc.dart';
-import 'package:chat_app/screens/settings/fill_profile/fill_profile_event.dart';
-import 'package:chat_app/screens/settings/fill_profile/fill_profile_state.dart';
-import 'package:chat_app/screens/settings/fill_profile/view_list_student_selected.dart';
+import 'package:chat_app/screens/authenticator/fill_profile/fill_profile_bloc.dart';
+import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +22,9 @@ import '../../../utilities/utils.dart';
 import '../../../widgets/animation_loading.dart';
 import '../../../widgets/primary_button.dart';
 import '../../main/main_app.dart';
+import 'fill_profile_event.dart';
+import 'fill_profile_state.dart';
+import 'view_list_student_selected.dart';
 
 class FillProfilePage extends StatefulWidget {
   final UserInfoModel userInfo;
@@ -36,6 +37,8 @@ class FillProfilePage extends StatefulWidget {
 
 class _FillProfilePageState extends State<FillProfilePage> {
   late FillProfileBloc _fillProfileBloc;
+
+  final _formKey = GlobalKey<FormState>();
 
   final bool isUserRoll = SharedPreferencesStorage().getUserRole();
 
@@ -88,7 +91,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        return false;
+        return true;
       },
       child: BlocConsumer<FillProfileBloc, FillProfileState>(
         listenWhen: (preState, curState) {
@@ -139,8 +142,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
   }
 
   Widget _body(BuildContext context, FillProfileState state) {
-    // studentIdSelected = {state.studentInfo?.id ?? 0: false};
-
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -163,68 +164,97 @@ class _FillProfilePageState extends State<FillProfilePage> {
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _imageAvt(context),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: inputTextWithLabel(
-                    context,
-                    controller: _usernameController,
-                    readOnly: true,
-                    initText: widget.userInfo.username,
-                    labelText: 'Username',
-                    prefixIcon: Icons.person_outline,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  _imageAvt(context),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: inputTextWithLabel(
+                      context,
+                      controller: _usernameController,
+                      readOnly: true,
+                      initText: widget.userInfo.username,
+                      labelText: 'Username',
+                      prefixIcon: Icons.person_outline,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter username';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: inputTextWithLabel(
-                    context,
-                    controller: _nameController,
-                    readOnly: false,
-                    initText: widget.userInfo.fullName,
-                    labelText: 'Full name',
-                    hintText: 'Enter full name',
-                    prefixIcon: Icons.contacts_outlined,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: inputTextWithLabel(
+                      context,
+                      controller: _nameController,
+                      readOnly: false,
+                      initText: widget.userInfo.fullName,
+                      labelText: 'Full name',
+                      hintText: 'Enter full name',
+                      prefixIcon: Icons.contacts_outlined,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter full name';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: inputTextWithLabel(
-                    context,
-                    controller: _emailController,
-                    readOnly: true,
-                    initText: widget.userInfo.email,
-                    labelText: 'Email',
-                    prefixIcon: Icons.email_outlined,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: inputTextWithLabel(
+                      context,
+                      controller: _emailController,
+                      readOnly: true,
+                      initText: widget.userInfo.email,
+                      labelText: 'Email',
+                      prefixIcon: Icons.email_outlined,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter email';
+                        } else if (!AppConstants.emailExp.hasMatch(value)) {
+                          return 'Please enter valid email';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: inputTextWithLabel(
-                    context,
-                    controller: _phoneController,
-                    readOnly: false,
-                    initText: widget.userInfo.phone,
-                    labelText: 'Phone number',
-                    hintText: 'Enter phone number',
-                    prefixIcon: Icons.phone,
-                    maxText: 10,
-                    keyboardType: TextInputType.phone,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: inputTextWithLabel(
+                      context,
+                      controller: _phoneController,
+                      readOnly: false,
+                      initText: widget.userInfo.phone,
+                      labelText: 'Phone number',
+                      hintText: 'Enter phone number',
+                      prefixIcon: Icons.phone,
+                      maxText: 10,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter phone number';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
-                ),
-                if (isUserRoll) _selectStudent(state),
-                Padding(
-                  padding: const EdgeInsets.only(top: 32, bottom: 32),
-                  child: PrimaryButton(
-                    text: 'Save',
-                    onTap: () async =>
-                        await onTapButton(context, widget.userInfo),
+                  if (isUserRoll) _selectStudent(state),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 32, bottom: 32),
+                    child: PrimaryButton(
+                      text: 'Save',
+                      onTap: () async =>
+                          await onTapButton(context, widget.userInfo),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -236,28 +266,30 @@ class _FillProfilePageState extends State<FillProfilePage> {
     BuildContext context,
     UserInfoModel? userInfo,
   ) async {
-    if (_nameController.text.isEmpty && mounted) {
-      showCupertinoMessageDialog(context, 'Full name cannot be empty');
-    } else if (_phoneController.text.isEmpty) {
-      showCupertinoMessageDialog(context, 'Phone number cannot be empty');
-    } else if (isNullOrEmpty(_image)) {
+    if (isNullOrEmpty(_image)) {
       showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
     } else {
-      List<int?> listStudentIdSelected = listStudent.map((e) => e.id).toList();
+      if (_formKey.currentState!.validate()) {
+        List<int?> listStudentIdSelected = listStudent
+            .map(
+              (e) => e.id,
+            )
+            .toList();
 
-      final Map<String, dynamic> userData = {
-        "fileUrl": _isOnline
-            ? userInfo?.fileUrl
-            : await getUrlImage(file: File(_image!)),
-        "fullName": _nameController.text.trim(),
-        "isFillProfileKey": true,
-        "phone": _phoneController.text.trim(),
-        "studentIds": listStudentIdSelected
-      };
-      _fillProfileBloc.add(FillProfile(
-        userId: SharedPreferencesStorage().getUserId(),
-        userData: userData,
-      ));
+        final Map<String, dynamic> userData = {
+          "fileUrl": _isOnline
+              ? userInfo?.fileUrl
+              : await getUrlImage(file: File(_image!)),
+          "fullName": _nameController.text.trim(),
+          "isFillProfileKey": true,
+          "phone": _phoneController.text.trim(),
+          "studentIds": listStudentIdSelected
+        };
+        _fillProfileBloc.add(FillProfile(
+          userId: SharedPreferencesStorage().getUserId(),
+          userData: userData,
+        ));
+      }
     }
   }
 
@@ -270,7 +302,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
 
   Widget _selectStudent(FillProfileState state) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Container(
         height: _isShow ? 344 : 50,
         decoration: BoxDecoration(
@@ -437,11 +469,14 @@ class _FillProfilePageState extends State<FillProfilePage> {
       onTap: () {
         if (_isSelectId) {
           listStudent.add(student);
+          print(listStudent);
         } else {
           listStudent.remove(student);
+          print('remove: $listStudent');
         }
         setState(() {
-          studentIdSelected[student.id!] = !_isSelectId;
+          studentIdSelected[student.id ?? 0] = !_isSelectId;
+          // _isAdded = !_isAdded;
         });
       },
       child: Stack(
@@ -555,9 +590,10 @@ class _FillProfilePageState extends State<FillProfilePage> {
             top: 6,
             right: 6,
             child: Icon(
-              _isSelectId
-                  ? Icons.add_circle_outline
-                  : Icons.check_circle_outline,
+              _isSelectId == false
+                  ? Icons.check_circle_outline
+                  : Icons.add_circle_outline,
+              // : Icons.add_circle_outline,
               size: 30,
               color: Theme.of(context).primaryColor,
             ),
@@ -651,7 +687,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
 
   Widget _imageAvt(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 0),
+      padding: const EdgeInsets.only(top: 16, bottom: 16),
       child: Container(
         height: 200,
         width: 200,

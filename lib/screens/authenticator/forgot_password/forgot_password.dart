@@ -12,6 +12,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../utilities/app_constants.dart';
 import 'forgot_password_state.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -29,6 +30,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   late ForgotPasswordBloc _forgotPasswordBloc;
   final AuthRepository _authRepository = AuthRepository();
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -80,7 +83,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget _body(ForgotPasswordState state) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         centerTitle: true,
         title: const Text(
@@ -88,60 +91,65 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_outlined,
             size: 24,
-            color: Colors.black,
+            color: Colors.white,
           ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Image.asset(
-                      'assets/images/image_wrong.png',
-                      width: 150,
-                      height: 150,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Text(
-                        'Reset your password',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        'assets/images/image_wrong.png',
+                        width: 150,
+                        height: 150,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Text(
+                          'Reset your password',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
                         ),
                       ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        'Please enter your email. We will send a code to your email to reset your password.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Text(
+                          'Please enter your email. We will send a code to your email to reset your password.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ),
-                    _inputField(),
-                  ],
+                      _inputField(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buttonSendCode(state),
-          ],
+              _buttonSendCode(state),
+            ],
+          ),
         ),
       ),
     );
@@ -150,19 +158,29 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget _inputField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
-      child: SizedBox(
-        height: 50,
-        child: Input(
-          keyboardType: TextInputType.text,
-          controller: _emailController,
-          onChanged: (text) {
-            setState(() {});
-          },
-          textInputAction: TextInputAction.next,
-          onSubmit: (_) => focusNode.requestFocus(),
-          hint: 'Enter your email',
-          prefixIcon: Icons.mail_outline,
-        ),
+      child: Input(
+        keyboardType: TextInputType.text,
+        controller: _emailController,
+        onChanged: (text) {
+          setState(() {});
+        },
+        textInputAction: TextInputAction.done,
+        onSubmit: (string) async {
+          if (_formKey.currentState!.validate()) {
+            await _onClickButton();
+          }
+        },
+        labelText: 'Email',
+        hint: 'Enter your email',
+        prefixIcon: Icons.mail_outline,
+        validator: (String? value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter email';
+          } else if (!AppConstants.emailExp.hasMatch(value)) {
+            return 'Please enter valid email';
+          }
+          return null;
+        },
       ),
     );
   }
@@ -176,45 +194,47 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         onTap: _emailController.text.isEmpty
             ? null
             : () async {
-                ConnectivityResult connectivityResult =
-                    await Connectivity().checkConnectivity();
-                if (connectivityResult == ConnectivityResult.none && mounted) {
-                  showMessageNoInternetDialog(context);
-                } else {
-                  _forgotPasswordBloc.add(DisplayLoading());
-                  final response = await _authRepository.forgotPassword(
-                    email: _emailController.text.trim(),
-                    // email: 'truong3@gmail.com',
-                  );
-
-                  if (response.isSuccess && mounted) {
-                    _forgotPasswordBloc.add(OnSuccess());
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BlocProvider<VerifyOtpBloc>(
-                          create: (context) => VerifyOtpBloc(context),
-                          child: VerifyOtp(
-                            email: _emailController.text.trim(),
-                          ),
-                        ),
-                      ),
-                    );
-                  } else {
-                    // setState(() {
-                    //   state.isLoading = false;
-                    // });
-                    _forgotPasswordBloc.add(OnFailure(
-                      errorMessage: response.errors?.first.errorMessage,
-                    ));
-                    showCupertinoMessageDialog(
-                      context,
-                      response.errors?.first.errorMessage,
-                    );
-                  }
+                if (_formKey.currentState!.validate()) {
+                  await _onClickButton();
                 }
               },
       ),
     );
+  }
+
+  Future<void> _onClickButton() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none && mounted) {
+      showMessageNoInternetDialog(context);
+    } else {
+      _forgotPasswordBloc.add(DisplayLoading());
+      final response = await _authRepository.forgotPassword(
+        email: _emailController.text.trim(),
+        // email: 'truong3@gmail.com',
+      );
+
+      if (response.isOK() && mounted) {
+        _forgotPasswordBloc.add(OnSuccess());
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider<VerifyOtpBloc>(
+              create: (context) => VerifyOtpBloc(context),
+              child: VerifyOtp(
+                email: _emailController.text.trim(),
+              ),
+            ),
+          ),
+        );
+      } else {
+        _forgotPasswordBloc.add(OnFailure(
+          errorMessage: response.errors?.first.errorMessage,
+        ));
+        showCupertinoMessageDialog(
+          context,
+          response.errors?.first.errorMessage,
+        );
+      }
+    }
   }
 }

@@ -1,13 +1,12 @@
 import 'package:chat_app/bloc/api_result_state.dart';
+import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
-
-import '../../network/model/user_info_model.dart';
 
 class ChatsState implements ApiResultState {
   final bool isLoading;
   final ApiError _apiError;
-  final UserInfoModel? userData;
-  final List<UserInfoModel>? listUser;
+  final UserFirebaseData? userData;
+  final List<UserFirebaseData>? listUser;
 
   ChatsState({
     this.isLoading = true,
@@ -24,8 +23,8 @@ extension ChatsStateEx on ChatsState {
   ChatsState copyWith({
     bool? isLoading,
     ApiError? apiError,
-    UserInfoModel? userData,
-    List<UserInfoModel>? listUser,
+    UserFirebaseData? userData,
+    List<UserFirebaseData>? listUser,
   }) =>
       ChatsState(
         isLoading: isLoading ?? this.isLoading,

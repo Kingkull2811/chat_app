@@ -22,6 +22,11 @@ class StudentFirebase {
         className: json['className'],
       );
 
+  @override
+  String toString() {
+    return 'StudentFirebase{studentId: $studentId, studentName: $studentName, dob: $dob, imageUrl: $imageUrl, className: $className}';
+  }
+
   Map<String, dynamic> toFirestore() => {
         'studentId': studentId,
         'studentName': studentName,

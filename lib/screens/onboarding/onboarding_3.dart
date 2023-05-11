@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../utilities/shared_preferences_storage.dart';
-import '../settings/fill_profile/fill_profile.dart';
-import '../settings/fill_profile/fill_profile_bloc.dart';
-import '../settings/fill_profile/fill_profile_event.dart';
+import '../authenticator/fill_profile/fill_profile.dart';
+import '../authenticator/fill_profile/fill_profile_bloc.dart';
+import '../authenticator/fill_profile/fill_profile_event.dart';
 
 class OnBoarding3Page extends StatefulWidget {
   const OnBoarding3Page({

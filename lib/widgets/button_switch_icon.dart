@@ -19,35 +19,32 @@ class ButtonSwitchIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            maxLines: 1,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          maxLines: 1,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
-          FlutterSwitch(
-            width: 40.0,
-            height: 20.0,
-            toggleSize: 18.0,
-            value: value,
-            borderRadius: 10.0,
-            padding: 1.0,
-            activeColor: const Color(0xFF81c784),
-            inactiveColor: Theme.of(context).primaryColor,
-            activeIcon: activeIcon ?? const SizedBox.shrink(),
-            inactiveIcon: inActiveIcon ?? const SizedBox.shrink(),
-            onToggle: onToggle,
-          ),
-        ],
-      ),
+        ),
+        FlutterSwitch(
+          width: 40.0,
+          height: 20.0,
+          toggleSize: 18.0,
+          value: value,
+          borderRadius: 10.0,
+          padding: 1.0,
+          activeColor: const Color(0xFF81c784),
+          inactiveColor: Theme.of(context).primaryColor,
+          activeIcon: activeIcon ?? const SizedBox.shrink(),
+          inactiveIcon: inActiveIcon ?? const SizedBox.shrink(),
+          onToggle: onToggle,
+        ),
+      ],
     );
   }
 }

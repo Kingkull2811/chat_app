@@ -7,8 +7,7 @@ class AppConstants {
   static const messagingSenderId = '103251286025';
   static const projectId = 'chatapp-97dbc';
 
-  static RegExp emailExp =
-      RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+  static RegExp emailExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]');
   static RegExp passwordExp =
       RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
 

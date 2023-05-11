@@ -1,3 +1,4 @@
+import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import './chat_event.dart';
 import './chat_state.dart';
-import '../../network/model/user_info_model.dart';
 import '../../services/firebase_services.dart';
 import '../../utilities/shared_preferences_storage.dart';
 
@@ -25,10 +25,12 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
             apiError: ApiError.noInternetConnection,
           ));
         } else {
-          final UserInfoModel? userInfo = await _firebaseService.getUserDetails(
+          final UserFirebaseData? userInfo =
+              await _firebaseService.getUserDetails(
             userId: SharedPreferencesStorage().getUserId(),
           );
-          final List<UserInfoModel> listUser =
+          // log('user: $userInfo');
+          final List<UserFirebaseData> listUser =
               await _firebaseService.getAllProfile();
           listUser.removeWhere((user) => user.id == userInfo?.id);
 

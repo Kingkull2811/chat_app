@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/base_auth_result.dart';
 import 'package:chat_app/network/provider/auth_provider.dart';
 import 'package:chat_app/network/response/base_response.dart';
@@ -62,73 +60,28 @@ class AuthRepository {
     return _authProvider.changePassword(data);
   }
 
-  Future<BaseAuthResult> forgotPassword({
+  Future<BaseResponse> forgotPassword({
     required String email,
   }) async {
-    final response = await _authProvider.forgotPassword(email: email);
-
-    // log('forgot response: ${response.toString()})');
-    if (response.httpStatus == 200) {
-      return BaseAuthResult(
-        isSuccess: true,
-        message: response.message,
-        errors: null,
-      );
-    }
-    return BaseAuthResult(
-      isSuccess: false,
-      message: null,
-      errors: response.errors,
-    );
+    return await _authProvider.forgotPassword(email: email);
   }
 
-  Future<BaseAuthResult> verifyOtp({
+  Future<BaseResponse> verifyOtp({
     required String email,
     required String otpCode,
   }) async {
-    final response = await _authProvider.verifyOtp(
-      email: email,
-      otpCode: otpCode,
-    );
-
-    // log('verify response ${response.toString()}');
-    if (response.httpStatus == 200) {
-      return BaseAuthResult(
-        isSuccess: true,
-        message: response.message,
-        errors: null,
-      );
-    }
-    return BaseAuthResult(
-      isSuccess: false,
-      message: null,
-      errors: response.errors,
-    );
+    return await _authProvider.verifyOtp(email: email, otpCode: otpCode);
   }
 
-  Future<BaseAuthResult> newPassword({
+  Future<BaseResponse> newPassword({
     required String email,
     required String password,
     required String confirmPassword,
   }) async {
-    final response = await _authProvider.newPassword(
+    return await _authProvider.newPassword(
       email: email,
       password: password,
       confirmPassword: confirmPassword,
-    );
-
-    log('newPass response ${response.toString()}');
-    if (response.httpStatus == 200) {
-      return BaseAuthResult(
-        isSuccess: true,
-        message: response.message,
-        errors: null,
-      );
-    }
-    return BaseAuthResult(
-      isSuccess: false,
-      message: null,
-      errors: response.errors,
     );
   }
 }

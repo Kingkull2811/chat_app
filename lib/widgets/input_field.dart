@@ -13,10 +13,11 @@ class Input extends StatelessWidget {
   final Pattern? whiteList;
   final TextInputType? keyboardType;
   final String? initText;
+  final String? labelText;
   final IconData? prefixIcon;
-  final bool isInputError;
   final bool enable;
   final int? maxText;
+  final String? Function(String?)? validator;
 
   const Input({
     Key? key,
@@ -29,10 +30,11 @@ class Input extends StatelessWidget {
     this.keyboardType,
     this.whiteList,
     this.initText,
+    this.labelText,
     this.prefixIcon,
-    this.isInputError = false,
     this.enable = true,
     this.maxText,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -67,18 +69,15 @@ class Input extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(15),
             ),
-            prefix: Icon(
-              prefixIcon,
-              size: 24,
-              color: AppColors.greyLight,
-            ),
+            prefix: Icon(prefixIcon, size: 24, color: AppColors.greyLight),
             placeholder: hint,
             // maxLines: 1,
           )
-        : TextField(
+        : TextFormField(
+            validator: validator,
             enabled: enable,
             textInputAction: textInputAction,
-            onSubmitted: onSubmit,
+            onFieldSubmitted: onSubmit,
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
@@ -100,12 +99,20 @@ class Input extends StatelessWidget {
                 contentPadding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
                 filled: true,
                 fillColor: const Color.fromARGB(102, 230, 230, 230),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide:
+                      const BorderSide(width: 1, color: AppColors.greyLight),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide:
+                      const BorderSide(width: 1, color: AppColors.greyLight),
+                ),
                 disabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(
-                    width: 1,
-                    color: Color.fromARGB(128, 130, 130, 130),
-                  ),
+                  borderSide:
+                      const BorderSide(width: 1, color: AppColors.greyLight),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -114,15 +121,13 @@ class Input extends StatelessWidget {
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
-                enabledBorder: OutlineInputBorder(
+                errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(
-                    width: 1,
-                    color: isInputError
-                        ? AppColors.red700
-                        : const Color.fromARGB(128, 130, 130, 130),
-                  ),
+                  borderSide:
+                      const BorderSide(width: 1, color: AppColors.red700),
                 ),
+                labelText: labelText,
+                labelStyle: TextStyle(color: Theme.of(context).primaryColor),
                 hintText: hint,
                 hintStyle: TextStyle(color: Colors.grey.withOpacity(0.6))),
           );

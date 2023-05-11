@@ -7,7 +7,6 @@ import 'package:chat_app/screens/authenticator/login/login_form/login_form_event
 import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
-import 'package:chat_app/screens/settings/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/enum/highlight_status.dart';
@@ -22,8 +21,10 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../settings/fill_profile/fill_profile.dart';
-import '../../../settings/fill_profile/fill_profile_event.dart';
+import '../../../../widgets/custom_check_box.dart';
+import '../../fill_profile/fill_profile.dart';
+import '../../fill_profile/fill_profile_bloc.dart';
+import '../../fill_profile/fill_profile_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormPage extends StatefulWidget {
@@ -43,12 +44,14 @@ class _LoginFormPageState extends State<LoginFormPage> {
   final _inputUsernameController = TextEditingController();
   final _inputPasswordController = TextEditingController();
 
-  // bool _rememberInfo = false;
+  bool _rememberInfo = false;
   bool _isShowPassword = false;
 
   late LoginFormBloc _loginFormBloc;
 
   final AuthRepository _authRepository = AuthRepository();
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -87,90 +90,20 @@ class _LoginFormPageState extends State<LoginFormPage> {
             clearFocus(context);
           },
           child: Scaffold(
-            // resizeToAvoidBottomInset: true,
-            body: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 40, 16, 0),
-              child: SingleChildScrollView(
+            body: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
+              child: IntrinsicHeight(
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 50, bottom: 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Image.asset(
-                            'assets/images/app_logo_light.png',
-                            height: 150,
-                            width: 150,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 20),
-                            child: Text(
-                              'Welcome to \'app name\'',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    Expanded(
+                      child: _loginForm(),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      child: SizedBox(
-                        height: 50,
-                        child: Input(
-                          keyboardType: TextInputType.text,
-                          controller: _inputUsernameController,
-                          onChanged: (text) {
-                            _validateForm();
-                          },
-                          textInputAction: TextInputAction.next,
-                          onSubmit: (_) => focusNode.requestFocus(),
-                          hint: 'Enter your username',
-                          prefixIcon: Icons.person_outline,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      child: SizedBox(
-                        height: 50,
-                        child: InputPasswordField(
-                          inputError: false,
-                          obscureText: !_isShowPassword,
-                          onTapSuffixIcon: () {
-                            setState(() {
-                              _isShowPassword = !_isShowPassword;
-                            });
-                          },
-                          keyboardType: TextInputType.text,
-                          controller: _inputPasswordController,
-                          onChanged: (text) {},
-                          textInputAction: TextInputAction.done,
-                          onFieldSubmitted: (_) {
-                            focusNode.requestFocus();
-                            _validateForm();
-                          },
-                          hint: 'Enter your password',
-                          prefixIcon: Icons.lock_outline,
-                        ),
-                      ),
-                    ),
-                    _rememberOrForgot(),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 90, 0, 16),
+                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
                       child: Column(
                         children: [
-                          _buildBiometricsButton(state),
+                          // _buildBiometricsButton(state),
                           _buttonLogin(context, state),
                           _goToSignUpPage(),
                         ],
@@ -183,6 +116,104 @@ class _LoginFormPageState extends State<LoginFormPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _loginForm() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 100,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 50, bottom: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    'assets/images/app_logo_light.png',
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20),
+                    child: Text(
+                      'Welcome to \'app name\'',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Input(
+                keyboardType: TextInputType.text,
+                controller: _inputUsernameController,
+                onChanged: (text) {
+                  _validateForm();
+                },
+                textInputAction: TextInputAction.next,
+                onSubmit: (_) => focusNode.requestFocus(),
+                labelText: 'Username',
+                hint: 'Enter your username',
+                prefixIcon: Icons.person_outline,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter username';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: InputPasswordField(
+                obscureText: !_isShowPassword,
+                onTapSuffixIcon: () {
+                  setState(() {
+                    _isShowPassword = !_isShowPassword;
+                  });
+                },
+                keyboardType: TextInputType.text,
+                controller: _inputPasswordController,
+                onChanged: (text) {},
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) async {
+                  focusNode.requestFocus();
+                  _validateForm();
+                  if (_formKey.currentState!.validate()) {
+                    await _handleButtonLogin(context);
+                  }
+                },
+                labelText: 'Password',
+                hint: 'Enter your password',
+                prefixIcon: Icons.lock_outline,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter password';
+                  }
+                  if (value.isNotEmpty && value.length < 6) {
+                    return 'Password must be at least 6 characters';
+                  } else if (value.length > 40) {
+                    return 'Password must be more than 40 characters';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            _rememberOrForgot(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -257,41 +288,42 @@ class _LoginFormPageState extends State<LoginFormPage> {
     });
   }
 
-  Widget _buttonLogin(BuildContext context, LoginFormState currentState) {
+  Widget _buttonLogin(BuildContext context, LoginFormState state) {
     return PrimaryButton(
       text: 'Login',
       onTap: () async {
-        if (_inputUsernameController.text.isEmpty) {
-          showCupertinoMessageDialog(context, 'Username cannot be empty');
-        } else if (_inputPasswordController.text.isEmpty) {
-          showCupertinoMessageDialog(context, 'Password cannot be empty');
-        } else {
-          ConnectivityResult connectivityResult =
-              await Connectivity().checkConnectivity();
-          if (connectivityResult == ConnectivityResult.none && mounted) {
-            showMessageNoInternetDialog(context);
-          } else {
-            _loginFormBloc.add(DisplayLoading());
-            final response = await _authRepository.login(
-              username: _inputUsernameController.text,
-              password: _inputPasswordController.text,
-            );
-            if (response.httpStatus == 200) {
-              await SharedPreferencesStorage().setRememberInfo(true);
-              await SharedPreferencesStorage().setSaveUserInfo(response.data);
-              const Duration(milliseconds: 300);
-              await _goToTermPolicy();
-            } else {
-              showCupertinoMessageDialog(
-                this.context,
-                'Error',
-                content: response.errors?.first.errorMessage,
-              );
-            }
-          }
+        if (_formKey.currentState!.validate()) {
+          await _handleButtonLogin(context);
         }
       },
     );
+  }
+
+  Future<void> _handleButtonLogin(BuildContext context) async {
+    await SharedPreferencesStorage().setRememberInfo(_rememberInfo);
+
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none && mounted) {
+      showMessageNoInternetDialog(context);
+    } else {
+      _loginFormBloc.add(DisplayLoading());
+      final response = await _authRepository.login(
+        username: _inputUsernameController.text,
+        password: _inputPasswordController.text,
+      );
+      if (response.httpStatus == 200) {
+        await SharedPreferencesStorage().setRememberInfo(true);
+        await SharedPreferencesStorage().setSaveUserInfo(response.data);
+        const Duration(milliseconds: 300);
+        await _goToTermPolicy();
+      } else {
+        showCupertinoMessageDialog(
+          this.context,
+          'Error',
+          content: response.errors?.first.errorMessage,
+        );
+      }
+    }
   }
 
   Widget _goToSignUpPage() {
@@ -332,49 +364,49 @@ class _LoginFormPageState extends State<LoginFormPage> {
 
   Widget _rememberOrForgot() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          // Expanded(
-          //   child: GestureDetector(
-          //     onTap: () {
-          //       setState(() {
-          //         _rememberInfo = !_rememberInfo;
-          //       });
-          //     },
-          //     child: Row(
-          //       children: <Widget>[
-          //         SizedBox(
-          //           width: 20,
-          //           height: 20,
-          //           child: CustomCheckBox(
-          //             value: _rememberInfo,
-          //             onChanged: (value) {
-          //               setState(() {
-          //                 _rememberInfo = value;
-          //               });
-          //             },
-          //           ),
-          //         ),
-          //         const Expanded(
-          //           child: Padding(
-          //             padding: EdgeInsets.only(left: 10),
-          //             child: Text(
-          //               'Remember password',
-          //               style: TextStyle(
-          //                 fontSize: 14,
-          //                 fontWeight: FontWeight.w400,
-          //               ),
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _rememberInfo = !_rememberInfo;
+                });
+              },
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CustomCheckBox(
+                      value: _rememberInfo,
+                      onChanged: (value) {
+                        setState(() {
+                          _rememberInfo = value;
+                        });
+                      },
+                    ),
+                  ),
+                  const Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        'Remember password',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.only(left: 10, right: 5),
+            padding: const EdgeInsets.only(left: 10),
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
