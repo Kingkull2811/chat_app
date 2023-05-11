@@ -6,7 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../utilities/enum/api_error_result.dart';
+import '../../../../utilities/enum/api_error_result.dart';
 import 'add_student_event.dart';
 import 'add_student_state.dart';
 

@@ -20,6 +20,7 @@ import '../../../utilities/enum/api_error_result.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/animation_loading.dart';
+import '../../../widgets/input_field_with_ontap.dart';
 import '../../../widgets/primary_button.dart';
 import '../../main/main_app.dart';
 import 'fill_profile_event.dart';
@@ -172,8 +173,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
                   _imageAvt(context),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: inputTextWithLabel(
-                      context,
+                    child: InputField(
+                      context: context,
                       controller: _usernameController,
                       readOnly: true,
                       initText: widget.userInfo.username,
@@ -189,8 +190,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: inputTextWithLabel(
-                      context,
+                    child: InputField(
+                      context: context,
                       controller: _nameController,
                       readOnly: false,
                       initText: widget.userInfo.fullName,
@@ -207,8 +208,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: inputTextWithLabel(
-                      context,
+                    child: InputField(
+                      context: context,
                       controller: _emailController,
                       readOnly: true,
                       initText: widget.userInfo.email,
@@ -226,8 +227,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: inputTextWithLabel(
-                      context,
+                    child: InputField(
+                      context: context,
                       controller: _phoneController,
                       readOnly: false,
                       initText: widget.userInfo.phone,

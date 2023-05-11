@@ -1,6 +1,7 @@
-import 'package:chat_app/screens/transcript/add_student/add_student.dart';
-import 'package:chat_app/screens/transcript/add_student/add_student_bloc.dart';
 import 'package:chat_app/screens/transcript/class_management/class_management.dart';
+import 'package:chat_app/screens/transcript/students_management/students_management.dart';
+import 'package:chat_app/screens/transcript/students_management/students_management_bloc.dart';
+import 'package:chat_app/screens/transcript/students_management/students_management_event.dart';
 import 'package:chat_app/screens/transcript/subject_management/subject_management.dart';
 import 'package:chat_app/screens/transcript/subject_management/subject_management_bloc.dart';
 import 'package:chat_app/screens/transcript/subject_management/subject_management_event.dart';
@@ -9,7 +10,6 @@ import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/app_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -139,116 +139,67 @@ class TranscriptPageState extends State<TranscriptPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey.withOpacity(0.2),
-                ),
-                child: InkWell(
-                  overlayColor: const MaterialStatePropertyAll(Colors.white),
-                  borderRadius: BorderRadius.circular(15),
-                  onTap: () {
-                    _navToClassManagement();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Class Management',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.navigate_next,
-                          size: 24,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            _itemManage(
+              title: 'Class Management',
+              onTap: () {
+                _navToClassManagement();
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey.withOpacity(0.2),
-                ),
-                child: InkWell(
-                  overlayColor: const MaterialStatePropertyAll(Colors.white),
-                  borderRadius: BorderRadius.circular(15),
-                  onTap: () {
-                    _navToSubjectManagement();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Subjects Management',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.navigate_next,
-                          size: 24,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            _itemManage(
+              title: 'Subjects Management',
+              onTap: () {
+                _navToSubjectManagement();
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey.withOpacity(0.2),
-                ),
-                child: InkWell(
-                  overlayColor: const MaterialStatePropertyAll(Colors.white),
-                  borderRadius: BorderRadius.circular(15),
-                  onTap: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Students Management',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
-                        Icon(
-                          Icons.navigate_next,
-                          size: 24,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            _itemManage(
+              title: 'Students Management',
+              onTap: () {
+                _navToStudentManagement();
+              },
+            ),
+            _itemManage(
+              title: 'Transcript Management',
+              onTap: () {},
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _itemManage({String? title, Function()? onTap}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.grey.withOpacity(0.2),
+        ),
+        child: InkWell(
+          overlayColor: const MaterialStatePropertyAll(Colors.white),
+          borderRadius: BorderRadius.circular(15),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 6, 24),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title ?? '',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.navigate_next,
+                  size: 24,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -277,12 +228,15 @@ class TranscriptPageState extends State<TranscriptPage> {
         ),
       );
 
-  _navToAddStudent() => Navigator.push(
+  _navToStudentManagement() => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (context) => AddStudentBloc(context),
-            child: const AddStudent(),
+          builder: (context) => BlocProvider<StudentsManagementBloc>(
+            create: (context) => StudentsManagementBloc(context)
+              ..add(
+                InitStudentsEvent(),
+              ),
+            child: const StudentsManagementPage(),
           ),
         ),
       );

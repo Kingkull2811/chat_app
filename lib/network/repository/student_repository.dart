@@ -10,20 +10,15 @@ class StudentRepository {
   Future<Object> getStudentBySSID({required String studentSSID}) async =>
       await _studentProvider.getStudentBySSID(studentSSID: studentSSID);
 
-  Future<Object> addStudent({
-    required String studentName,
-    required int classId,
-    required String dob,
-    required String semesterYear,
-    required String imageUrl,
-  }) async {
-    final data = {
-      "classId": 0,
-      "dateOfBirth": "2023-04-29",
-      "imageUrl": "string",
-      "name": "string",
-      "semesterYear": "string"
-    };
-    return _studentProvider.addStudent(data);
-  }
+  Future<Object> addStudent({required Map<String, dynamic> data}) async =>
+      _studentProvider.addStudent(data: data);
+
+  Future<Object> editStudent({
+    required int studentId,
+    required Map<String, dynamic> data,
+  }) async =>
+      _studentProvider.editStudent(studentId: studentId, data: data);
+
+  Future<Object> deleteStudent({required int studentId}) async =>
+      _studentProvider.deleteStudent(studentId: studentId);
 }

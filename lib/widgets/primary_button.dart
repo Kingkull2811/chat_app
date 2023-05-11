@@ -1,3 +1,4 @@
+import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -7,11 +8,14 @@ class PrimaryButton extends StatelessWidget {
   ///for disable button
   final bool isDisable;
 
+  final bool isWarning;
+
   const PrimaryButton({
     Key? key,
     this.text,
     this.onTap,
     this.isDisable = false,
+    this.isWarning = false,
   }) : super(key: key);
 
   @override
@@ -29,9 +33,12 @@ class PrimaryButton extends StatelessWidget {
                   ? BorderSide(
                       color: Theme.of(context).primaryColor,
                       width: 2,
-                      style: BorderStyle.solid)
+                      style: BorderStyle.solid,
+                    )
                   : BorderSide(
-                      color: Theme.of(context).primaryColor,
+                      color: isWarning
+                          ? AppColors.red700
+                          : Theme.of(context).primaryColor,
                     ),
             ),
           ),
@@ -39,7 +46,12 @@ class PrimaryButton extends StatelessWidget {
             Theme.of(context).primaryColor,
           ),
           backgroundColor: MaterialStatePropertyAll(
-              isDisable ? Colors.transparent : Theme.of(context).primaryColor),
+            isDisable
+                ? Colors.transparent
+                : isWarning
+                    ? AppColors.red700
+                    : Theme.of(context).primaryColor,
+          ),
           foregroundColor: const MaterialStatePropertyAll(Colors.transparent),
           textStyle: const MaterialStatePropertyAll(
             TextStyle(color: Colors.white),

@@ -14,9 +14,9 @@ abstract class AppColors {
   static const cardLight = Color(0xFFF9FAFE);
   static const cardDark = Color(0xFF303334);
 
-  static const primaryColor =  Color.fromARGB(255, 120, 144, 156);
+  static const primaryColor = Color.fromARGB(255, 120, 144, 156);
   static const greyLight = Color(0xffbebebe);
-  static const red700 = Color(0xFFCA0000);
+  static const red700 = Color(0xFFDA4D4D);
   static const grey630 = Color(0xFF737373);
   static const grey130 = Color(0xFFCFD8DC);
   static const green600 = Color(0xFF2AD000);

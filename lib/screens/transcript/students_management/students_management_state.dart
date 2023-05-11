@@ -1,32 +1,32 @@
 import 'package:chat_app/bloc/api_result_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 
-import '../../../network/model/class_model.dart';
+import '../../../network/model/student.dart';
 
-class AddStudentState implements ApiResultState {
+class StudentManagementState implements ApiResultState {
   final bool isLoading;
   final ApiError _apiError;
-  final List<ClassModel>? listClass;
+  final List<Student>? listStudent;
 
-  AddStudentState({
+  StudentManagementState({
     this.isLoading = true,
     ApiError apiError = ApiError.noError,
-    this.listClass,
+    this.listStudent,
   }) : _apiError = apiError;
 
   @override
   ApiError get apiError => _apiError;
 }
 
-extension NewsStateExtension on AddStudentState {
-  AddStudentState copyWith({
+extension StudentManagementStateEx on StudentManagementState {
+  StudentManagementState copyWith({
     ApiError? apiError,
     bool? isLoading,
-    List<ClassModel>? listClass,
+    List<Student>? listStudent,
   }) =>
-      AddStudentState(
+      StudentManagementState(
         isLoading: isLoading ?? this.isLoading,
         apiError: apiError ?? this.apiError,
-        listClass: listClass ?? this.listClass,
+        listStudent: listStudent ?? this.listStudent,
       );
 }

@@ -29,11 +29,11 @@ class Student {
 
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      code: json['code'] as String,
-      dateOfBirth: json['dateOfBirth'] as String,
-      imageUrl: json['imageUrl'] as String,
+      id: json['id'],
+      name: json['name'],
+      code: json['code'],
+      dateOfBirth: json['dateOfBirth'],
+      imageUrl: json['imageUrl'],
       className: json['className'],
       classResponse: isNotNullOrEmpty(json['classResponse'])
           ? ClassModel.fromJson(json['classResponse'])

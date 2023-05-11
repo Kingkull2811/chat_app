@@ -2,10 +2,10 @@ import '../../utilities/utils.dart';
 import '../model/student.dart';
 import 'base_get_response.dart';
 
-class ListStudentResponse extends BaseGetResponse {
+class ListStudentsResponse extends BaseGetResponse {
   final List<Student>? listStudent;
 
-  ListStudentResponse({
+  ListStudentsResponse({
     this.listStudent,
     int? pageNumber,
     int? pageSize,
@@ -20,8 +20,8 @@ class ListStudentResponse extends BaseGetResponse {
           error: error,
         );
 
-  factory ListStudentResponse.fromJson(Map<String, dynamic> json) =>
-      ListStudentResponse(
+  factory ListStudentsResponse.fromJson(Map<String, dynamic> json) =>
+      ListStudentsResponse(
         listStudent: isNullOrEmpty(json['content'])
             ? []
             : List.generate(
