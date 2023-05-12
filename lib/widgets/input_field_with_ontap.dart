@@ -21,6 +21,7 @@ class InputField extends StatelessWidget {
   final int? maxText;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
+  final TextAlign? textAlign;
 
   const InputField({
     Key? key,
@@ -40,6 +41,7 @@ class InputField extends StatelessWidget {
     this.maxText,
     this.keyboardType,
     this.validator,
+    this.textAlign,
   }) : super(key: key);
 
   @override
@@ -50,7 +52,7 @@ class InputField extends StatelessWidget {
       controller: controller,
       validator: validator,
       inputFormatters: [LengthLimitingTextInputFormatter(maxText)],
-      textAlign: TextAlign.start,
+      textAlign: textAlign ?? TextAlign.start,
       textAlignVertical: TextAlignVertical.center,
       textInputAction: inputAction ?? TextInputAction.done,
       onFieldSubmitted: (value) {},

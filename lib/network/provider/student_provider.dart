@@ -2,12 +2,12 @@ import 'dart:developer';
 
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
+import 'package:chat_app/network/response/base_response.dart';
 import 'package:path/path.dart';
 
 import '../api/api_path.dart';
 import '../response/base_get_response.dart';
 import '../response/list_student_response.dart';
-import '../response/student_response.dart';
 
 class StudentProvider with ProviderMixin {
   Future<BaseGetResponse> getListStudent() async {
@@ -47,7 +47,7 @@ class StudentProvider with ProviderMixin {
 
   Future<Object> addStudent({required Map<String, dynamic> data}) async {
     if (await isExpiredToken()) {
-      return ExpiredTokenGetResponse();
+      return ExpiredTokenResponse();
     }
     try {
       final response = await dio.post(
@@ -57,7 +57,7 @@ class StudentProvider with ProviderMixin {
       );
       log(response.toString());
 
-      return StudentResponse.fromJson(response.data);
+      return Student.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorResponse(error, stacktrace, ApiPath.listStudent);
     }
@@ -70,7 +70,7 @@ class StudentProvider with ProviderMixin {
     final apiEditStudent = join(ApiPath.listStudent, studentId.toString());
 
     if (await isExpiredToken()) {
-      return ExpiredTokenGetResponse();
+      return ExpiredTokenResponse();
     }
     try {
       final response = await dio.put(
@@ -80,7 +80,7 @@ class StudentProvider with ProviderMixin {
       );
       log(response.toString());
 
-      return StudentResponse.fromJson(response.data);
+      return Student.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorResponse(error, stacktrace, apiEditStudent);
     }

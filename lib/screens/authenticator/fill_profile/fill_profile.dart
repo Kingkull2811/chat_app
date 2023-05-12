@@ -64,16 +64,21 @@ class _FillProfilePageState extends State<FillProfilePage> {
   bool _isSelectId = false;
   List<Student> listStudent = [];
   Map<int, bool> studentIdSelected = {};
+  bool _isShowAddedIcon = true;
   Map<String, dynamic> studentFirebase = StudentFirebase().toFirestore();
 
   @override
   void initState() {
-    _fillProfileBloc = BlocProvider.of<FillProfileBloc>(context);
-    _fillProfileBloc.add(FillInit());
+    _fillProfileBloc = BlocProvider.of<FillProfileBloc>(context)
+      ..add(FillInit());
     _image = widget.userInfo.fileUrl;
     _searchController.addListener(() {
       _isShowClear = _searchController.text.isNotEmpty;
     });
+    _usernameController.text = widget.userInfo.username ?? '';
+    _nameController.text = widget.userInfo.fullName ?? '';
+    _emailController.text = widget.userInfo.email ?? '';
+    _phoneController.text = widget.userInfo.phone ?? '';
     super.initState();
   }
 
@@ -177,7 +182,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
                       context: context,
                       controller: _usernameController,
                       readOnly: true,
-                      initText: widget.userInfo.username,
                       labelText: 'Username',
                       prefixIcon: Icons.person_outline,
                       validator: (value) {
@@ -194,7 +198,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
                       context: context,
                       controller: _nameController,
                       readOnly: false,
-                      initText: widget.userInfo.fullName,
                       labelText: 'Full name',
                       hintText: 'Enter full name',
                       prefixIcon: Icons.contacts_outlined,
@@ -212,7 +215,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
                       context: context,
                       controller: _emailController,
                       readOnly: true,
-                      initText: widget.userInfo.email,
                       labelText: 'Email',
                       prefixIcon: Icons.email_outlined,
                       validator: (value) {
@@ -231,7 +233,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
                       context: context,
                       controller: _phoneController,
                       readOnly: false,
-                      initText: widget.userInfo.phone,
                       labelText: 'Phone number',
                       hintText: 'Enter phone number',
                       prefixIcon: Icons.phone,
@@ -270,6 +271,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
     if (isNullOrEmpty(_image)) {
       showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
     } else {
+      showLoading(context);
       if (_formKey.currentState!.validate()) {
         List<int?> listStudentIdSelected = listStudent
             .map(
@@ -465,10 +467,11 @@ class _FillProfilePageState extends State<FillProfilePage> {
   }
 
   Widget _itemStudent(Student student) {
-    _isSelectId = studentIdSelected[student.id] ?? false;
+    print('studentIdSelected[student.id : ${studentIdSelected[student.id]}');
+    // _isSelectId = studentIdSelected[student.id] ?? false;
     return InkWell(
       onTap: () {
-        if (_isSelectId) {
+        if (_isShowAddedIcon) {
           listStudent.add(student);
           print(listStudent);
         } else {
@@ -476,7 +479,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
           print('remove: $listStudent');
         }
         setState(() {
-          studentIdSelected[student.id ?? 0] = !_isSelectId;
+          // studentIdSelected[student.id ?? 0] = !_isSelectId;
+          _isShowAddedIcon = !_isShowAddedIcon;
           // _isAdded = !_isAdded;
         });
       },
@@ -591,9 +595,9 @@ class _FillProfilePageState extends State<FillProfilePage> {
             top: 6,
             right: 6,
             child: Icon(
-              _isSelectId == false
-                  ? Icons.check_circle_outline
-                  : Icons.add_circle_outline,
+              _isShowAddedIcon
+                  ? Icons.add_circle_outline
+                  : Icons.check_circle_outline,
               // : Icons.add_circle_outline,
               size: 30,
               color: Theme.of(context).primaryColor,
@@ -623,10 +627,15 @@ class _FillProfilePageState extends State<FillProfilePage> {
           controller: _searchController,
           textCapitalization: TextCapitalization.sentences,
           onChanged: (v) {},
-          onFieldSubmitted: (v) {
-            _fillProfileBloc.add(SearchStudentBySSID(studentSSID: v));
+          onFieldSubmitted: (sSID) {
+            //todo:::check list student had SSID ->> student added
+            // if(listStudent.contains(sSID))
+
+            _fillProfileBloc
+                .add(SearchStudentBySSID(studentSSID: sSID.toUpperCase()));
             setState(() {
-              studentSSID = v;
+              studentSSID = sSID;
+              _isShowAddedIcon = true;
             });
           },
           maxLines: 1,

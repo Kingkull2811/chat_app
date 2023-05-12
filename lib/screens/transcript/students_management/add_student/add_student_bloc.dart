@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:chat_app/network/repository/class_repository.dart';
+import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/class_response.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
             isAddSuccess: true,
             message: 'Add new student success',
           ));
-        } else if (response is ExpiredTokenGetResponse) {
+        } else if (response is ExpiredTokenResponse) {
           Navigator.pop(this.context);
           logoutIfNeed(this.context);
         } else {

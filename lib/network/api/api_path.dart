@@ -1,6 +1,6 @@
 class ApiPath {
   static const String apiDomain = 'http://192.168.1.26:8080';
-  static const String apiDomainMac = 'http://10.10.150.104:8080';
+  static const String apiDomainMac = 'http://10.10.150.54:8080';
 
   //change [useMac] - false: ip window
   //                - true: ip mac

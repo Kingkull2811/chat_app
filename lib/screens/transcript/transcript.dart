@@ -6,6 +6,9 @@ import 'package:chat_app/screens/transcript/subject_management/subject_managemen
 import 'package:chat_app/screens/transcript/subject_management/subject_management_bloc.dart';
 import 'package:chat_app/screens/transcript/subject_management/subject_management_event.dart';
 import 'package:chat_app/screens/transcript/transcript_bloc.dart';
+import 'package:chat_app/screens/transcript/transcript_management/transcript_management.dart';
+import 'package:chat_app/screens/transcript/transcript_management/transcript_management_bloc.dart';
+import 'package:chat_app/screens/transcript/transcript_management/transcript_management_event.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -159,7 +162,9 @@ class TranscriptPageState extends State<TranscriptPage> {
             ),
             _itemManage(
               title: 'Transcript Management',
-              onTap: () {},
+              onTap: () {
+                _navToTranscriptManagement();
+              },
             ),
           ],
         ),
@@ -237,6 +242,18 @@ class TranscriptPageState extends State<TranscriptPage> {
                 InitStudentsEvent(),
               ),
             child: const StudentsManagementPage(),
+          ),
+        ),
+      );
+  _navToTranscriptManagement() => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<TranscriptManagementBloc>(
+            create: (context) => TranscriptManagementBloc(context)
+              ..add(
+                InitTranscriptEvent(),
+              ),
+            child: const TranscriptManagementPage(),
           ),
         ),
       );

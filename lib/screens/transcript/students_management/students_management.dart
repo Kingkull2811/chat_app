@@ -321,7 +321,11 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
         ),
       );
 
-  String formatDate(String value) {
-    return DateFormat('dd-MM-yyyy').format(DateTime.tryParse(value)!);
+  String formatDate(String? value) {
+    final DateTime? dateTime = DateTime.tryParse(value ?? '');
+    if (isNullOrEmpty(dateTime)) {
+      return '';
+    }
+    return DateFormat('dd-MM-yyyy').format(dateTime!);
   }
 }

@@ -14,6 +14,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../network/model/class_model.dart';
+import '../../../../network/repository/student_repository.dart';
+import '../../../../network/response/base_response.dart';
 import '../../../../utilities/enum/api_error_result.dart';
 import '../../../../utilities/utils.dart';
 import '../../../../widgets/animation_loading.dart';
@@ -63,6 +65,8 @@ class _AddStudentState extends State<AddStudent> {
   }
 
   late AddStudentBloc _studentBloc;
+
+  final _studentRepository = StudentRepository();
 
   @override
   void initState() {
@@ -196,7 +200,7 @@ class _AddStudentState extends State<AddStudent> {
                       if (widget.isEdit && (value == null || value.isEmpty)) {
                         return 'SSID can\'t be empty';
                       } else if (widget.isEdit &&
-                          !RegExp(r'^SSID\d{4}$')
+                          !RegExp(r'^SSID\d{3}$')
                               .hasMatch(value!.toUpperCase())) {
                         return 'Please enter SSID like SSID**** with * is the number';
                       }
@@ -387,7 +391,7 @@ class _AddStudentState extends State<AddStudent> {
                                   } else {
                                     if (_formKey.currentState!.validate()) {
                                       showLoading(context);
-                                      await _buttonUpdate();
+                                      await _buttonUpdate(context);
                                     }
                                   }
                                 },
@@ -404,7 +408,7 @@ class _AddStudentState extends State<AddStudent> {
                             } else {
                               if (_formKey.currentState!.validate()) {
                                 showLoading(context);
-                                await _buttonAdd();
+                                await _buttonAdd(context);
                               }
                             }
                           },
@@ -418,7 +422,7 @@ class _AddStudentState extends State<AddStudent> {
     );
   }
 
-  Future<void> _buttonAdd() async {
+  Future<void> _buttonAdd(BuildContext context) async {
     final Map<String, dynamic> data = {
       "classId": _classId,
       "dateOfBirth": _calendarController.text.trim(),
@@ -431,10 +435,32 @@ class _AddStudentState extends State<AddStudent> {
       "name": _nameController.text.trim(),
       "semesterYear": _yearController.text.trim()
     };
-    _studentBloc.add(AddStudentsEvent(data: data));
+    // _studentBloc.add(AddStudentsEvent(data: data));
+    final response = await _studentRepository.addStudent(data: data);
+    if (response is Student) {
+      await showCupertinoMessageDialog(this.context, 'Add new student success',
+          onCloseDialog: () {
+        setState(() {
+          _nameController.clear();
+          _calendarController.clear();
+          _classController.clear();
+          _yearController.clear();
+          imagePath = '';
+          _classId = null;
+        });
+        Navigator.pop(context);
+      });
+    } else if (response is ExpiredTokenResponse) {
+      logoutIfNeed(this.context);
+    } else {
+      showCupertinoMessageDialog(
+        this.context,
+        'Add student failed',
+      );
+    }
   }
 
-  Future<void> _buttonUpdate() async {
+  Future<void> _buttonUpdate(BuildContext context) async {
     if (widget.student?.id == null) {
       showCupertinoMessageDialog(
         context,
@@ -455,10 +481,29 @@ class _AddStudentState extends State<AddStudent> {
       "name": _nameController.text.trim(),
       "semesterYear": _yearController.text.trim()
     };
-    _studentBloc.add(EditStudentsEvent(
-      studentID: (widget.student?.id)!,
+    // _studentBloc.add(EditStudentsEvent(
+    //   studentID: (widget.student?.id)!,
+    //   data: data,
+    // ));
+    final response = await _studentRepository.editStudent(
+      studentId: (widget.student?.id)!,
       data: data,
-    ));
+    );
+
+    if (response is Student) {
+      showCupertinoMessageDialog(
+        this.context,
+        'Update student success',
+        onCloseDialog: () {
+          Navigator.pop(context);
+          Navigator.of(context).pop(true);
+        },
+      );
+    } else if (response is ExpiredTokenResponse) {
+      logoutIfNeed(this.context);
+    } else {
+      showCupertinoMessageDialog(this.context, 'Update student failed');
+    }
   }
 
   Widget _listSchoolYear(List<String> listSchoolYear) {
