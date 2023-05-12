@@ -7,8 +7,30 @@ abstract class AddStudentEvent extends Equatable {
 
 class InitialEvent extends AddStudentEvent {}
 
-class StudentAdd extends AddStudentEvent {}
+class AddStudentsEvent extends AddStudentEvent {
+  final Map<String, dynamic> data;
 
-class AddSuccess extends AddStudentEvent {}
+  AddStudentsEvent({required this.data});
 
-class AddFailure extends AddStudentEvent {}
+  @override
+  List<Object?> get props => [data];
+}
+
+class EditStudentsEvent extends AddStudentEvent {
+  final int studentID;
+  final Map<String, dynamic> data;
+
+  EditStudentsEvent({required this.studentID, required this.data});
+
+  @override
+  List<Object?> get props => [studentID, data];
+}
+
+class DeleteStudentsEvent extends AddStudentEvent {
+  final int studentID;
+
+  DeleteStudentsEvent(this.studentID);
+
+  @override
+  List<Object?> get props => [studentID];
+}

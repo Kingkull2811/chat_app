@@ -83,7 +83,7 @@ class _ClassManagementState extends State<ClassManagement> {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
             child: Text(
-              'List subject:',
+              'List class:',
               style: TextStyle(
                 fontSize: 20,
                 color: Theme.of(context).primaryColor,

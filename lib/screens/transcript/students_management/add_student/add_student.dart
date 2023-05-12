@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:chat_app/network/model/student.dart';
+import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/app_image.dart';
@@ -35,7 +38,7 @@ class _AddStudentState extends State<AddStudent> {
   final _nameController = TextEditingController();
   final _calendarController = TextEditingController();
   final _classController = TextEditingController();
-  final _semesterYearController = TextEditingController();
+  final _yearController = TextEditingController();
 
   bool _showClass = false;
   bool _showYear = false;
@@ -52,17 +55,19 @@ class _AddStudentState extends State<AddStudent> {
       _nameController.text = widget.student?.name ?? '';
       _calendarController.text = widget.student?.dateOfBirth ?? '';
       _classController.text = widget.student?.className ?? '';
-      _semesterYearController.text =
-          widget.student?.classResponse?.schoolYear ?? '';
+      _yearController.text = widget.student?.classResponse?.schoolYear ?? '';
       imagePath = widget.student?.imageUrl;
       _classId = widget.student?.classResponse?.classId;
       _isOnline = widget.isEdit ? true : false;
     });
   }
 
+  late AddStudentBloc _studentBloc;
+
   @override
   void initState() {
-    BlocProvider.of<AddStudentBloc>(context).add(InitialEvent());
+    _studentBloc = BlocProvider.of<AddStudentBloc>(context)
+      ..add(InitialEvent());
     initEdit();
     super.initState();
   }
@@ -73,7 +78,8 @@ class _AddStudentState extends State<AddStudent> {
     _nameController.dispose();
     _calendarController.dispose();
     _classController.dispose();
-    _semesterYearController.dispose();
+    _yearController.dispose();
+    _studentBloc.close();
     super.dispose();
   }
 
@@ -93,6 +99,30 @@ class _AddStudentState extends State<AddStudent> {
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
+        }
+        if (curState.isAddSuccess) {
+          showCupertinoMessageDialog(
+            context,
+            curState.message,
+            onCloseDialog: () {
+              Navigator.pop(context);
+              _navToStudentManagement();
+            },
+          );
+        } else {
+          showCupertinoMessageDialog(context, curState.message);
+        }
+        if (curState.isEditSuccess) {
+          showCupertinoMessageDialog(
+            context,
+            curState.message,
+            onCloseDialog: () {
+              Navigator.pop(context);
+              _navToStudentManagement();
+            },
+          );
+        } else {
+          showCupertinoMessageDialog(context, curState.message);
         }
       },
       builder: (context, curState) {
@@ -135,6 +165,11 @@ class _AddStudentState extends State<AddStudent> {
     );
   }
 
+  _navToStudentManagement() {
+    Navigator.pop(context);
+    Navigator.of(context).pop(true);
+  }
+
   Widget _body(BuildContext context, AddStudentState state) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
@@ -147,26 +182,28 @@ class _AddStudentState extends State<AddStudent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: InputField(
-                  context: context,
-                  controller: _codeController,
-                  inputAction: TextInputAction.next,
-                  prefixIcon: Icons.badge_outlined,
-                  labelText: 'Student SSID',
-                  hintText: 'Enter student SSID',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'SSID can\'t be empty';
-                    } else if (!RegExp(r'^SSID\d{4}$')
-                        .hasMatch(value.toUpperCase())) {
-                      return 'Please enter SSID like SSID**** with * is the number';
-                    }
-                    return null;
-                  },
+              if (widget.isEdit)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: InputField(
+                    context: context,
+                    controller: _codeController,
+                    inputAction: TextInputAction.next,
+                    prefixIcon: Icons.badge_outlined,
+                    labelText: 'Student SSID',
+                    hintText: 'Enter student SSID',
+                    validator: (value) {
+                      if (widget.isEdit && (value == null || value.isEmpty)) {
+                        return 'SSID can\'t be empty';
+                      } else if (widget.isEdit &&
+                          !RegExp(r'^SSID\d{4}$')
+                              .hasMatch(value!.toUpperCase())) {
+                        return 'Please enter SSID like SSID**** with * is the number';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: InputField(
@@ -207,7 +244,9 @@ class _AddStudentState extends State<AddStudent> {
                               DateFormat('yyyy-MM-dd', 'en').format(date);
                         });
                       },
-                      currentTime: DateTime.now(),
+                      currentTime:
+                          DateTime.tryParse(_calendarController.text) ??
+                              DateTime.now(),
                       locale: LocaleType.en,
                     );
                   },
@@ -221,59 +260,80 @@ class _AddStudentState extends State<AddStudent> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: InputField(
-                  context: context,
-                  readOnly: true,
-                  controller: _classController,
-                  inputAction: TextInputAction.next,
-                  iconPath: 'assets/images/ic_presentation.png',
-                  labelText: 'Class',
-                  hintText: 'Select Class',
-                  showSuffix: true,
-                  isShow: _showClass,
-                  onTap: () {
-                    setState(() {
-                      _showClass = !_showClass;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select class';
-                    }
-                    return null;
-                  },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey.withOpacity(0.1),
+                  ),
+                  child: Column(
+                    children: [
+                      InputField(
+                        context: context,
+                        readOnly: true,
+                        controller: _classController,
+                        inputAction: TextInputAction.next,
+                        iconPath: 'assets/images/ic_presentation.png',
+                        labelText: 'Class',
+                        hintText: 'Select Class',
+                        showSuffix: true,
+                        isShow: _showClass,
+                        onTap: () {
+                          setState(() {
+                            _showClass = !_showClass;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select class';
+                          }
+                          return null;
+                        },
+                      ),
+                      if (_showClass) _listItemClass(state.listClass),
+                    ],
+                  ),
                 ),
               ),
-              if (_showClass) _listItemClass(state.listClass),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: InputField(
-                  context: context,
-                  readOnly: true,
-                  controller: _semesterYearController,
-                  inputAction: TextInputAction.next,
-                  // icon: Icons.badge_outlined,
-                  iconPath: 'assets/images/ic_semester.png',
-                  labelText: 'Semester',
-                  hintText: 'Select Semester',
-                  showSuffix: true,
-                  isShow: _showYear,
-                  onTap: () {
-                    setState(() {
-                      _showYear = !_showYear;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select semester year';
-                    }
-                    return null;
-                  },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey.withOpacity(0.1),
+                  ),
+                  child: Column(
+                    children: [
+                      InputField(
+                        context: context,
+                        readOnly: true,
+                        controller: _yearController,
+                        inputAction: TextInputAction.next,
+                        // icon: Icons.badge_outlined,
+                        iconPath: 'assets/images/ic_semester.png',
+                        labelText: 'School Year',
+                        hintText: 'Select School Year',
+                        showSuffix: true,
+                        isShow: _showYear,
+                        onTap: () {
+                          setState(() {
+                            _showYear = !_showYear;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select school year';
+                          }
+                          return null;
+                        },
+                      ),
+                      if (_showYear)
+                        _listSchoolYear(AppConstants.listSchoolYear),
+                    ],
+                  ),
                 ),
               ),
-              if (_showYear) _listSemesterYear(AppConstants.listSemesterYear),
               Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
                   'Student Image',
                   style: TextStyle(
@@ -297,7 +357,23 @@ class _AddStudentState extends State<AddStudent> {
                               child: PrimaryButton(
                                 isWarning: true,
                                 text: 'Delete',
-                                onTap: () async {},
+                                onTap: () async {
+                                  showMessageTwoOption(context,
+                                      'Do you want to delete this student?',
+                                      okLabel: 'Delete', onOk: () {
+                                    if (widget.student?.id == null) {
+                                      showCupertinoMessageDialog(
+                                        context,
+                                        'Error',
+                                        content: 'Student not found',
+                                      );
+                                    }
+                                    _studentBloc.add(DeleteStudentsEvent(
+                                      (widget.student?.id)!,
+                                    ));
+                                    Navigator.of(context).pop(true);
+                                  });
+                                },
                               ),
                             ),
                             SizedBox(
@@ -310,6 +386,7 @@ class _AddStudentState extends State<AddStudent> {
                                         context, 'Please add student image');
                                   } else {
                                     if (_formKey.currentState!.validate()) {
+                                      showLoading(context);
                                       await _buttonUpdate();
                                     }
                                   }
@@ -326,6 +403,7 @@ class _AddStudentState extends State<AddStudent> {
                                   context, 'Please add student image');
                             } else {
                               if (_formKey.currentState!.validate()) {
+                                showLoading(context);
                                 await _buttonAdd();
                               }
                             }
@@ -341,55 +419,67 @@ class _AddStudentState extends State<AddStudent> {
   }
 
   Future<void> _buttonAdd() async {
-    //todo::
-    print('add student');
-    // final response = StudentRepository().addStudent(
-    //   studentName: _nameController.text.trim(),
-    //   classId: _classId!,
-    //   dob: _calendarController.text.trim(),
-    //   semesterYear: _semesterYearController.text.trim(),
-    //   imageUrl: await FirebaseService().uploadImageToStorage(
-    //       titleName: 'image_news', image: File(imagePath!)),
-    // );
+    final Map<String, dynamic> data = {
+      "classId": _classId,
+      "dateOfBirth": _calendarController.text.trim(),
+      "imageUrl": _isOnline
+          ? imagePath
+          : await FirebaseService().uploadImageToStorage(
+              titleName: 'student_image',
+              image: File(imagePath!),
+            ),
+      "name": _nameController.text.trim(),
+      "semesterYear": _yearController.text.trim()
+    };
+    _studentBloc.add(AddStudentsEvent(data: data));
   }
 
   Future<void> _buttonUpdate() async {
-    //todo::
-    print('add student');
-    // final response = StudentRepository().addStudent(
-    //   studentName: _nameController.text.trim(),
-    //   classId: _classId!,
-    //   dob: _calendarController.text.trim(),
-    //   semesterYear: _semesterYearController.text.trim(),
-    //   imageUrl: await FirebaseService().uploadImageToStorage(
-    //       titleName: 'image_news', image: File(imagePath!)),
-    // );
+    if (widget.student?.id == null) {
+      showCupertinoMessageDialog(
+        context,
+        'Error',
+        content: 'Student not found',
+      );
+    }
+    final Map<String, dynamic> data = {
+      "classId": _classId,
+      "code": _codeController.text.trim().toUpperCase(),
+      "dateOfBirth": _calendarController.text.trim(),
+      "imageUrl": _isOnline
+          ? imagePath
+          : await FirebaseService().uploadImageToStorage(
+              titleName: 'student_image',
+              image: File(imagePath!),
+            ),
+      "name": _nameController.text.trim(),
+      "semesterYear": _yearController.text.trim()
+    };
+    _studentBloc.add(EditStudentsEvent(
+      studentID: (widget.student?.id)!,
+      data: data,
+    ));
   }
 
-  Widget _listSemesterYear(List<String> listSemesterYear) {
-    return Container(
-      height: 40 * listSemesterYear.length.toDouble(),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.grey.withOpacity(0.1),
-      ),
-      child: isNotNullOrEmpty(listSemesterYear)
+  Widget _listSchoolYear(List<String> listSchoolYear) {
+    return SizedBox(
+      height: 40 * listSchoolYear.length.toDouble(),
+      child: isNotNullOrEmpty(listSchoolYear)
           ? ListView.builder(
-              itemCount: listSemesterYear.length,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: listSchoolYear.length,
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
                     setState(() {
-                      // _showYear = !_showYear;
-                      _semesterYearController.text = listSemesterYear[index];
+                      _yearController.text = listSchoolYear[index];
                     });
                   },
                   child: Container(
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: (_semesterYearController.text ==
-                              listSemesterYear[index])
+                      color: (_yearController.text == listSchoolYear[index])
                           ? Colors.grey.withOpacity(0.25)
                           : null,
                     ),
@@ -400,15 +490,14 @@ class _AddStudentState extends State<AddStudent> {
                         children: [
                           Expanded(
                             child: Text(
-                              listSemesterYear[index],
+                              listSchoolYear[index],
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black,
                               ),
                             ),
                           ),
-                          if (_semesterYearController.text ==
-                              listSemesterYear[index])
+                          if (_yearController.text == listSchoolYear[index])
                             const Padding(
                               padding: EdgeInsets.only(left: 10),
                               child: Icon(
@@ -438,14 +527,11 @@ class _AddStudentState extends State<AddStudent> {
   }
 
   Widget _listItemClass(List<ClassModel>? listClass) {
-    return Container(
+    return SizedBox(
       height: 40 * (listClass?.length.toDouble() ?? 0 + 1),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Colors.grey.withOpacity(0.1),
-      ),
       child: isNotNullOrEmpty(listClass)
           ? ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: listClass!.length,
               itemBuilder: (context, index) {
                 return InkWell(

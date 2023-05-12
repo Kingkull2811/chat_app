@@ -312,9 +312,9 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
               color: Colors.white,
             ),
           ),
-          title: const Text(
-            'Add new subject',
-            style: TextStyle(
+          title: Text(
+            isEdit ? 'Edit subject' : 'Add new subject',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -327,18 +327,19 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 0),
-                child: _inputText(
-                  context,
-                  controller: _subjectCodeController,
-                  inputAction: TextInputAction.done,
-                  labelText: 'Subject Code',
-                  initText: isEdit ? '${subjectData?.code}' : '',
+              if (isEdit)
+                Padding(
+                  padding: const EdgeInsets.only(top: 0),
+                  child: _inputText(
+                    context,
+                    controller: _subjectCodeController,
+                    inputAction: TextInputAction.done,
+                    labelText: 'Subject Code',
+                    initText: isEdit ? '${subjectData?.code}' : '',
+                  ),
                 ),
-              ),
               Padding(
-                padding: const EdgeInsets.only(top: 16),
+                padding: EdgeInsets.only(top: isEdit ? 16 : 32),
                 child: _inputText(
                   context,
                   controller: _subjectNameController,
@@ -350,9 +351,9 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 32),
                 child: PrimaryButton(
-                  text: 'Save',
+                  text: isEdit ? 'Update' : 'Save',
                   onTap: () {
-                    if (_subjectCodeController.text.isEmpty) {
+                    if (_subjectCodeController.text.isEmpty && isEdit) {
                       showCupertinoMessageDialog(
                           context, 'Subject Code can\'t be empty');
                     } else if (_subjectNameController.text.isEmpty) {

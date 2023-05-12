@@ -146,36 +146,43 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
       ),
       body: isNullOrEmpty(listStudent)
           ? const DataNotFoundPage(title: 'Students data not found')
-          : ListView.builder(
-              scrollDirection: Axis.vertical,
-              physics: const BouncingScrollPhysics(),
-              itemCount: listStudent!.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-                    child: Text(
-                      'List student:',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  );
-                }
-                return _createItemStudent(context, listStudent[index - 1]);
+          : RefreshIndicator(
+              onRefresh: () async {
+                _subjectBloc.add(InitStudentsEvent());
+                // setState(() {});
               },
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                physics: const BouncingScrollPhysics(),
+                itemCount: listStudent!.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+                      child: Text(
+                        'List student:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    );
+                  }
+                  return _createItemStudent(context, listStudent[index - 1]);
+                },
+              ),
             ),
     );
   }
 
   Widget _createItemStudent(BuildContext context, Student student) {
-    return InkWell(
-      onTap: () {
-        _navToAddStudent(isEdit: true, student: student);
-      },
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () {
+          _navToAddStudent(isEdit: true, student: student);
+        },
         child: Container(
           height: 190,
           decoration: BoxDecoration(
@@ -198,14 +205,17 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.grey.withOpacity(0.1),
                   ),
-                  child: AppImage(
-                    isOnline: true,
-                    localPathOrUrl: student.imageUrl,
-                    boxFit: BoxFit.cover,
-                    errorWidget: Icon(
-                      Icons.person,
-                      size: 70,
-                      color: Colors.grey.withOpacity(0.3),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: AppImage(
+                      isOnline: true,
+                      localPathOrUrl: student.imageUrl,
+                      boxFit: BoxFit.cover,
+                      errorWidget: Icon(
+                        Icons.person,
+                        size: 70,
+                        color: Colors.grey.withOpacity(0.3),
+                      ),
                     ),
                   ),
                 ),

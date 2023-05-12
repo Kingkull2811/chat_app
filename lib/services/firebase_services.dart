@@ -46,7 +46,7 @@ class FirebaseService {
     required File image,
   }) async {
     try {
-      String fileName = '${titleName}_${DateTime.now().microsecondsSinceEpoch}';
+      String fileName = '${titleName}_${DateTime.now().toIso8601String()}';
       Reference reference =
           _firebaseStorage.ref().child('images').child('/$fileName');
       UploadTask uploadTask = reference.putFile(image);

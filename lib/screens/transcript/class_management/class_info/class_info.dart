@@ -14,6 +14,7 @@ import '../../../../utilities/app_constants.dart';
 import '../../../../utilities/enum/api_error_result.dart';
 import '../../../../utilities/screen_utilities.dart';
 import '../../../../utilities/utils.dart';
+import '../../../../widgets/input_field_with_ontap.dart';
 
 class ClassInfoPage extends StatefulWidget {
   final bool isEdit;
@@ -39,6 +40,8 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
   bool _showListYear = false;
 
   late ClassInfoBloc _cLassInfoBloc;
+
+  final _formKey = GlobalKey<FormState>();
 
   void initEdit() {
     setState(() {
@@ -143,59 +146,78 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 0),
-              child: _inputText(
-                context,
-                controller: _codeController,
-                inputAction: TextInputAction.done,
-                labelText: 'Class Code',
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: _inputText(
-                context,
-                controller: _nameController,
-                inputAction: TextInputAction.done,
-                labelText: 'Class Name',
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey.withOpacity(0.1),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (widget.isEdit)
+                Padding(
+                  padding: const EdgeInsets.only(top: 0),
+                  child: _inputText(
+                    context,
+                    controller: _codeController,
+                    inputAction: TextInputAction.done,
+                    labelText: 'Class Code',
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    _inputText(context,
-                        readOnly: true,
+              Padding(
+                padding: EdgeInsets.only(top: widget.isEdit ? 16 : 0),
+                child: InputField(
+                  context: context,
+                  controller: _nameController,
+                  inputAction: TextInputAction.done,
+                  labelText: 'Class Name',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter class name';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey.withOpacity(0.1),
+                  ),
+                  child: Column(
+                    children: [
+                      InputField(
+                        context: context,
+                        labelText: 'Select year',
                         controller: _yearController,
                         inputAction: TextInputAction.done,
-                        showSuffixIcon: true,
-                        showListBelow: _showListYear,
-                        labelText: 'Select year', onTap: () {
-                      setState(() {
-                        _showListYear = !_showListYear;
-                      });
-                    }),
-                    if (_showListYear)
-                      _listSemesterYear(AppConstants.listSchoolYear),
-                  ],
+                        readOnly: true,
+                        showSuffix: true,
+                        isShow: _showListYear,
+                        onTap: () {
+                          setState(() {
+                            _showListYear = !_showListYear;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select school year';
+                          }
+                          return null;
+                        },
+                      ),
+                      if (_showListYear)
+                        _listSemesterYear(AppConstants.listSchoolYear),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _listSubject(listSubject),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-              child: widget.isEdit ? _buttonUpdate() : _buttonSave(),
-            ),
-          ],
+              _listSubject(listSubject),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+                child: widget.isEdit ? _buttonUpdate() : _buttonSave(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -208,17 +230,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
         if (_codeController.text.isEmpty) {
           showCupertinoMessageDialog(
             context,
-            'Class code can\'t not be empty',
-          );
-        } else if (_nameController.text.isEmpty) {
-          showCupertinoMessageDialog(
-            context,
-            'Class name can\'t not be empty',
-          );
-        } else if (_yearController.text.isEmpty) {
-          showCupertinoMessageDialog(
-            context,
-            'Please select school year',
+            'Please enter class code',
           );
         } else if (listSubjectSelected.isEmpty) {
           showCupertinoMessageDialog(
@@ -226,20 +238,22 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
             'Please select the subject for class',
           );
         } else {
-          final Map<String, dynamic> data = {
-            "code": _codeController.text.trim(),
-            "name": _nameController.text.trim(),
-            "subjectIds": listSubjectSelected,
-            "year": _yearController.text.trim()
-          };
-          if (widget.classInfoEdit?.classId == null) {
-            showCupertinoMessageDialog(context, 'Class not found');
+          if (_formKey.currentState!.validate()) {
+            if (widget.classInfoEdit?.classId == null) {
+              showCupertinoMessageDialog(context, 'Class not found');
+            }
+            final Map<String, dynamic> data = {
+              "code": _codeController.text.trim(),
+              "name": _nameController.text.trim(),
+              "subjectIds": listSubjectSelected,
+              "year": _yearController.text.trim()
+            };
+            _cLassInfoBloc.add(EditClassEvent(
+              classId: (widget.classInfoEdit?.classId)!,
+              data: data,
+            ));
+            // setState(() {});
           }
-          _cLassInfoBloc.add(EditClassEvent(
-            classId: (widget.classInfoEdit?.classId)!,
-            data: data,
-          ));
-          // setState(() {});
         }
       },
     );
@@ -249,35 +263,22 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
     return PrimaryButton(
       text: 'Save',
       onTap: () async {
-        if (_codeController.text.isEmpty) {
-          showCupertinoMessageDialog(
-            context,
-            'Class code can\'t not be empty',
-          );
-        } else if (_nameController.text.isEmpty) {
-          showCupertinoMessageDialog(
-            context,
-            'Class name can\'t not be empty',
-          );
-        } else if (_yearController.text.isEmpty) {
-          showCupertinoMessageDialog(
-            context,
-            'Please select school year',
-          );
-        } else if (listSubjectSelected.isEmpty) {
+        if (listSubjectSelected.isEmpty) {
           showCupertinoMessageDialog(
             context,
             'Please select the subject for class',
           );
         } else {
-          final Map<String, dynamic> data = {
-            "code": _codeController.text.trim(),
-            "name": _nameController.text.trim(),
-            "subjectIds": listSubjectSelected,
-            "year": _yearController.text.trim()
-          };
-          _cLassInfoBloc.add(AddClassEvent(data: data));
-          // setState(() {});
+          if (_formKey.currentState!.validate()) {
+            final Map<String, dynamic> data = {
+              // "code": _codeController.text.trim(),
+              "name": _nameController.text.trim(),
+              "subjectIds": listSubjectSelected,
+              "year": _yearController.text.trim()
+            };
+            _cLassInfoBloc.add(AddClassEvent(data: data));
+            // setState(() {});
+          }
         }
       },
     );
