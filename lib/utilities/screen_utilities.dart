@@ -5,13 +5,13 @@ import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:local_auth_android/types/auth_messages_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
 import '../widgets/message_dialog.dart';
 import '../widgets/primary_button.dart';
+import '../widgets/text_edit_dialog_widget.dart';
 
 void showBlankPage(BuildContext context) {
   showDialog(
@@ -28,6 +28,7 @@ void showLoading(BuildContext context) {
       context: context,
       builder: (BuildContext context) {
         return Scaffold(
+          backgroundColor: Colors.transparent,
           body: Center(
             child: CircularProgressIndicator(
               valueColor:
@@ -299,6 +300,19 @@ Future<void> showSuccessBottomSheet(
     ),
   );
 }
+
+Future<T?> showTextDialog<T>(
+  BuildContext context, {
+  required String title,
+  required String value,
+}) =>
+    showDialog<T>(
+      context: context,
+      builder: (context) => TextDialogWidget(
+        title: title,
+        value: value,
+      ),
+    );
 
 Future<String?> pickImage(BuildContext context) async {
   String? imagePath;

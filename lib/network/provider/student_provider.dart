@@ -10,16 +10,18 @@ import '../response/base_get_response.dart';
 import '../response/list_student_response.dart';
 
 class StudentProvider with ProviderMixin {
-  Future<BaseGetResponse> getListStudent() async {
+  Future<BaseGetResponse> getListStudent({
+    required Map<String, dynamic> queryParameters,
+  }) async {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
     try {
       final response = await dio.get(
         ApiPath.listStudent,
+        queryParameters: queryParameters,
         options: await defaultOptions(url: ApiPath.listStudent),
       );
-      log(response.toString());
 
       return ListStudentsResponse.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -37,7 +39,6 @@ class StudentProvider with ProviderMixin {
         queryParameters: {'code': studentSSID},
         options: await defaultOptions(url: ApiPath.getStudentInfo),
       );
-      log(response.toString());
 
       return Student.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -55,7 +56,6 @@ class StudentProvider with ProviderMixin {
         data: data,
         options: await defaultOptions(url: ApiPath.listStudent),
       );
-      log(response.toString());
 
       return Student.fromJson(response.data);
     } catch (error, stacktrace) {

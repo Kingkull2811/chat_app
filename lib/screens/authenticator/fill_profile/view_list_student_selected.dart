@@ -89,14 +89,17 @@ class _ViewListStudentSelectedState extends State<ViewListStudentSelected> {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.white,
                     ),
-                    child: AppImage(
-                      isOnline: true,
-                      localPathOrUrl: student.imageUrl,
-                      boxFit: BoxFit.cover,
-                      errorWidget: Icon(
-                        Icons.person,
-                        size: 70,
-                        color: Colors.grey.withOpacity(0.3),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: AppImage(
+                        isOnline: true,
+                        localPathOrUrl: student.imageUrl,
+                        boxFit: BoxFit.cover,
+                        errorWidget: Icon(
+                          Icons.person,
+                          size: 70,
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
                       ),
                     ),
                   ),

@@ -6,7 +6,6 @@ import 'package:chat_app/widgets/data_not_found.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../utilities/enum/api_error_result.dart';
 import '../../../utilities/screen_utilities.dart';
@@ -320,12 +319,4 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
           ),
         ),
       );
-
-  String formatDate(String? value) {
-    final DateTime? dateTime = DateTime.tryParse(value ?? '');
-    if (isNullOrEmpty(dateTime)) {
-      return '';
-    }
-    return DateFormat('dd-MM-yyyy').format(dateTime!);
-  }
 }

@@ -4,8 +4,10 @@ import 'package:chat_app/network/response/base_get_response.dart';
 class StudentRepository {
   final _studentProvider = StudentProvider();
 
-  Future<BaseGetResponse> getListStudent() async =>
-      await _studentProvider.getListStudent();
+  Future<BaseGetResponse> getListStudent({
+    required Map<String, dynamic> queryParameters,
+  }) async =>
+      await _studentProvider.getListStudent(queryParameters: queryParameters);
 
   Future<Object> getStudentBySSID({required String studentSSID}) async =>
       await _studentProvider.getStudentBySSID(studentSSID: studentSSID);

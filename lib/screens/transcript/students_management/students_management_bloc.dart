@@ -29,7 +29,14 @@ class StudentsManagementBloc
             apiError: ApiError.noInternetConnection,
           ));
         } else {
-          final response = await _studentRepository.getListStudent();
+          final Map<String, dynamic> queryParameters = {
+            'search': '',
+            // 'classId': 0,
+            // 'semesterYear': '2023-2024'
+          };
+          final response = await _studentRepository.getListStudent(
+            queryParameters: queryParameters,
+          );
           if (response is ListStudentsResponse) {
             emit(state.copyWith(
               isLoading: false,

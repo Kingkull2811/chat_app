@@ -34,4 +34,9 @@ class ListStudentsResponse extends BaseGetResponse {
         status: json['status'],
         error: json['error'],
       );
+
+  @override
+  String toString() {
+    return 'ListStudentsResponse{listStudent: $listStudent}';
+  }
 }

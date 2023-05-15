@@ -17,18 +17,6 @@ String getBiometricsButtonPath({
   return 'assets/images/ic_face_touch_id.png';
 }
 
-///use for validate confirm set new password
-// Minimum 1 Upper case
-// Minimum 1 lowercase
-// Minimum 1 Numeric Number
-// Minimum 1 Special Character
-// Common Allow Character ( ! @ # $ & * ~ )
-// bool validateStructure(String value) {
-//   RegExp regExp =
-//       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$');
-//   return regExp.hasMatch(value);
-// }
-
 bool isNotNullOrEmpty(dynamic obj) => !isNullOrEmpty(obj);
 
 /// For String, List, Map
@@ -140,4 +128,12 @@ int setMessageType(MessageType? type) {
   } else {
     return 3;
   }
+}
+
+String formatDate(String? value) {
+  final DateTime? dateTime = DateTime.tryParse(value ?? '');
+  if (isNullOrEmpty(dateTime)) {
+    return '';
+  }
+  return DateFormat('dd-MM-yyyy').format(dateTime!);
 }

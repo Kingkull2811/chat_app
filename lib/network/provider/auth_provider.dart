@@ -96,7 +96,7 @@ class AuthProvider with ProviderMixin {
       log('signUp: $response');
 
       return BaseResponse.fromJson(response.data);
-    } catch (error, stacktrace) {
+    } catch (error) {
       if (error is DioError) {
         return BaseResponse.fromJson(error.response?.data);
       }
@@ -143,7 +143,7 @@ class AuthProvider with ProviderMixin {
         data: data,
         options: await defaultOptions(url: apiFillProfile),
       );
-      log(response.toString());
+      // log(response.toString());
 
       return UserInfoModel.fromJson(response.data);
     } catch (error) {

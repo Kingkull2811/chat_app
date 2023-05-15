@@ -7,6 +7,14 @@ abstract class TranscriptManagementEvent extends Equatable {
 
 class InitTranscriptEvent extends TranscriptManagementEvent {}
 
+class SearchEvent extends TranscriptManagementEvent {
+  final String? searchQuery;
+  final String? schoolYear;
+  final int? classId;
+
+  SearchEvent({this.searchQuery, this.schoolYear, this.classId});
+}
+
 class AddTranscriptEvent extends TranscriptManagementEvent {
   final Map<String, dynamic> data;
 

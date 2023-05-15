@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:badges/badges.dart';
-import 'package:chat_app/network/model/student_firebase.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -61,11 +60,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
   String? _image;
   String studentSSID = '';
 
-  bool _isSelectId = false;
   List<Student> listStudent = [];
-  Map<int, bool> studentIdSelected = {};
   bool _isShowAddedIcon = true;
-  Map<String, dynamic> studentFirebase = StudentFirebase().toFirestore();
 
   @override
   void initState() {
@@ -268,11 +264,11 @@ class _FillProfilePageState extends State<FillProfilePage> {
     BuildContext context,
     UserInfoModel? userInfo,
   ) async {
-    if (isNullOrEmpty(_image)) {
-      showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
-    } else {
-      showLoading(context);
-      if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
+      if (isNullOrEmpty(_image)) {
+        showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
+      } else {
+        // showLoading(context);
         List<int?> listStudentIdSelected = listStudent
             .map(
               (e) => e.id,
@@ -454,11 +450,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
       return;
     }
     List<int?>? listIdRemove = result?.map((e) => e.id).toList();
-    studentIdSelected.forEach((key, value) {
-      if (listIdRemove?.contains(key) ?? false) {
-        studentIdSelected[key] = false;
-      }
-    });
 
     listStudent.removeWhere(
       (element) => listIdRemove?.contains(element.id) ?? false,
@@ -467,21 +458,27 @@ class _FillProfilePageState extends State<FillProfilePage> {
   }
 
   Widget _itemStudent(Student student) {
-    print('studentIdSelected[student.id : ${studentIdSelected[student.id]}');
-    // _isSelectId = studentIdSelected[student.id] ?? false;
     return InkWell(
       onTap: () {
         if (_isShowAddedIcon) {
-          listStudent.add(student);
-          print(listStudent);
+          if (isNullOrEmpty(listStudent)) {
+            listStudent.add(student);
+          } else {
+            for (var students in listStudent) {
+              if (student.id != students.id) {
+                listStudent.add(student);
+                break;
+              } else {
+                listStudent.removeWhere((e) => student.id == e.id);
+              }
+            }
+          }
         } else {
-          listStudent.remove(student);
-          print('remove: $listStudent');
+          listStudent.removeWhere((e) => student.id == e.id);
         }
+
         setState(() {
-          // studentIdSelected[student.id ?? 0] = !_isSelectId;
           _isShowAddedIcon = !_isShowAddedIcon;
-          // _isAdded = !_isAdded;
         });
       },
       child: Stack(
@@ -498,14 +495,17 @@ class _FillProfilePageState extends State<FillProfilePage> {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.grey.withOpacity(0.1),
                   ),
-                  child: AppImage(
-                    isOnline: true,
-                    localPathOrUrl: student.imageUrl,
-                    boxFit: BoxFit.cover,
-                    errorWidget: Icon(
-                      Icons.person,
-                      size: 70,
-                      color: Colors.grey.withOpacity(0.3),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: AppImage(
+                      isOnline: true,
+                      localPathOrUrl: student.imageUrl,
+                      boxFit: BoxFit.cover,
+                      errorWidget: Icon(
+                        Icons.person,
+                        size: 70,
+                        color: Colors.grey.withOpacity(0.3),
+                      ),
                     ),
                   ),
                 ),
@@ -598,7 +598,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
               _isShowAddedIcon
                   ? Icons.add_circle_outline
                   : Icons.check_circle_outline,
-              // : Icons.add_circle_outline,
               size: 30,
               color: Theme.of(context).primaryColor,
             ),
@@ -627,15 +626,24 @@ class _FillProfilePageState extends State<FillProfilePage> {
           controller: _searchController,
           textCapitalization: TextCapitalization.sentences,
           onChanged: (v) {},
-          onFieldSubmitted: (sSID) {
-            //todo:::check list student had SSID ->> student added
-            // if(listStudent.contains(sSID))
+          onFieldSubmitted: (ssid) {
+            bool ssidExists = false;
 
-            _fillProfileBloc
-                .add(SearchStudentBySSID(studentSSID: sSID.toUpperCase()));
+            for (var student in listStudent) {
+              if (student.code == ssid.toUpperCase()) {
+                ssidExists = true;
+                break;
+              } else {
+                ssidExists = false;
+              }
+            }
+
+            _fillProfileBloc.add(SearchStudentBySSID(
+              studentSSID: ssid.toUpperCase(),
+            ));
             setState(() {
-              studentSSID = sSID;
-              _isShowAddedIcon = true;
+              studentSSID = ssid;
+              _isShowAddedIcon = ssidExists ? false : true;
             });
           },
           maxLines: 1,

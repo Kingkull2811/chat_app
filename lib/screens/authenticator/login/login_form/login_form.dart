@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
@@ -15,7 +13,6 @@ import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
-import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/input_field.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -23,6 +20,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../widgets/animation_loading.dart';
 import '../../../../widgets/custom_check_box.dart';
 import '../../fill_profile/fill_profile.dart';
 import '../../fill_profile/fill_profile_bloc.dart';
@@ -86,32 +84,34 @@ class _LoginFormPageState extends State<LoginFormPage> {
       builder: (context, state) {
         if (state.isLoading) {
           return const AnimationLoading();
+          // showLoading(context);
         }
         return GestureDetector(
           onTap: () {
             clearFocus(context);
           },
           child: Scaffold(
-            body: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              physics: const BouncingScrollPhysics(),
-              child: IntrinsicHeight(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: _loginForm(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-                      child: Column(
+            body: Padding(
+              padding: const EdgeInsets.all(0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _loginForm(),
+                      Column(
                         children: [
                           // _buildBiometricsButton(state),
                           _buttonLogin(context, state),
                           _goToSignUpPage(),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -123,7 +123,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
 
   Widget _loginForm() {
     return SizedBox(
-      height: MediaQuery.of(context).size.height - 100,
+      height: MediaQuery.of(context).size.height - 120,
       child: Form(
         key: _formKey,
         child: Column(
@@ -226,11 +226,10 @@ class _LoginFormPageState extends State<LoginFormPage> {
       if (!agreedWithTerms) {
         _navigateToTerm();
       } else {
-        showLoading(context);
+        // showLoading(context);
         final userInfo = await _authRepository.getUserInfo(
             userId: SharedPreferencesStorage().getUserId());
         if (userInfo is UserInfoModel) {
-          log(userInfo.toString());
           userInfo.isFillProfileKey
               ? _navigateToMainPage()
               : _navigateToFillProfilePage(userInfo);
