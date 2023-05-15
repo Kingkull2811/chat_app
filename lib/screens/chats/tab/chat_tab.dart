@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../on_chatting/on_chatting.dart';
-import '../on_chatting/on_chatting_bloc.dart';
+import '../chat_room/chat_room.dart';
+import '../chat_room/chat_room_bloc.dart';
 
 class ChatTab extends StatefulWidget {
   const ChatTab({Key? key}) : super(key: key);
@@ -132,7 +132,7 @@ class _ChatTabState extends State<ChatTab> {
             MaterialPageRoute(
               builder: (context) => BlocProvider<OnChattingBloc>(
                 create: (context) => OnChattingBloc(context),
-                child: OnChattingPage(item: item),
+                child: ChatRoom(item: item),
               ),
             ),
           );

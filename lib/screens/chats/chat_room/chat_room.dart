@@ -1,25 +1,26 @@
-import 'package:chat_app/screens/chats/on_chatting/on_chatting_bloc.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/custom_app_bar_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../tab/chat_tab.dart';
-import 'on_chatting_state.dart';
+import 'chat_room_bloc.dart';
+import 'chat_room_state.dart';
 
-class OnChattingPage extends StatefulWidget {
+class ChatRoom extends StatefulWidget {
   final CustomListItem item;
 
-  const OnChattingPage({Key? key, required this.item}) : super(key: key);
+  const ChatRoom({Key? key, required this.item}) : super(key: key);
 
   @override
-  State<OnChattingPage> createState() => OnChattingPageState();
+  State<ChatRoom> createState() => ChatRoomState();
 }
 
-class OnChattingPageState extends State<OnChattingPage> {
+class ChatRoomState extends State<ChatRoom> {
   final _inputTextController = TextEditingController();
   final _focusNode = FocusNode();
   bool _showIconSend = false;
+  bool _showEmoji = false;
 
   @override
   void initState() {
@@ -44,32 +45,23 @@ class OnChattingPageState extends State<OnChattingPage> {
     return BlocConsumer<OnChattingBloc, OnChattingState>(
       listener: (context, state) {},
       builder: (context, state) {
-        if (state.isLoading) {
-          return Scaffold(
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
             appBar: CustomAppBarChat(
+              title: widget.item.name,
+              image: widget.item.imageUrlAvt,
               onTapLeadingIcon: () {
                 Navigator.pop(context);
               },
-              image: widget.item.imageUrlAvt,
-              title: widget.item.name,
             ),
-            body: const AnimationLoading(),
-          );
-        }
-        return Scaffold(
-          appBar: CustomAppBarChat(
-            title: widget.item.name,
-            image: widget.item.imageUrlAvt,
-            onTapLeadingIcon: () {
-              Navigator.pop(context);
-            },
-          ),
-          resizeToAvoidBottomInset: true,
-          body: Column(
-            children: <Widget>[
-              _bodyChat(),
-              _bottomChatField(),
-            ],
+            resizeToAvoidBottomInset: true,
+            body: Column(
+              children: <Widget>[
+                state.isLoading ? const AnimationLoading() : _bodyChat(),
+                _chatInput(),
+              ],
+            ),
           ),
         );
       },
@@ -136,61 +128,38 @@ class OnChattingPageState extends State<OnChattingPage> {
     );
   }
 
-  Widget _bottomChatField() {
+  Widget _chatInput() {
     return Container(
-      height: 66,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, 4),
-            blurRadius: 32,
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-          ),
-        ],
+        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        border: BorderDirectional(
+          top: BorderSide(width: 0.3, color: Colors.grey.withOpacity(0.05)),
+        ),
       ),
-      child: SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              child: IconButton(
-                onPressed: () {},
-                iconSize: 30,
-                icon: Icon(
-                  Icons.grid_view_outlined,
-                  color: Theme.of(context).primaryColor,
-                ),
+            IconButton(
+              onPressed: () {},
+              iconSize: 30,
+              icon: Icon(
+                Icons.image_outlined,
+                color: Theme.of(context).primaryColor,
               ),
             ),
-            !_showIconSend
-                ? IconButton(
-                    onPressed: () {},
-                    iconSize: 30,
-                    icon: Icon(
-                      Icons.image_outlined,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  )
-                : const SizedBox.shrink(),
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,
                 constraints: const BoxConstraints(
-                  maxHeight: 34,
+                  maxHeight: 40,
                   // maxHeight: 50,
                   // minHeight: 34,
                 ),
                 child: TextFormField(
                   controller: _inputTextController,
-                  focusNode: _focusNode,
                   keyboardType: TextInputType.text,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black,
-                    height: 1.3,
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                   maxLines: null,
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.only(left: 16),
@@ -201,6 +170,9 @@ class OnChattingPageState extends State<OnChattingPage> {
                     suffixIcon: GestureDetector(
                       onTap: () {
                         //handle emoji
+                        setState(() {
+                          _showEmoji = !_showEmoji;
+                        });
                       },
                       child: Icon(
                         Icons.emoji_emotions_outlined,
@@ -220,7 +192,7 @@ class OnChattingPageState extends State<OnChattingPage> {
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(
                         width: 1,
-                        color: Color.fromARGB(128, 130, 130, 130),
+                        color: Colors.grey,
                       ),
                     ),
                   ),

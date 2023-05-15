@@ -437,21 +437,21 @@ class ChatsPageState extends State<ChatsPage>
           ],
         ),
       ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: GestureDetector(
-            onTap: () {
-              _createNewMessage(context);
-            },
-            child: Icon(
-              Icons.add_comment_outlined,
-              size: 28,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ),
-      ],
+      // actions: [
+      //   Padding(
+      //     padding: const EdgeInsets.only(right: 16.0),
+      //     child: GestureDetector(
+      //       onTap: () {
+      //         _createNewMessage(context);
+      //       },
+      //       child: Icon(
+      //         Icons.add_comment_outlined,
+      //         size: 28,
+      //         color: Theme.of(context).primaryColor,
+      //       ),
+      //     ),
+      //   ),
+      // ],
     );
   }
 }

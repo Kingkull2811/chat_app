@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../utilities/enum/message_type.dart';
 import '../../utilities/utils.dart';
 
@@ -18,19 +16,13 @@ class MessageModel {
     this.timestamp,
   });
 
-  factory MessageModel.formFirestore(
-    DocumentSnapshot<Map<String, dynamic>> snapshot,
-    SnapshotOptions? options,
-  ) {
-    final data = snapshot.data();
-    return MessageModel(
-      uId: data?['uId'],
-      sender: data?['sender'],
-      message: data?['message'],
-      messageType: getMessageType(data?['messesType']),
-      timestamp: data?['timestamp'],
-    );
-  }
+  factory MessageModel.formJson(Map<String, dynamic> json) => MessageModel(
+        uId: json['uId'],
+        sender: json['sender'],
+        message: json['message'],
+        messageType: getMessageType(json['messesType']),
+        timestamp: json['timestamp'],
+      );
 
   Map<String, dynamic> toFirestore() {
     return {
