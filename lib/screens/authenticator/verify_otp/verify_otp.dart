@@ -214,8 +214,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                       enableDrag: false,
                       isDismissible: false,
                       titleMessage: 'Verified!',
-                      contentMessage:
-                          'You have verified verified your account.',
+                      contentMessage: 'You have verified your account.',
                       buttonLabel: 'Set a new password',
                       onTap: () {
                         Navigator.pushReplacement(

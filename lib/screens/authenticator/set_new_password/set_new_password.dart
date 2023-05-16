@@ -219,7 +219,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
         showSuccessBottomSheet(
           context,
           enableDrag: false,
-          isDismissible: true,
+          isDismissible: false,
           // titleMessage: 'Successfully!',
           contentMessage: '${response.message}',
           buttonLabel: 'Login',
@@ -239,7 +239,8 @@ class _SetNewPasswordState extends State<SetNewPassword> {
         showCupertinoMessageDialog(
           context,
           "Error!",
-          content: response.errors?.first.errorMessage,
+          // content: response.errors?.first.errorMessage,
+          content: 'Set new password failure',
         );
       }
     }
