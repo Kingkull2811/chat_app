@@ -1,26 +1,38 @@
+import 'package:chat_app/network/model/message_content_model.dart';
+import 'package:chat_app/network/model/message_model.dart';
+import 'package:chat_app/services/firebase_services.dart';
+import 'package:chat_app/utilities/enum/message_type.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/custom_app_bar_chat.dart';
+import 'package:chat_app/widgets/photo_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../tab/chat_tab.dart';
-import 'chat_room_bloc.dart';
-import 'chat_room_state.dart';
+import '../../../utilities/utils.dart';
+import '../../../widgets/app_image.dart';
 
 class ChatRoom extends StatefulWidget {
-  final CustomListItem item;
+  final MessageModel messageData;
+  final String docID;
 
-  const ChatRoom({Key? key, required this.item}) : super(key: key);
+  const ChatRoom({
+    Key? key,
+    required this.messageData,
+    required this.docID,
+  }) : super(key: key);
 
   @override
-  State<ChatRoom> createState() => ChatRoomState();
+  State<ChatRoom> createState() => _ChatRoomState();
 }
 
-class ChatRoomState extends State<ChatRoom> {
+class _ChatRoomState extends State<ChatRoom> {
   final _inputTextController = TextEditingController();
-  final _focusNode = FocusNode();
   bool _showIconSend = false;
   bool _showEmoji = false;
+
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -40,90 +52,147 @@ class ChatRoomState extends State<ChatRoom> {
     });
   }
 
+  void _scrollToEnd() {
+    Future.delayed(Duration(milliseconds: 200), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<OnChattingBloc, OnChattingState>(
-      listener: (context, state) {},
-      builder: (context, state) {
-        return GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Scaffold(
-            appBar: CustomAppBarChat(
-              title: widget.item.name,
-              image: widget.item.imageUrlAvt,
-              onTapLeadingIcon: () {
-                Navigator.pop(context);
-              },
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: CustomAppBarChat(
+          title: widget.messageData.toName ?? '',
+          image: widget.messageData.toAvatar ?? '',
+          onTapLeadingIcon: () {
+            Navigator.pop(context);
+          },
+        ),
+        resizeToAvoidBottomInset: true,
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: _bodyChat(),
             ),
-            resizeToAvoidBottomInset: true,
-            body: Column(
-              children: <Widget>[
-                state.isLoading ? const AnimationLoading() : _bodyChat(),
-                _chatInput(),
-              ],
-            ),
-          ),
-        );
-      },
+            _chatInput(),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _bodyChat() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(0),
-        child: ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          reverse: true,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Container(
-                padding: const EdgeInsets.only(top: 40, bottom: 20),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 150,
-                      width: 150,
-                      child: CircleAvatar(
-                        radius: 75,
-                        child: Image.asset(
-                          widget.item.imageUrlAvt,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        widget.item.name,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28,
-                            color: Colors.black),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Say hi to start chat, ${widget.item.name}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 12,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
+    return StreamBuilder(
+      stream: FirebaseService().getListMessageInChatRoom(widget.docID),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return const AnimationLoading();
+        } else {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+              return const AnimationLoading();
+            case ConnectionState.active:
+            case ConnectionState.done:
+              if (snapshot.data!.docs.isEmpty) {
+                return _helloMessage();
+              } else {
+                List<MessageContentModel> listMessageContent = [];
+                final data = snapshot.data?.docs;
+
+                for (var doc in data!) {
+                  if (doc.exists) {
+                    if (doc.data() is Map<String, dynamic>) {
+                      final message = MessageContentModel.fromJson(
+                        doc.data() as Map<String, dynamic>,
+                      );
+                      listMessageContent.add(message);
+                    }
+                  }
+                }
+                _scrollToEnd();
+                return _listMessage(listMessageContent);
+              }
+          }
+        }
+      },
+    );
+  }
+
+  Widget _listMessage(List<MessageContentModel>? listMessage) {
+    if (isNullOrEmpty(listMessage)) {
+      return _helloMessage();
+    } else {
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        controller: _scrollController,
+        physics: const BouncingScrollPhysics(),
+        itemCount: listMessage!.length,
+        itemBuilder: (context, index) {
+          return _chatItem(context, listMessage[index]);
+        },
+      );
+    }
+  }
+
+  Widget _helloMessage() {
+    return Container(
+      padding: const EdgeInsets.only(top: 40, bottom: 20),
+      child: Column(
+        children: [
+          Container(
+            height: 150,
+            width: 150,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  width: 1.5,
+                  color: Theme.of(context).primaryColor,
+                )
+                // borderRadius: BorderRadius.circular(50),
                 ),
-              );
-            }
-            return _chatItem(
-              context,
-              itemMessage[index - 1],
-            );
-          },
-          itemCount: itemMessage.length + 1,
-        ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(75),
+              child: AppImage(
+                isOnline: true,
+                localPathOrUrl: widget.messageData.toAvatar,
+                boxFit: BoxFit.cover,
+                errorWidget: const Icon(
+                  CupertinoIcons.person,
+                  size: 30,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: Text(
+              widget.messageData.toName ?? '',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30,
+                  color: Colors.black),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Say hi 👋 to start chat with @${widget.messageData.toName}',
+              style: TextStyle(
+                fontWeight: FontWeight.normal,
+                fontSize: 16,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -157,8 +226,9 @@ class ChatRoomState extends State<ChatRoom> {
                   // minHeight: 34,
                 ),
                 child: TextFormField(
+                  onTap: () {},
                   controller: _inputTextController,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.multiline,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
                   maxLines: null,
                   decoration: InputDecoration(
@@ -199,14 +269,37 @@ class ChatRoomState extends State<ChatRoom> {
                 ),
               ),
             ),
-            IconButton(
-              iconSize: 30,
-              onPressed: () {},
-              icon: Icon(
-                _showIconSend ? Icons.send_outlined : Icons.mic_none_outlined,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
+            _showIconSend
+                ? IconButton(
+                    iconSize: 30,
+                    onPressed: () async {
+                      if (_inputTextController.text.isNotEmpty) {
+                        MessageContentModel message = MessageContentModel(
+                          fromId: widget.messageData.fromId,
+                          message: _inputTextController.text.trim(),
+                          messageType: MessageType.text,
+                          time: Timestamp.now(),
+                        );
+                        await FirebaseService()
+                            .sendMessageToFirebase(widget.docID, message);
+                        _inputTextController.clear();
+                      }
+                    },
+                    icon: Icon(
+                      Icons.send_outlined,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  )
+                : IconButton(
+                    iconSize: 30,
+                    onPressed: () {
+                      if (_inputTextController.text.isNotEmpty) {}
+                    },
+                    icon: Icon(
+                      Icons.mic_none_outlined,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
           ],
         ),
       ),
@@ -215,21 +308,21 @@ class ChatRoomState extends State<ChatRoom> {
 
   Widget _chatItem(
     BuildContext context,
-    MessageItem itemMessage,
+    MessageContentModel message,
   ) {
-    final isMe = itemMessage.sender == 'You';
-    Widget messageContain(MessageItem itemMessage) {
-      switch (itemMessage.typeMessage) {
-        case TypeMessage.text:
+    final isMe = message.fromId == SharedPreferencesStorage().getUserId();
+    Widget messageContain(MessageContentModel itemMessage) {
+      switch (itemMessage.messageType) {
+        case MessageType.text:
           return textMessage(itemMessage, isMe);
 
-        case TypeMessage.image:
+        case MessageType.image:
           return imageMessage(itemMessage, isMe);
 
-        case TypeMessage.video:
+        case MessageType.video:
           return videoMessage(itemMessage, isMe);
 
-        case TypeMessage.audio:
+        case MessageType.audio:
           return audioMessage(itemMessage, isMe);
 
         default:
@@ -240,74 +333,38 @@ class ChatRoomState extends State<ChatRoom> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 6, bottom: 0),
+          //   child: Center(
+          //     child: Text(
+          //       formatDateUtcToTime(message.time),
+          //       style: TextStyle(
+          //           fontSize: 14,
+          //           fontWeight: FontWeight.normal,
+          //           color: Theme.of(context).primaryColor),
+          //     ),
+          //   ),
+          // ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Center(
-              child: Text(
-                '---${itemMessage.timestamp.replaceAll('T', ' ').replaceAll('.000Z', '')}---',
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                    color: Theme.of(context).primaryColor),
-              ),
-            ),
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: messageContain(message),
           ),
-          Row(
-            mainAxisAlignment: (itemMessage.sender == 'You')
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.start,
-            children: [
-              if (!isMe) ...[
-                Container(
-                  height: 24,
-                  width: 24,
-                  alignment: Alignment.bottomCenter,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: CircleAvatar(
-                    radius: 12,
-                    child: Image.asset(widget.item.imageUrlAvt),
-                  ),
-                )
-              ],
-              Padding(
-                padding: EdgeInsets.only(left: isMe ? 0.0 : 10.0),
-                child: messageContain(itemMessage),
-              ),
-              if (isMe) ...[
-                Container(
-                  margin: const EdgeInsets.only(left: 10),
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).primaryColor,
-                      width: 1,
-                    ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    (itemMessage.status == MessageStatus.notSent)
-                        ? null
-                        : (itemMessage.status == MessageStatus.viewed)
-                            ? Icons.done_all
-                            : Icons.done,
-                    size: 8,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ],
-            ],
+          Text(
+            formatDateUtcToTime(message.time),
+            style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: Theme.of(context).primaryColor),
           ),
         ],
       ),
     );
   }
 
-  Widget textMessage(MessageItem itemMessage, bool isMe) {
+  Widget textMessage(MessageContentModel message, bool isMe) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -322,62 +379,52 @@ class ChatRoomState extends State<ChatRoom> {
         ),
       ),
       child: Text(
-        itemMessage.message,
+        message.message ?? '',
         style: const TextStyle(
           color: Colors.black,
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.normal,
         ),
       ),
     );
   }
 
-  Widget imageMessage(MessageItem itemMessage, bool isMe) {
+  Widget imageMessage(MessageContentModel itemMessage, bool isMe) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.65,
-      child: AspectRatio(
-        aspectRatio: 1.6,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    PhotoViewPage(imageUrl: itemMessage.message),
               ),
-              child: ClipRect(
-                child: Image.asset(itemMessage.message),
+            );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: AppImage(
+              isOnline: true,
+              localPathOrUrl: itemMessage.message,
+              boxFit: BoxFit.cover,
+              errorWidget: Icon(
+                Icons.image_outlined,
+                size: 50,
+                color: Theme.of(context).primaryColor,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget videoMessage(MessageItem itemMessage, bool isMe) {
-    // return Container(
-    //   width: MediaQuery.of(context).size.width * 0.65,
-    //   decoration: BoxDecoration(
-    //     borderRadius: BorderRadius.circular(10),
-    //     image: const DecorationImage(
-    //       image: AssetImage('assets/images/image_onboarding_1.png'),
-    //     ),
-    //   ),
-    //   child: Container(
-    //     height: 30,
-    //     width: 30,
-    //     decoration: BoxDecoration(
-    //       color: Theme.of(context).primaryColor,
-    //       shape: BoxShape.circle,
-    //     ),
-    //     child: const Icon(
-    //       Icons.play_arrow,
-    //       size: 24,
-    //       color: Colors.white,
-    //     ),
-    //   ),
-    // );
-
+  Widget videoMessage(MessageContentModel itemMessage, bool isMe) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.65,
       child: AspectRatio(
@@ -389,8 +436,18 @@ class ChatRoomState extends State<ChatRoom> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: ClipRect(
-                child: Image.asset(itemMessage.message),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: AppImage(
+                  isOnline: true,
+                  localPathOrUrl: itemMessage.message,
+                  boxFit: BoxFit.cover,
+                  errorWidget: Icon(
+                    Icons.image_outlined,
+                    size: 50,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
               ),
             ),
             Container(
@@ -412,7 +469,7 @@ class ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget audioMessage(MessageItem itemMessage, bool isMe) {
+  Widget audioMessage(MessageContentModel itemMessage, bool isMe) {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
@@ -476,96 +533,4 @@ class ChatRoomState extends State<ChatRoom> {
       ),
     );
   }
-}
-
-enum TypeMessage { text, image, video, audio }
-
-enum MessageStatus { notSent, notView, viewed }
-
-List<MessageItem> itemMessage = [
-  MessageItem(
-    sender: 'Martha',
-    message: 'Hello',
-    typeMessage: TypeMessage.text,
-    timestamp: '2023-03-09T10:00:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-  MessageItem(
-    sender: 'Martha',
-    message: 'assets/images/image_onboarding_1.png',
-    typeMessage: TypeMessage.image,
-    timestamp: '2023-03-09T10:05:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-  MessageItem(
-    sender: 'Martha',
-    message: 'assets/images/image_onboarding_1.png',
-    typeMessage: TypeMessage.video,
-    timestamp: '2023-03-09T10:00:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-  MessageItem(
-    sender: 'Martha',
-    message: 'sdadasdaddsdasda',
-    typeMessage: TypeMessage.audio,
-    timestamp: '2023-03-09T10:01:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-  MessageItem(
-    sender: 'You',
-    message: 'Hello MMMMM',
-    typeMessage: TypeMessage.text,
-    timestamp: '2023-03-09T10:12:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-  MessageItem(
-    sender: 'You',
-    message: 'assets/images/image_onboarding_2.png',
-    typeMessage: TypeMessage.image,
-    timestamp: '2023-03-09T10:15:00.000Z',
-    status: MessageStatus.notView,
-  ),
-  MessageItem(
-    sender: 'You',
-    message: 'assets/images/image_onboarding_2.png',
-    typeMessage: TypeMessage.video,
-    timestamp: '2023-03-09T10:00:00.000Z',
-    status: MessageStatus.viewed,
-  ),
-  MessageItem(
-    sender: 'You',
-    message: 'Hello cccc',
-    typeMessage: TypeMessage.audio,
-    timestamp: '2023-03-09T10:18:00.000Z',
-    status: MessageStatus.viewed,
-  ),
-  MessageItem(
-    sender: 'Martha',
-    message: 'Helloooooo',
-    typeMessage: TypeMessage.text,
-    timestamp: '2023-03-09T10:20:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-  MessageItem(
-    sender: 'Martha',
-    message: 'assets/images/image_onboarding_3.png',
-    typeMessage: TypeMessage.image,
-    timestamp: '2023-03-09T10:25:00.000Z',
-    status: MessageStatus.notSent,
-  ),
-];
-
-class MessageItem {
-  final String sender;
-  final dynamic message;
-  final MessageStatus status;
-  final TypeMessage typeMessage;
-  final String timestamp;
-
-  MessageItem(
-      {required this.sender,
-      required this.message,
-      required this.status,
-      required this.typeMessage,
-      required this.timestamp});
 }

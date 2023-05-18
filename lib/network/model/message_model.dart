@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../utilities/enum/message_type.dart';
 import '../../utilities/utils.dart';
 
@@ -12,7 +14,7 @@ class MessageModel {
   final String? read;
   final String? lastMessage;
   final MessageType? messageType;
-  final DateTime? lastTime;
+  final Timestamp? lastTime;
   final int? messageNum;
 
   MessageModel({
@@ -30,7 +32,7 @@ class MessageModel {
     this.messageNum,
   });
 
-  factory MessageModel.formJson(Map<String, dynamic> json) => MessageModel(
+  factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(
         fromId: json['from_id'],
         fromName: json['from_name'],
         fromAvatar: json['from_avatar'],
@@ -39,9 +41,9 @@ class MessageModel {
         toAvatar: json['to_avatar'],
         read: json['read'],
         sent: json['sent'],
-        lastMessage: json['message'],
+        lastMessage: json['last_message'],
         messageType: getMessageType(json['messes_type']),
-        lastTime: json['timestamp'],
+        lastTime: json['last_time'],
         messageNum: json['message_num'],
       );
 
@@ -60,5 +62,10 @@ class MessageModel {
       'timestamp': lastTime,
       'message_num': messageNum,
     };
+  }
+
+  @override
+  String toString() {
+    return 'MessageModel{fromId: $fromId, fromName: $fromName, fromAvatar: $fromAvatar, toId: $toId, toName: $toName, toAvatar: $toAvatar, sent: $sent, read: $read, lastMessage: $lastMessage, messageType: $messageType, lastTime: $lastTime, messageNum: $messageNum}';
   }
 }

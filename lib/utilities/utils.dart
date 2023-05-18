@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -104,6 +105,16 @@ String formatDateString(String? input, {String format = 'yyyy/MM/dd'}) {
   } catch (ignore) {
     return '';
   }
+}
+
+String formatDateUtcToTime(Timestamp? timestamp) {
+  if (timestamp == null) {
+    return '';
+  }
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
+
+  return DateFormat('hh:mm a').format(DateTime.parse(dateTime.toString()));
 }
 
 MessageType getMessageType(String? type) {

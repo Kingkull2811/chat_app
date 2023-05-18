@@ -8,6 +8,8 @@ import 'package:chat_app/widgets/message_dialog_2_action.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/app_image.dart';
+
 class ChatInfoPage extends StatefulWidget {
   final bool isGroup;
   final String name;
@@ -66,12 +68,29 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             Padding(
               padding: const EdgeInsets.only(top: 0),
               child: Container(
-                height: 100,
-                width: 100,
+                height: 150,
+                width: 150,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 1.5,
+                      color: Theme.of(context).primaryColor,
+                    )
+                    // borderRadius: BorderRadius.circular(50),
+                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(75),
+                  child: AppImage(
+                    isOnline: true,
+                    localPathOrUrl: widget.urlImage,
+                    boxFit: BoxFit.cover,
+                    errorWidget: Icon(
+                      CupertinoIcons.person,
+                      size: 30,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
-                child: Image.asset(widget.urlImage),
               ),
             ),
             Padding(

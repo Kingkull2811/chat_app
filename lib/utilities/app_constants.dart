@@ -92,5 +92,6 @@ class AppConstants {
 
   static const String userCollection = 'users';
   static const String messageCollection = 'messages';
+  static const String messageListCollection = 'message_list';
   static const String imageChild = 'images';
 }

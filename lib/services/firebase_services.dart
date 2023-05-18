@@ -5,12 +5,12 @@ import 'dart:io';
 import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:chat_app/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
-import '../network/model/message_model.dart';
-import '../utilities/enum/message_type.dart';
+import '../network/model/message_content_model.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -121,28 +121,73 @@ class FirebaseService {
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getListChatByUserID() {
     final int userId = SharedPreferencesStorage().getUserId();
-    return _firestore
+    final snapshot = _firestore
         .collection(AppConstants.messageCollection)
-        .where('form_id', isEqualTo: userId)
+        .where('from_id', isEqualTo: userId)
+        // .orderBy('last_time', descending: true)
         .snapshots();
+    return snapshot;
   }
 
-  Future<DocumentReference> sendMessageToFirebase(
-    String receiverId,
-    MessageModel message,
-  ) async {
-    return await _firestore
-        .collection('message')
-        .doc('receiver_id_$receiverId')
-        .collection('listMessage')
-        .add(<String, dynamic>{
-      'message': message,
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      // 'name': FirebaseAuth.instance.currentUser!.displayName,
-      // 'userId': FirebaseAuth.instance.currentUser!.uid,
-      'sender': '',
-      'userId': '',
-      'typeMessage': MessageType.text,
+  Stream<QuerySnapshot> getListMessageInChatRoom(String docId) {
+    final snapshot = _firestore
+        .collection(AppConstants.messageCollection)
+        .doc(docId)
+        .collection(AppConstants.messageListCollection)
+        .orderBy('time', descending: false)
+        .snapshots();
+    return snapshot;
+  }
+
+  Future<List<MessageContentModel>> getListMessage(String docId) async {
+    List<MessageContentModel> listMessage = [];
+    await _firestore
+        .collection(AppConstants.messageCollection)
+        .doc(docId)
+        .collection(AppConstants.messageListCollection)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      for (var element in snapshot.docChanges) {
+        final doc = element.doc;
+        if (doc.exists) {
+          log('data: ${doc.data().toString()}');
+          if (doc.data() is Map<String, dynamic>) {
+            final message = MessageContentModel.fromJson(
+                doc.data() as Map<String, dynamic>);
+            listMessage.add(message);
+          }
+        }
+      }
     });
+    return listMessage;
+  }
+
+  Future<void> sendMessageToFirebase(
+    String docId,
+    MessageContentModel message,
+  ) async {
+    await _firestore
+        .collection(AppConstants.messageCollection)
+        .doc(docId)
+        .collection(AppConstants.messageListCollection)
+        .withConverter(
+            fromFirestore: MessageContentModel.fromFirestore,
+            toFirestore: (MessageContentModel messageContent, options) =>
+                messageContent.toJson())
+        .add(message)
+        .then((DocumentReference doc) {
+      print('doc ${doc.id}');
+    });
+
+    await _firestore
+        .collection(AppConstants.messageCollection)
+        .doc(docId)
+        .update(
+      {
+        'last_message': message.message,
+        'last_time': message.time,
+        'message_type': setMessageType(message.messageType)
+      },
+    );
   }
 }
