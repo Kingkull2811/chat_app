@@ -106,27 +106,27 @@ String formatDateString(String? input, {String format = 'yyyy/MM/dd'}) {
   }
 }
 
-MessageType getMessageType(int? type) {
-  if (type == 0) {
+MessageType getMessageType(String? type) {
+  if (type == MessageType.text.name) {
     return MessageType.text;
-  } else if (type == 1) {
+  } else if (type == MessageType.image.name) {
     return MessageType.image;
-  } else if (type == 2) {
+  } else if (type == MessageType.video.name) {
     return MessageType.video;
   } else {
     return MessageType.audio;
   }
 }
 
-int setMessageType(MessageType? type) {
+String setMessageType(MessageType? type) {
   if (type == MessageType.text) {
-    return 0;
+    return MessageType.text.name;
   } else if (type == MessageType.image) {
-    return 1;
-  } else if (type == MessageType.audio) {
-    return 2;
+    return MessageType.image.name;
+  } else if (type == MessageType.video) {
+    return MessageType.video.name;
   } else {
-    return 3;
+    return MessageType.audio.name;
   }
 }
 

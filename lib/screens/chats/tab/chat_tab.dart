@@ -1,8 +1,8 @@
+import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../chat_room/chat_room.dart';
-import '../chat_room/chat_room_bloc.dart';
+import '../../../services/firebase_services.dart';
+import '../../../widgets/animation_loading.dart';
 
 class ChatTab extends StatefulWidget {
   const ChatTab({Key? key}) : super(key: key);
@@ -16,8 +16,13 @@ class _ChatTabState extends State<ChatTab> {
 
   bool _showSearchResult = false;
 
+  bool isRead = false;
+
   @override
   void initState() {
+    _searchController.addListener(() {
+      _showSearchResult = _searchController.text.isNotEmpty;
+    });
     super.initState();
   }
 
@@ -29,184 +34,117 @@ class _ChatTabState extends State<ChatTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _searchBox(context),
-        Expanded(
-          child: _showSearchResult
-              ? _searchResult()
-              : SizedBox(
-                  height: 71 * (itemList.length).toDouble(),
-                  child: ListView.separated(
-                    reverse: false,
-                    separatorBuilder: (context, index) {
-                      if (index == 0) {
-                        return const Divider(
-                          height: 1,
-                          color: Colors.transparent,
-                        );
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16.0),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey[200],
-                        ),
-                      );
-                    },
-                    itemCount: itemList.length,
-                    itemBuilder: (context, index) {
-                      return _cardChat(context, itemList[index]);
-                    },
-                  ),
-                ),
-        ),
-      ],
+    return StreamBuilder(
+      stream: FirebaseService().getListChatByUserID(),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return const AnimationLoading();
+          case ConnectionState.active:
+          case ConnectionState.done:
+            return Container();
+        }
+      },
     );
+
+    // return ListView.builder(
+    //   scrollDirection: Axis.vertical,
+    //   physics: const BouncingScrollPhysics(),
+    //   itemCount: 10,
+    //   itemBuilder: (context, index) => _itemChat(),
+    // );
   }
 
-  Widget _searchBox(BuildContext context) {
+  Widget _itemChat() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
-      child: SizedBox(
-        height: 40,
-        child: TextField(
-          onTap: () {
-            setState(() {
-              _showSearchResult = !_showSearchResult;
-            });
-          },
-          controller: _searchController,
-          onSubmitted: (_) {
-            if (_searchController.text.isEmpty) {
-              setState(() {
-                _showSearchResult = false;
-              });
-            }
-          },
-          decoration: InputDecoration(
-            hintText: 'Search',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24.0),
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            bottom: BorderSide(
+              width: 0.5,
+              color: Colors.grey.withOpacity(0.3),
             ),
-            prefixIcon: Icon(
-              Icons.search,
-              color: Theme.of(context).primaryColor,
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24),
-              borderSide: BorderSide(
+          ),
+        ),
+        child: ListTile(
+          onTap: () {},
+          leading: Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
                 width: 1,
                 color: Theme.of(context).primaryColor,
               ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24),
-              borderSide: const BorderSide(
-                width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: AppImage(
+                isOnline: true,
+                localPathOrUrl: '',
+                boxFit: BoxFit.cover,
+                errorWidget: Container(
+                  color: Colors.grey.withOpacity(0.2),
+                  child: const Icon(
+                    Icons.person_outline,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _searchResult() {
-    return Container(color: Colors.blue);
-  }
-
-  Widget _cardChat(
-    BuildContext context,
-    CustomListItem item,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider<OnChattingBloc>(
-                create: (context) => OnChattingBloc(context),
-                child: ChatRoom(item: item),
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'name',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 16, color: Colors.black),
               ),
-            ),
-          );
-        },
-        child: SizedBox(
-          height: 70,
-          child: ListTile(
-            leading: Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 2,
-                ),
-              ),
-              child: CircleAvatar(
-                radius: 50,
-                child: Image.asset(
-                  item.imageUrlAvt,
-                ),
-              ),
-            ),
-            title: Text(
-              item.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            subtitle: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.45,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.45,
-                    ),
-                    child: Text(
-                      item.lastMessage,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey,
-                      ),
-                    ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Text(
+                  'item.time',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(
-                      item.time,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            trailing: SizedBox(
-              width: 16,
-              child: Icon(
-                item.isRead ? Icons.check_circle : Icons.check_circle_outline,
-                size: 16,
-                color: Colors.grey,
-              ),
+                ),
+              )
+            ],
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'item.lastMessage',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(
+                    isRead ? Icons.check_circle : Icons.check_circle_outline,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

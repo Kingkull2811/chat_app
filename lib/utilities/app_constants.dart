@@ -89,4 +89,8 @@ class AppConstants {
     '2024-2025',
     '2025-2026',
   ];
+
+  static const String userCollection = 'users';
+  static const String messageCollection = 'messages';
+  static const String imageChild = 'images';
 }

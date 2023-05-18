@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_app/network/model/user_from_firebase.dart';
+import 'package:chat_app/utilities/app_constants.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -47,8 +49,10 @@ class FirebaseService {
   }) async {
     try {
       String fileName = '${titleName}_${DateTime.now().toIso8601String()}';
-      Reference reference =
-          _firebaseStorage.ref().child('images').child('/$fileName');
+      Reference reference = _firebaseStorage
+          .ref()
+          .child(AppConstants.imageChild)
+          .child('/$fileName');
       UploadTask uploadTask = reference.putFile(image);
 
       uploadTask.snapshotEvents.listen((event) {
@@ -74,7 +78,7 @@ class FirebaseService {
     }
     try {
       await _firestore
-          .collection('users')
+          .collection(AppConstants.userCollection)
           .doc('user_id_$userId')
           .set(data, options)
           .whenComplete(
@@ -84,8 +88,10 @@ class FirebaseService {
   }
 
   Future<UserFirebaseData?> getUserDetails({required int userId}) async {
-    final snapshot =
-        await _firestore.collection('users').doc('user_id_$userId').get();
+    final snapshot = await _firestore
+        .collection(AppConstants.userCollection)
+        .doc('user_id_$userId')
+        .get();
     if (snapshot.data() == null) {
       return null;
     }
@@ -95,7 +101,7 @@ class FirebaseService {
   Future<List<UserFirebaseData>> getAllProfile() async {
     final List<UserFirebaseData> profiles = [];
     await _firestore
-        .collection('users')
+        .collection(AppConstants.userCollection)
         .get()
         .then((QuerySnapshot querySnapshot) {
       for (var element in querySnapshot.docChanges) {
@@ -111,6 +117,14 @@ class FirebaseService {
       }
     });
     return profiles;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getListChatByUserID() {
+    final int userId = SharedPreferencesStorage().getUserId();
+    return _firestore
+        .collection(AppConstants.messageCollection)
+        .where('form_id', isEqualTo: userId)
+        .snapshots();
   }
 
   Future<DocumentReference> sendMessageToFirebase(

@@ -1,6 +1,9 @@
 import 'package:chat_app/network/model/user_from_firebase.dart';
+import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
+
+import '../../../network/model/student_firebase.dart';
 
 class ContactTab extends StatefulWidget {
   final List<UserFirebaseData>? listUser;
@@ -16,8 +19,14 @@ class _ContactTabState extends State<ContactTab> {
 
   bool _showSearchResult = false;
 
+  List<UserFirebaseData> listUsers = [];
+
   @override
   void initState() {
+    listUsers = widget.listUser ?? [];
+    _searchController.addListener(() {
+      _showSearchResult = _searchController.text.isNotEmpty;
+    });
     super.initState();
   }
 
@@ -33,18 +42,30 @@ class _ContactTabState extends State<ContactTab> {
       children: [
         _searchBox(context),
         Expanded(
-          child: _showSearchResult ? _searchResult() : _listView(),
+          child: _listView(_showSearchResult ? listUsers : widget.listUser),
         ),
       ],
     );
   }
 
-  Widget _listView() {
+  Widget _listView(List<UserFirebaseData>? listUserData) {
+    if (isNullOrEmpty(listUserData)) {
+      return Center(
+        child: Text(
+          'No contact',
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
-      itemCount: widget.listUser?.length,
-      // itemCount: 2,
-      itemBuilder: (context, index) => _createItemUser(widget.listUser?[index]),
-      // itemBuilder: (context, index) => Container(),
+      scrollDirection: Axis.vertical,
+      physics: const BouncingScrollPhysics(),
+      itemCount: listUserData!.length,
+      itemBuilder: (context, index) => _createItemUser(listUserData[index]),
     );
   }
 
@@ -169,18 +190,10 @@ class _ContactTabState extends State<ContactTab> {
       child: SizedBox(
         height: 40,
         child: TextField(
-          onTap: () {
-            setState(() {
-              _showSearchResult = !_showSearchResult;
-            });
-          },
           controller: _searchController,
-          onSubmitted: (_) {
-            if (_searchController.text.isEmpty) {
-              setState(() {
-                _showSearchResult = false;
-              });
-            }
+          onSubmitted: (value) {},
+          onChanged: (value) {
+            _search(value);
           },
           decoration: InputDecoration(
             hintText: 'Search',
@@ -212,7 +225,49 @@ class _ContactTabState extends State<ContactTab> {
     );
   }
 
-  Widget _searchResult() {
-    return Container(color: Colors.blue);
+  void _search(String searchQuery) {
+    if (searchQuery.isEmpty) {
+      setState(() {
+        listUsers = widget.listUser ?? [];
+      });
+    }
+    List<UserFirebaseData> suggestion = [];
+    widget.listUser?.forEach((user) {
+      if (user.username!.toLowerCase().contains(
+            searchQuery.toLowerCase(),
+          )) {
+        suggestion.add(user);
+      } else if (user.email!.contains(searchQuery)) {
+        for (UserFirebaseData userF in suggestion) {
+          if (user.id == userF.id) {
+            return;
+          } else {
+            suggestion.add(user);
+          }
+        }
+      } else if (user.phone!.contains(searchQuery)) {
+        for (UserFirebaseData userF in suggestion) {
+          if (user.id == userF.id) {
+            return;
+          } else {
+            suggestion.add(user);
+          }
+        }
+      }
+      for (StudentFirebase student in user.parentOf ?? []) {
+        if (student.className!.contains(searchQuery)) {
+          for (UserFirebaseData userF in suggestion) {
+            if (user.id == userF.id) {
+              return;
+            } else {
+              suggestion.add(user);
+            }
+          }
+        }
+      }
+    });
+    setState(() {
+      listUsers = suggestion;
+    });
   }
 }
