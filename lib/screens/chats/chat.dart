@@ -64,9 +64,6 @@ class ChatsPageState extends State<ChatsPage>
             context,
             'Error!',
             content: 'Internal Server Error',
-            // onCloseDialog: () {
-            //   reloadPage();
-            // },
           );
         }
       },
@@ -90,7 +87,7 @@ class ChatsPageState extends State<ChatsPage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            ChatTab(),
+            const ChatTab(),
             ContactTab(listUser: state.listUser),
           ],
         ),

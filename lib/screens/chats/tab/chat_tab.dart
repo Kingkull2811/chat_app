@@ -1,11 +1,14 @@
 import 'package:badges/badges.dart';
 import 'package:chat_app/screens/chats/chat_room/chat_room.dart';
+import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../network/model/message_model.dart';
 import '../../../services/firebase_services.dart';
+import '../../../utilities/shared_preferences_storage.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/animation_loading.dart';
 
@@ -17,32 +20,24 @@ class ChatTab extends StatefulWidget {
 }
 
 class _ChatTabState extends State<ChatTab> {
-  final _searchController = TextEditingController();
-
-  bool _showSearchResult = false;
-
   bool isRead = false;
 
-  Map<int, String> mapDocIdReceiverId = {};
+  Map<String, String> mapDocIdReceiverId = {};
 
   @override
   void initState() {
-    _searchController.addListener(() {
-      _showSearchResult = _searchController.text.isNotEmpty;
-    });
     super.initState();
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseService().getListChatByUserID(),
+      stream: FirebaseService().getAllMessage(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (!snapshot.hasData) {
           return const AnimationLoading();
@@ -70,10 +65,14 @@ class _ChatTabState extends State<ChatTab> {
                 for (var doc in data!) {
                   if (doc.exists) {
                     if (doc.data() is Map<String, dynamic>) {
+                      final int userID = SharedPreferencesStorage().getUserId();
                       final message = MessageModel.fromJson(
                           doc.data() as Map<String, dynamic>);
-                      mapDocIdReceiverId[message.toId!] = doc.id;
-                      listMessage.add(message);
+                      if (message.fromId == userID || message.toId == userID) {
+                        mapDocIdReceiverId[
+                            '${message.fromId}-${message.toId}'] = doc.id;
+                        listMessage.add(message);
+                      }
                     }
                   }
                 }
@@ -125,7 +124,8 @@ class _ChatTabState extends State<ChatTab> {
         ),
       );
 
-  Widget _itemChat(BuildContext context, MessageModel messageData) {
+  Widget _itemChat(BuildContext context, MessageModel message) {
+    final isMe = message.fromId == SharedPreferencesStorage().getUserId();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Container(
@@ -140,7 +140,7 @@ class _ChatTabState extends State<ChatTab> {
         child: Badge(
           showBadge: false, //(messageData.messageNum ?? 0) > 0,
           badgeContent: Text(
-            messageData.messageNum.toString(),
+            message.messageNum.toString(),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
@@ -156,8 +156,8 @@ class _ChatTabState extends State<ChatTab> {
           child: ListTile(
             onTap: () {
               _navToChatRoom(
-                messageData,
-                mapDocIdReceiverId[messageData.toId] ?? '',
+                message,
+                mapDocIdReceiverId['${message.fromId}-${message.toId}'] ?? '',
               );
             },
             leading: Container(
@@ -174,7 +174,7 @@ class _ChatTabState extends State<ChatTab> {
                 borderRadius: BorderRadius.circular(30),
                 child: AppImage(
                   isOnline: true,
-                  localPathOrUrl: messageData.toAvatar,
+                  localPathOrUrl: isMe ? message.toAvatar : message.fromAvatar,
                   boxFit: BoxFit.cover,
                   errorWidget: Container(
                     color: Colors.grey.withOpacity(0.2),
@@ -191,21 +191,20 @@ class _ChatTabState extends State<ChatTab> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  messageData.toName ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
+                Expanded(
                   child: Text(
-                    formatDateUtcToTime(messageData.lastTime),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.grey,
-                    ),
+                    isMe ? (message.toName ?? '') : (message.fromName ?? ''),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ),
+                Text(
+                  formatDateUtcToTime(message.lastTime),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey,
                   ),
                 )
               ],
@@ -216,15 +215,39 @@ class _ChatTabState extends State<ChatTab> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    messageData.lastMessage ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.grey,
-                    ),
+                  Expanded(
+                    child: message.messageType == MessageType.image
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: const [
+                              Icon(
+                                CupertinoIcons.photo,
+                                size: 10,
+                                color: Colors.grey,
+                              ),
+                              Text(
+                                ' photo',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            ],
+                          )
+                        : Text(
+                            message.lastMessage ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey,
+                            ),
+                          ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
@@ -242,4 +265,64 @@ class _ChatTabState extends State<ChatTab> {
       ),
     );
   }
+
+  // Widget _messageItem(
+  //     BuildContext context,
+  //     MessageModel message,
+  //     ) {
+  //   final isMe = message.fromId == SharedPreferencesStorage().getUserId();
+  //   Widget messageContain(MessageContentModel itemMessage) {
+  //     switch (itemMessage.messageType) {
+  //       case MessageType.text:
+  //         return textMessage(itemMessage, isMe);
+  //
+  //       case MessageType.image:
+  //         return imageMessage(itemMessage, isMe);
+  //
+  //       case MessageType.video:
+  //         return videoMessage(itemMessage, isMe);
+  //
+  //       case MessageType.audio:
+  //         return audioMessage(itemMessage, isMe);
+  //
+  //       default:
+  //         return const SizedBox();
+  //     }
+  //   }
+  //
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  //     child: Column(
+  //       crossAxisAlignment:
+  //       isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+  //       children: [
+  //         // Padding(
+  //         //   padding: const EdgeInsets.only(top: 6, bottom: 0),
+  //         //   child: Center(
+  //         //     child: Text(
+  //         //       formatDateUtcToTime(message.time),
+  //         //       style: TextStyle(
+  //         //           fontSize: 14,
+  //         //           fontWeight: FontWeight.normal,
+  //         //           color: Theme.of(context).primaryColor),
+  //         //     ),
+  //         //   ),
+  //         // ),
+  //         Padding(
+  //           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+  //           child: messageContain(message),
+  //         ),
+  //         Text(
+  //           formatDateUtcToTime(message.time),
+  //           style: TextStyle(
+  //             fontSize: 12,
+  //             fontWeight: FontWeight.normal,
+  //             color: Theme.of(context).primaryColor,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
 }

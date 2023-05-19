@@ -27,6 +27,9 @@ class AppRoutes {
                 child: const LoginPage(),
               );
       },
+      AppRoutes.chat: (context) {
+        return MainApp(currentTab: 0);
+      },
       AppRoutes.news: (context) {
         return MainApp(currentTab: 1);
       },

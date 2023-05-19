@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../utilities/utils.dart';
-import 'notification_sound/setting_notification.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -88,19 +87,19 @@ class _SettingPageState extends State<SettingPage> {
                   );
                 },
               ),
-              _itemWithIcon(
-                title: 'Notification & Sound',
-                iconPath: '',
-                icon: Icons.notifications_active_outlined,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingNotificationPage(),
-                    ),
-                  );
-                },
-              ),
+              // _itemWithIcon(
+              //   title: 'Notification & Sound',
+              //   iconPath: '',
+              //   icon: Icons.notifications_active_outlined,
+              //   onTap: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => const SettingNotificationPage(),
+              //       ),
+              //     );
+              //   },
+              // ),
               // _itemWithIcon(
               //   title: 'Privacy & Safety',
               //   iconPath: 'assets/images/ic_shield.png',

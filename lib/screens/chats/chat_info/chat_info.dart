@@ -1,47 +1,27 @@
+import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
 import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
-import 'package:chat_app/screens/chats/media_shared/media_shared.dart';
-import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/theme.dart';
-import 'package:chat_app/widgets/message_dialog_2_action.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/app_image.dart';
 
-class ChatInfoPage extends StatefulWidget {
+class ChatInfoPage extends StatelessWidget {
   final bool isGroup;
+  final int receiverID;
   final String name;
-  final String urlImage;
+  final String? imageUrl;
 
   const ChatInfoPage({
     Key? key,
     this.isGroup = false,
+    required this.receiverID,
     required this.name,
-    required this.urlImage,
+    this.imageUrl,
   }) : super(key: key);
-
-  @override
-  State<ChatInfoPage> createState() => _ChatInfoPageState();
-}
-
-class _ChatInfoPageState extends State<ChatInfoPage> {
-  bool _isMute = false;
-  final _focusNode = FocusNode();
-  final _searchController = TextEditingController();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +62,9 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                   borderRadius: BorderRadius.circular(75),
                   child: AppImage(
                     isOnline: true,
-                    localPathOrUrl: widget.urlImage,
+                    localPathOrUrl: imageUrl,
                     boxFit: BoxFit.cover,
-                    errorWidget: Icon(
+                    errorWidget: const Icon(
                       CupertinoIcons.person,
                       size: 30,
                       color: Colors.grey,
@@ -96,7 +76,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             Padding(
               padding: const EdgeInsets.only(top: 10, bottom: 10),
               child: Text(
-                widget.name,
+                name,
                 style: const TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -105,7 +85,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 60),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -118,8 +98,8 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => AudioCallPage(
-                            imageUrl: widget.urlImage,
-                            name: widget.name,
+                            imageUrl: imageUrl ?? '',
+                            name: name,
                           ),
                         ),
                       );
@@ -134,32 +114,20 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => VideoCallPage(
-                            imageUrl: widget.urlImage,
-                            name: widget.name,
+                            imageUrl: imageUrl ?? '',
+                            name: name,
                           ),
                         ),
                       );
                     },
                   ),
-                  _itemControl(context,
-                      icon: widget.isGroup
-                          ? Icons.person_add_alt_outlined
-                          : Icons.person_outline,
-                      itemTitle: widget.isGroup ? 'Add' : 'Profile',
-                      onTapItemControl: () {}),
-                  _itemControl(
-                    context,
-                    icon: _isMute
-                        ? Icons.notifications_on_outlined
-                        : Icons.notifications_off_outlined,
-                    itemTitle: _isMute ? 'UnMute' : 'Mute',
-                    isActive: !_isMute,
-                    onTapItemControl: () {
-                      setState(() {
-                        _isMute = !_isMute;
-                      });
-                    },
-                  ),
+                  if (!isGroup)
+                    _itemControl(
+                      context,
+                      icon: Icons.person_outline,
+                      itemTitle: 'Profile',
+                      onTapItemControl: () {},
+                    ),
                 ],
               ),
             ),
@@ -168,236 +136,85 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
                 padding: const EdgeInsets.only(top: 32),
                 child: Column(
                   children: [
-                    widget.isGroup
-                        ? _itemInfo(
-                            itemTitle: 'Group participants',
-                            icon: Icons.groups,
-                            onTapItem: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GroupParticipantPage(),
-                                ),
-                              );
-                            },
-                          )
-                        : const SizedBox.shrink(),
-                    _itemInfo(
-                      itemTitle: 'Search in conversation',
-                      icon: Icons.search_rounded,
-                      onTapItem: () async {
-                        await showDialog(
-                          barrierColor: Colors.grey[500],
-                          barrierDismissible: false,
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            //todo:::
-                            //set align top when keyboard show, center when keyboard hide
-                            alignment: Alignment.center,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Search in conversation',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Icon(
-                                    Icons.cancel_outlined,
-                                    size: 24,
-                                    color: AppColors.red700,
-                                  ),
-                                ),
-                              ],
+                    if (isGroup)
+                      _itemInfo(
+                        itemTitle: 'Group participants',
+                        icon: Icons.groups,
+                        onTapItem: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const GroupParticipantPage(),
                             ),
-                            content: SizedBox(
-                              width: double.maxFinite,
-                              height: 300,
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 35,
-                                    child: TextField(
-                                      controller: _searchController,
-                                      onSubmitted: (_) =>
-                                          _focusNode.requestFocus(),
-                                      maxLines: 1,
-                                      decoration: InputDecoration(
-                                        prefixIcon: Icon(
-                                          Icons.search,
-                                          size: 24,
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                        prefixIconColor:
-                                            Theme.of(context).primaryColor,
-                                        hintText: 'Search...',
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(24.0),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 6.0),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(24),
-                                          borderSide: BorderSide(
-                                            width: 2,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(24),
-                                          borderSide: const BorderSide(
-                                            width: 1,
-                                            color: Color.fromARGB(
-                                                128, 130, 130, 130),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      width: double.maxFinite,
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Container(
-                                        color: Colors.grey,
-                                        child: const Text('Result of search'),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    _itemInfo(
-                      itemTitle: 'Files, medias, documents & links',
-                      // icon: CupertinoIcons.doc,
-                      icon: CupertinoIcons.photo_on_rectangle,
-                      onTapItem: () async {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MediaShared(),
-                          ),
-                        );
-                      },
-                    ),
-
-                    // _itemInfo(
-                    //   itemTitle: 'Ignore message',
-                    //   icon: Icons.hide_source_outlined,
-                    //   onTapItem: () {},
-                    //),
-                    widget.isGroup
-                        ? const SizedBox.shrink()
-                        : _itemInfo(
-                            itemTitle: 'Block',
-                            icon: Icons.speaker_notes_off_outlined,
-                            onTapItem: () async {
-                              await showDialog(
-                                context: context,
-                                builder: (context) => MessageDialog2Action(
-                                  title: 'Block ${widget.name}?',
-                                  content:
-                                      'Do you want block ${widget.name}.\nAfter block, you can send message to ${widget.name} and vice versa.',
-                                  buttonLeftLabel: 'Cancel',
-                                  onLeftTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  buttonRightLabel: 'Block',
-                                  onRightTap: () {
-                                    //todo:::
-                                    //back to on chatting and can't send message
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              );
+                          );
+                        },
+                      ),
+                    if (!isGroup)
+                      _itemInfo(
+                        itemTitle: 'Block',
+                        icon: Icons.speaker_notes_off_outlined,
+                        onTapItem: () async {
+                          showMessageTwoOption(
+                            context,
+                            'Block $name?',
+                            content:
+                                'Do you want block $name.\nAfter block, you can send message to $name and vice versa.',
+                            okLabel: 'Block',
+                            onOk: () {
+                              //todo:::
+                              //bloc user and back to chat
+                              Navigator.of(context).pop(true);
                             },
-                          ),
+                          );
+                        },
+                      ),
                     _itemInfo(
                       itemTitle: 'Delete chat',
                       icon: CupertinoIcons.delete,
                       isRed: true,
                       onTapItem: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) => MessageDialog2Action(
-                            title: 'Delete chat',
-                            content:
-                                'Do you want delete this chat.\nAfter delete, you can\'t restore this chat.',
-                            buttonLeftLabel: 'Cancel',
-                            onLeftTap: () {
-                              Navigator.pop(context);
-                            },
-                            buttonRightLabel: 'Delete',
-                            isRedLabel: true,
-                            onRightTap: () {
-                              //todo:::
-                              //delete this chat and go to main app
-
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MainApp(currentTab: 0),
-                                ),
-                              );
-                            },
-                          ),
+                        showMessageTwoOption(
+                          context,
+                          'Delete chat',
+                          content:
+                              'Do you want delete this chat.\nAfter delete, you can\'t restore this chat.',
+                          okLabel: 'Delete',
+                          onOk: () {
+                            //todo:::
+                            //delete this chat and go to main app
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              AppRoutes.chat,
+                              (route) => false,
+                            );
+                          },
                         );
                       },
                     ),
-                    widget.isGroup
-                        ? _itemInfo(
-                            itemTitle: 'Leave group',
-                            icon: Icons.output_outlined,
-                            isRed: true,
-                            onTapItem: () async {
-                              await showDialog(
-                                context: context,
-                                builder: (context) => MessageDialog2Action(
-                                  title: 'Leave group chat',
-                                  content: 'Do you want leave group chat.',
-                                  buttonLeftLabel: 'Cancel',
-                                  onLeftTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  buttonRightLabel: 'Leave',
-                                  isRedLabel: true,
-                                  onRightTap: () {
-                                    //todo:::
-                                    //leave user out group chat
-
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            MainApp(currentTab: 0),
-                                      ),
-                                    );
-                                  },
-                                ),
+                    if (isGroup)
+                      _itemInfo(
+                        itemTitle: 'Leave group',
+                        icon: Icons.output_outlined,
+                        isRed: true,
+                        onTapItem: () async {
+                          showMessageTwoOption(
+                            context,
+                            'Leave group chat',
+                            content: 'Do you want leave group chat?',
+                            okLabel: 'Leave',
+                            onOk: () {
+                              //todo:::
+                              //leave user out group chat
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                AppRoutes.chat,
+                                (route) => false,
                               );
                             },
-                          )
-                        : const SizedBox.shrink(),
+                          );
+                        },
+                      ),
                   ],
                 ),
               ),
@@ -423,18 +240,18 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
         child: Column(
           children: [
             Container(
-              height: 36,
-              width: 36,
+              height: 50,
+              width: 50,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(25),
                 color: isActive
                     ? Theme.of(context).primaryColor
-                    : Colors.grey[300],
+                    : Colors.grey.withOpacity(0.2),
               ),
               child: Icon(
                 icon,
-                size: 24,
-                color: Colors.black,
+                size: 30,
+                color: AppColors.primaryColor,
               ),
             ),
             Padding(
@@ -471,21 +288,21 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
             Text(
               itemTitle,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.normal,
                 color: isRed ? AppColors.red700 : Colors.black,
               ),
             ),
             Container(
-              width: 28,
-              height: 28,
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(17),
+                color: Colors.grey.withOpacity(0.2),
               ),
               child: Icon(
                 icon,
-                size: 18,
+                size: 20,
                 color: isRed ? AppColors.red700 : Colors.black,
               ),
             ),

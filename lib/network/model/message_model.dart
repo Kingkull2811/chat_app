@@ -66,6 +66,6 @@ class MessageModel {
 
   @override
   String toString() {
-    return 'MessageModel{fromId: $fromId, fromName: $fromName, fromAvatar: $fromAvatar, toId: $toId, toName: $toName, toAvatar: $toAvatar, sent: $sent, read: $read, lastMessage: $lastMessage, messageType: $messageType, lastTime: $lastTime, messageNum: $messageNum}';
+    return 'MessageModel{fromId: $fromId, toId: $toId, toName: $toName, toAvatar: $toAvatar, sent: $sent, read: $read, lastMessage: $lastMessage, messageType: $messageType, lastTime: $lastTime, messageNum: $messageNum}';
   }
 }

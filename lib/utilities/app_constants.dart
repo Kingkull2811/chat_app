@@ -90,8 +90,13 @@ class AppConstants {
     '2025-2026',
   ];
 
+  ///collection in firebase & child folder storage
   static const String userCollection = 'users';
   static const String messageCollection = 'messages';
   static const String messageListCollection = 'message_list';
   static const String imageChild = 'images';
+  static const String imageMessageChild = 'messages';
+  static const String imageNewsChild = 'news';
+  static const String imageStudentsChild = 'students';
+  static const String imageProfilesChild = 'profiles';
 }

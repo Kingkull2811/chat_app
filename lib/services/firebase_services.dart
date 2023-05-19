@@ -11,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
 import '../network/model/message_content_model.dart';
+import '../network/model/message_model.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -43,21 +44,34 @@ class FirebaseService {
         .update(dataNeedUpdate);
   }
 
-  uploadImageToStorage({
+  Future uploadImageToStorage({
     required String titleName,
+    required String childFolder,
     required File image,
   }) async {
     try {
-      String fileName = '${titleName}_${DateTime.now().toIso8601String()}';
+      String fileName = '${titleName}_${DateTime.now().millisecondsSinceEpoch}';
       Reference reference = _firebaseStorage
           .ref()
           .child(AppConstants.imageChild)
+          .child(childFolder)
           .child('/$fileName');
       UploadTask uploadTask = reference.putFile(image);
 
-      uploadTask.snapshotEvents.listen((event) {
+      uploadTask.snapshotEvents.listen((event) async {
         if (kDebugMode) {
           print('processing ${event.bytesTransferred}/${event.totalBytes}');
+        }
+        switch (event.state) {
+          case TaskState.paused:
+          case TaskState.running:
+          case TaskState.canceled:
+          case TaskState.error:
+            break;
+
+          case TaskState.success:
+            //get imageUrl and send message
+            break;
         }
       });
       await uploadTask.whenComplete(() => null);
@@ -68,7 +82,7 @@ class FirebaseService {
     }
   }
 
-  Future<dynamic> uploadUserData({
+  Future uploadUserData({
     int? userId,
     required Map<String, dynamic> data,
     SetOptions? options,
@@ -119,14 +133,29 @@ class FirebaseService {
     return profiles;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getListChatByUserID() {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getListChatByFromId() {
     final int userId = SharedPreferencesStorage().getUserId();
     final snapshot = _firestore
         .collection(AppConstants.messageCollection)
         .where('from_id', isEqualTo: userId)
-        // .orderBy('last_time', descending: true)
         .snapshots();
     return snapshot;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getListChatToId() {
+    final int userId = SharedPreferencesStorage().getUserId();
+    final snapshot = _firestore
+        .collection(AppConstants.messageCollection)
+        .where('to_id', isEqualTo: userId)
+        .snapshots();
+    return snapshot;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessage() {
+    return _firestore
+        .collection(AppConstants.messageCollection)
+        .orderBy('last_time', descending: true)
+        .snapshots();
   }
 
   Stream<QuerySnapshot> getListMessageInChatRoom(String docId) {
@@ -176,7 +205,9 @@ class FirebaseService {
                 messageContent.toJson())
         .add(message)
         .then((DocumentReference doc) {
-      print('doc ${doc.id}');
+      if (kDebugMode) {
+        print('doc ${doc.id}');
+      }
     });
 
     await _firestore
@@ -190,4 +221,9 @@ class FirebaseService {
       },
     );
   }
+
+  Future addNewCollectionMessage({
+    required MessageContentModel messageContent,
+    required MessageModel message,
+  }) async {}
 }

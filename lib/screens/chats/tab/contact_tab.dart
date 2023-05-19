@@ -1,9 +1,8 @@
 import 'package:chat_app/network/model/user_from_firebase.dart';
+import 'package:chat_app/screens/chats/chat_room/chat_room.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
-
-import '../../../network/model/student_firebase.dart';
 
 class ContactTab extends StatefulWidget {
   final List<UserFirebaseData>? listUser;
@@ -38,13 +37,22 @@ class _ContactTabState extends State<ContactTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _searchBox(context),
-        Expanded(
-          child: _listView(_showSearchResult ? listUsers : widget.listUser),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).focusedChild?.unfocus(),
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(0),
+          child: Column(
+            children: [
+              _searchBox(context),
+              Expanded(
+                child:
+                    _listView(_showSearchResult ? listUsers : widget.listUser),
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 
@@ -78,12 +86,12 @@ class _ContactTabState extends State<ContactTab> {
           children: [
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 4.5),
+                padding: const EdgeInsets.symmetric(vertical: 4.5),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(right: 16),
+                      padding: const EdgeInsets.only(right: 16),
                       child: Container(
                         height: 50,
                         width: 50,
@@ -116,7 +124,7 @@ class _ContactTabState extends State<ContactTab> {
                         children: [
                           Text(
                             item?.fullName ?? '',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -133,9 +141,20 @@ class _ContactTabState extends State<ContactTab> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 10),
+                      padding: const EdgeInsets.only(left: 10),
                       child: InkWell(
-                        onTap: () {},
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatRoom(
+                                isNewMessage: true,
+                                receiver: item,
+                              ),
+                            ),
+                          );
+                        },
                         child: Container(
                           height: 35,
                           width: 35,
@@ -143,7 +162,7 @@ class _ContactTabState extends State<ContactTab> {
                             borderRadius: BorderRadius.circular(20),
                             color: Theme.of(context).primaryColor,
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.message_outlined,
                             size: 20,
                             color: Colors.white,
@@ -152,8 +171,9 @@ class _ContactTabState extends State<ContactTab> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 10),
+                      padding: const EdgeInsets.only(left: 10),
                       child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
                         onTap: () {},
                         child: Container(
                           height: 35,
@@ -162,7 +182,7 @@ class _ContactTabState extends State<ContactTab> {
                             borderRadius: BorderRadius.circular(20),
                             color: Theme.of(context).primaryColor,
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.call,
                             size: 20,
                             color: Colors.white,
@@ -189,9 +209,9 @@ class _ContactTabState extends State<ContactTab> {
       padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
       child: SizedBox(
         height: 40,
-        child: TextField(
+        child: TextFormField(
           controller: _searchController,
-          onSubmitted: (value) {},
+          onFieldSubmitted: (value) {},
           onChanged: (value) {
             _search(value);
           },
@@ -231,41 +251,30 @@ class _ContactTabState extends State<ContactTab> {
         listUsers = widget.listUser ?? [];
       });
     }
-    List<UserFirebaseData> suggestion = [];
-    widget.listUser?.forEach((user) {
-      if (user.username!.toLowerCase().contains(
-            searchQuery.toLowerCase(),
-          )) {
-        suggestion.add(user);
-      } else if (user.email!.contains(searchQuery)) {
-        for (UserFirebaseData userF in suggestion) {
-          if (user.id == userF.id) {
-            return;
-          } else {
-            suggestion.add(user);
-          }
-        }
-      } else if (user.phone!.contains(searchQuery)) {
-        for (UserFirebaseData userF in suggestion) {
-          if (user.id == userF.id) {
-            return;
-          } else {
-            suggestion.add(user);
-          }
-        }
-      }
-      for (StudentFirebase student in user.parentOf ?? []) {
-        if (student.className!.contains(searchQuery)) {
-          for (UserFirebaseData userF in suggestion) {
-            if (user.id == userF.id) {
-              return;
-            } else {
-              suggestion.add(user);
-            }
-          }
-        }
-      }
-    });
+    List<UserFirebaseData> suggestion = widget.listUser?.where((user) {
+          bool matchesFullName = user.fullName
+                  ?.toLowerCase()
+                  .contains(searchQuery.toLowerCase()) ??
+              false;
+          bool matchesEmail =
+              user.email?.toLowerCase().contains(searchQuery.toLowerCase()) ??
+                  false;
+          bool matchesPhone =
+              user.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ??
+                  false;
+          bool matchesParentClassName = user.parentOf?.any((student) =>
+                  student.className
+                      ?.toLowerCase()
+                      .contains(searchQuery.toLowerCase()) ??
+                  false) ??
+              false;
+
+          return matchesFullName ||
+              matchesEmail ||
+              matchesPhone ||
+              matchesParentClassName;
+        }).toList() ??
+        [];
     setState(() {
       listUsers = suggestion;
     });
