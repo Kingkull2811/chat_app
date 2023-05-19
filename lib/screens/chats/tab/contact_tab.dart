@@ -1,8 +1,9 @@
 import 'package:chat_app/network/model/user_from_firebase.dart';
-import 'package:chat_app/screens/chats/chat_room/chat_room.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
+
+import '../chat_room/message_view.dart';
 
 class ContactTab extends StatefulWidget {
   final List<UserFirebaseData>? listUser;
@@ -41,7 +42,7 @@ class _ContactTabState extends State<ContactTab> {
       onTap: () => FocusScope.of(context).focusedChild?.unfocus(),
       child: Scaffold(
         body: Padding(
-          padding: EdgeInsets.all(0),
+          padding: const EdgeInsets.all(0),
           child: Column(
             children: [
               _searchBox(context),
@@ -77,7 +78,7 @@ class _ContactTabState extends State<ContactTab> {
     );
   }
 
-  Widget _createItemUser(UserFirebaseData? item) {
+  Widget _createItemUser(UserFirebaseData item) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: SizedBox(
@@ -106,7 +107,7 @@ class _ContactTabState extends State<ContactTab> {
                           borderRadius: BorderRadius.circular(25),
                           child: AppImage(
                             isOnline: true,
-                            localPathOrUrl: item?.fileUrl,
+                            localPathOrUrl: item.fileUrl,
                             boxFit: BoxFit.cover,
                             errorWidget: Image.asset(
                               'assets/images/ic_account_circle.png',
@@ -123,7 +124,7 @@ class _ContactTabState extends State<ContactTab> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Text(
-                            item?.fullName ?? '',
+                            item.fullName ?? '',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
@@ -131,7 +132,7 @@ class _ContactTabState extends State<ContactTab> {
                             ),
                           ),
                           Text(
-                            item?.email ?? '',
+                            item.email ?? '',
                             style: TextStyle(
                               fontSize: 14,
                               color: Theme.of(context).primaryColor,
@@ -148,9 +149,10 @@ class _ContactTabState extends State<ContactTab> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatRoom(
-                                isNewMessage: true,
-                                receiver: item,
+                              builder: (context) => MessageView(
+                                receiverId: item.id.toString(),
+                                receiverName: item.fullName ?? '',
+                                receiverAvt: item.fileUrl ?? '',
                               ),
                             ),
                           );

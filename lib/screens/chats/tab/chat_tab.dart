@@ -1,12 +1,9 @@
-import 'package:badges/badges.dart';
-import 'package:chat_app/screens/chats/chat_room/chat_room.dart';
-import 'package:chat_app/utilities/enum/message_type.dart';
+import 'package:chat_app/network/model/chat_model.dart';
+import 'package:chat_app/screens/chats/chat_room/message_view.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../network/model/message_model.dart';
 import '../../../services/firebase_services.dart';
 import '../../../utilities/shared_preferences_storage.dart';
 import '../../../utilities/utils.dart';
@@ -20,9 +17,7 @@ class ChatTab extends StatefulWidget {
 }
 
 class _ChatTabState extends State<ChatTab> {
-  bool isRead = false;
-
-  Map<String, String> mapDocIdReceiverId = {};
+  final int currentUserId = SharedPreferencesStorage().getUserId();
 
   @override
   void initState() {
@@ -34,64 +29,87 @@ class _ChatTabState extends State<ChatTab> {
     super.dispose();
   }
 
+  List<ChatModel> convertListChat(
+    AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
+  ) {
+    List<ChatModel> listChat = [];
+    final data = snapshot.data?.docs;
+    for (var doc in data!) {
+      if (doc.exists) {
+        Map<String, dynamic> docData = doc.data() as Map<String, dynamic>;
+        Map<String, dynamic> userId = docData['members'];
+        Map<String, dynamic> names = docData['names'];
+        Map<String, dynamic> imageUrls = docData['imageUrls'];
+        userId.remove('$currentUserId');
+        names.remove('$currentUserId');
+        imageUrls.remove('$currentUserId');
+
+        final Map<String, dynamic> mapDoc = {
+          "receiver_id": userId.keys.first,
+          "receiver_avt": imageUrls.values.first,
+          "receiver_name": names.values.first,
+          "last_message": docData['last_message'],
+          "message_type": docData['message_type'],
+          "time": docData['time']
+        };
+
+        listChat.add(ChatModel.fromJson(mapDoc));
+      }
+    }
+    return listChat;
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FirebaseService().getAllMessage(),
+      stream: FirebaseService().getListChat(currentUserId),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Something went wrong"),
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const AnimationLoading();
-        } else {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-              return const AnimationLoading();
-            case ConnectionState.active:
-            case ConnectionState.done:
-              if (snapshot.data!.docs.isEmpty) {
-                return Center(
-                  child: Text(
-                    'no messages yet',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                );
-              } else {
-                List<MessageModel> listMessage = [];
-                final data = snapshot.data?.docs;
+        }
 
-                for (var doc in data!) {
-                  if (doc.exists) {
-                    if (doc.data() is Map<String, dynamic>) {
-                      final int userID = SharedPreferencesStorage().getUserId();
-                      final message = MessageModel.fromJson(
-                          doc.data() as Map<String, dynamic>);
-                      if (message.fromId == userID || message.toId == userID) {
-                        mapDocIdReceiverId[
-                            '${message.fromId}-${message.toId}'] = doc.id;
-                        listMessage.add(message);
-                      }
-                    }
-                  }
-                }
-                return _listChat(listMessage);
-              }
-          }
+        if (snapshot.hasData) {
+          List<ChatModel> listChat = convertListChat(snapshot);
+          return _listChat(listChat);
+        } else {
+          return Center(
+            child: Text(
+              'no messages yet',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          );
         }
       },
     );
   }
 
-  Widget _listChat(List<MessageModel> listMessage) {
+  Widget _listChat(List<ChatModel>? listChat) {
     return Scaffold(
-      body: ListView.builder(
-        scrollDirection: Axis.vertical,
-        physics: const BouncingScrollPhysics(),
-        itemCount: listMessage.length,
-        itemBuilder: (context, index) => _itemChat(context, listMessage[index]),
-      ),
+      body: isNullOrEmpty(listChat)
+          ? Center(
+              child: Text(
+                'no messages yet',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            )
+          : ListView.builder(
+              scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
+              itemCount: listChat!.length,
+              itemBuilder: (context, index) =>
+                  _itemChat(context, listChat[index]),
+            ),
       floatingActionButton: InkWell(
         borderRadius: BorderRadius.circular(25),
         onTap: () {},
@@ -112,20 +130,18 @@ class _ChatTabState extends State<ChatTab> {
     );
   }
 
-  _navToNewChat() {}
-
-  _navToChatRoom(MessageModel messageData, String docId) => Navigator.push(
+  _navToChatRoom(ChatModel chatItem) => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ChatRoom(
-            messageData: messageData,
-            docID: docId,
+          builder: (context) => MessageView(
+            receiverId: chatItem.receiverId ?? '',
+            receiverName: chatItem.receiverName ?? '',
+            receiverAvt: chatItem.receiverAvt ?? '',
           ),
         ),
       );
 
-  Widget _itemChat(BuildContext context, MessageModel message) {
-    final isMe = message.fromId == SharedPreferencesStorage().getUserId();
+  Widget _itemChat(BuildContext context, ChatModel chatItem) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Container(
@@ -137,192 +153,90 @@ class _ChatTabState extends State<ChatTab> {
             ),
           ),
         ),
-        child: Badge(
-          showBadge: false, //(messageData.messageNum ?? 0) > 0,
-          badgeContent: Text(
-            message.messageNum.toString(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          badgeStyle: const BadgeStyle(
-            badgeColor: Colors.red,
-            padding: EdgeInsets.fromLTRB(6, 6, 6, 6),
-          ),
-          position: BadgePosition.topEnd(top: 0, end: 0),
-          child: ListTile(
-            onTap: () {
-              _navToChatRoom(
-                message,
-                mapDocIdReceiverId['${message.fromId}-${message.toId}'] ?? '',
-              );
-            },
-            leading: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(
-                  width: 1,
-                  color: Theme.of(context).primaryColor,
-                ),
+        child: ListTile(
+          onTap: () {
+            _navToChatRoom(chatItem);
+          },
+          leading: Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                width: 1,
+                color: Theme.of(context).primaryColor,
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: AppImage(
-                  isOnline: true,
-                  localPathOrUrl: isMe ? message.toAvatar : message.fromAvatar,
-                  boxFit: BoxFit.cover,
-                  errorWidget: Container(
-                    color: Colors.grey.withOpacity(0.2),
-                    child: const Icon(
-                      Icons.person_outline,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: AppImage(
+                isOnline: true,
+                localPathOrUrl: chatItem.receiverAvt,
+                boxFit: BoxFit.cover,
+                errorWidget: Container(
+                  color: Colors.grey.withOpacity(0.2),
+                  child: const Icon(
+                    Icons.person_outline,
+                    size: 40,
+                    color: Colors.grey,
                   ),
                 ),
               ),
             ),
-            title: Row(
+          ),
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  chatItem.receiverName ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ),
+              Text(
+                formatDateUtcToTime(chatItem.time),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey,
+                ),
+              )
+            ],
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
-                    isMe ? (message.toName ?? '') : (message.fromName ?? ''),
+                    chatItem.lastMessage ?? '',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                ),
-                Text(
-                  formatDateUtcToTime(message.lastTime),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey,
-                  ),
-                )
-              ],
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: message.messageType == MessageType.image
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: const [
-                              Icon(
-                                CupertinoIcons.photo,
-                                size: 10,
-                                color: Colors.grey,
-                              ),
-                              Text(
-                                ' photo',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.grey,
-                                ),
-                              )
-                            ],
-                          )
-                        : Text(
-                            message.lastMessage ?? '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.grey,
-                            ),
-                          ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Icon(
-                      isRead ? Icons.check_circle : Icons.check_circle_outline,
-                      size: 16,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
                       color: Colors.grey,
                     ),
                   ),
-                ],
-              ),
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 10),
+                //   child: Icon(
+                //     isRead ? Icons.check_circle : Icons.check_circle_outline,
+                //     size: 16,
+                //     color: Colors.grey,
+                //   ),
+                // ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
-
-  // Widget _messageItem(
-  //     BuildContext context,
-  //     MessageModel message,
-  //     ) {
-  //   final isMe = message.fromId == SharedPreferencesStorage().getUserId();
-  //   Widget messageContain(MessageContentModel itemMessage) {
-  //     switch (itemMessage.messageType) {
-  //       case MessageType.text:
-  //         return textMessage(itemMessage, isMe);
-  //
-  //       case MessageType.image:
-  //         return imageMessage(itemMessage, isMe);
-  //
-  //       case MessageType.video:
-  //         return videoMessage(itemMessage, isMe);
-  //
-  //       case MessageType.audio:
-  //         return audioMessage(itemMessage, isMe);
-  //
-  //       default:
-  //         return const SizedBox();
-  //     }
-  //   }
-  //
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-  //     child: Column(
-  //       crossAxisAlignment:
-  //       isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-  //       children: [
-  //         // Padding(
-  //         //   padding: const EdgeInsets.only(top: 6, bottom: 0),
-  //         //   child: Center(
-  //         //     child: Text(
-  //         //       formatDateUtcToTime(message.time),
-  //         //       style: TextStyle(
-  //         //           fontSize: 14,
-  //         //           fontWeight: FontWeight.normal,
-  //         //           color: Theme.of(context).primaryColor),
-  //         //     ),
-  //         //   ),
-  //         // ),
-  //         Padding(
-  //           padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-  //           child: messageContain(message),
-  //         ),
-  //         Text(
-  //           formatDateUtcToTime(message.time),
-  //           style: TextStyle(
-  //             fontSize: 12,
-  //             fontWeight: FontWeight.normal,
-  //             color: Theme.of(context).primaryColor,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
 }

@@ -65,6 +65,10 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                   userId: SharedPreferencesStorage().getUserId(),
                 );
                 if (userInfo is UserInfoModel) {
+                  await SharedPreferencesStorage()
+                      .setFullName(userInfo.fullName ?? '');
+                  await SharedPreferencesStorage()
+                      .setImageAvartarUrl(userInfo.fileUrl ?? '');
                   if (!mounted) {}
                   const Duration(milliseconds: 500);
                   userInfo.isFillProfileKey == true

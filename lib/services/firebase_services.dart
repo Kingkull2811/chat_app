@@ -10,8 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
-import '../network/model/message_content_model.dart';
 import '../network/model/message_model.dart';
+import '../utilities/enum/message_type.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -31,17 +31,6 @@ class FirebaseService {
     UploadTask uploadTask = reference.putFile(File(imagePath));
     reference.getDownloadURL();
     return uploadTask;
-  }
-
-  Future<void> uploadDataFireStore(
-    String collectionPath,
-    String path,
-    Map<String, String> dataNeedUpdate,
-  ) {
-    return _firestore
-        .collection(collectionPath)
-        .doc(path)
-        .update(dataNeedUpdate);
   }
 
   Future uploadImageToStorage({
@@ -133,43 +122,8 @@ class FirebaseService {
     return profiles;
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getListChatByFromId() {
-    final int userId = SharedPreferencesStorage().getUserId();
-    final snapshot = _firestore
-        .collection(AppConstants.messageCollection)
-        .where('from_id', isEqualTo: userId)
-        .snapshots();
-    return snapshot;
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getListChatToId() {
-    final int userId = SharedPreferencesStorage().getUserId();
-    final snapshot = _firestore
-        .collection(AppConstants.messageCollection)
-        .where('to_id', isEqualTo: userId)
-        .snapshots();
-    return snapshot;
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessage() {
-    return _firestore
-        .collection(AppConstants.messageCollection)
-        .orderBy('last_time', descending: true)
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot> getListMessageInChatRoom(String docId) {
-    final snapshot = _firestore
-        .collection(AppConstants.messageCollection)
-        .doc(docId)
-        .collection(AppConstants.messageListCollection)
-        .orderBy('time', descending: false)
-        .snapshots();
-    return snapshot;
-  }
-
-  Future<List<MessageContentModel>> getListMessage(String docId) async {
-    List<MessageContentModel> listMessage = [];
+  Future<List<MessageModel>> getListMessage(String docId) async {
+    List<MessageModel> listMessage = [];
     await _firestore
         .collection(AppConstants.messageCollection)
         .doc(docId)
@@ -181,8 +135,8 @@ class FirebaseService {
         if (doc.exists) {
           log('data: ${doc.data().toString()}');
           if (doc.data() is Map<String, dynamic>) {
-            final message = MessageContentModel.fromJson(
-                doc.data() as Map<String, dynamic>);
+            final message =
+                MessageModel.fromJson(doc.data() as Map<String, dynamic>);
             listMessage.add(message);
           }
         }
@@ -191,39 +145,136 @@ class FirebaseService {
     return listMessage;
   }
 
-  Future<void> sendMessageToFirebase(
-    String docId,
-    MessageContentModel message,
-  ) async {
+  Stream<QuerySnapshot<Map<String, dynamic>>> getListChat(int currentUserId) {
+    return _firestore
+        .collection(AppConstants.chatsCollection)
+        .where('members.$currentUserId', isNull: true)
+        .snapshots();
+  }
+
+  Future<String> checkMessageExists({
+    required int currentUserId,
+    required String receiverId,
+    required String receiverAvt,
+    required String receiverName,
+  }) async {
+    var docID;
     await _firestore
-        .collection(AppConstants.messageCollection)
-        .doc(docId)
+        .collection(AppConstants.chatsCollection)
+        .where('members',
+            isEqualTo: {currentUserId.toString(): null, receiverId: null})
+        .limit(1)
+        .get()
+        .then(
+          (QuerySnapshot querySnapshot) async {
+            if (querySnapshot.docs.isNotEmpty) {
+              docID = querySnapshot.docs.single.id;
+            } else {
+              await _firestore.collection(AppConstants.chatsCollection).add({
+                "members": {currentUserId.toString(): null, receiverId: null},
+                'names': {
+                  currentUserId.toString():
+                      SharedPreferencesStorage().getFullName(),
+                  receiverId: receiverName
+                },
+                'imageUrls': {
+                  currentUserId.toString():
+                      SharedPreferencesStorage().getImageAvartarUrl(),
+                  receiverId: receiverAvt
+                },
+              }).then((value) {
+                docID = value.id;
+              });
+            }
+          },
+        )
+        .catchError((error) {});
+    return docID;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getMessage(var docID) {
+    return _firestore
+        .collection(AppConstants.chatsCollection)
+        .doc(docID)
         .collection(AppConstants.messageListCollection)
-        .withConverter(
-            fromFirestore: MessageContentModel.fromFirestore,
-            toFirestore: (MessageContentModel messageContent, options) =>
-                messageContent.toJson())
-        .add(message)
-        .then((DocumentReference doc) {
-      if (kDebugMode) {
-        print('doc ${doc.id}');
-      }
-    });
+        .orderBy('time', descending: true)
+        .snapshots();
+  }
+
+  Future<void> sendTextMessage(
+    var docID,
+    String messageText,
+    int currentUserId,
+  ) async {
+    final MessageModel message = MessageModel(
+      fromId: currentUserId,
+      message: messageText,
+      messageType: MessageType.text,
+      time: Timestamp.now(),
+    );
 
     await _firestore
-        .collection(AppConstants.messageCollection)
-        .doc(docId)
-        .update(
+        .collection(AppConstants.chatsCollection)
+        .doc(docID)
+        .collection(AppConstants.messageListCollection)
+        .withConverter(
+            fromFirestore: MessageModel.fromFirestore,
+            toFirestore: (MessageModel messageFireStore, options) =>
+                messageFireStore.toJson())
+        .add(message)
+        .then((value) {
+      if (kDebugMode) {
+        print('docText ${value.id}');
+      }
+    });
+    await _firestore.collection(AppConstants.chatsCollection).doc(docID).update(
       {
         'last_message': message.message,
-        'last_time': message.time,
+        'time': message.time,
         'message_type': setMessageType(message.messageType)
       },
     );
   }
 
-  Future addNewCollectionMessage({
-    required MessageContentModel messageContent,
-    required MessageModel message,
-  }) async {}
+  Future<void> sendImageMessage(var docID, String? imagePath) async {
+    if (imagePath != null) {
+      MessageModel message = MessageModel(
+        fromId: SharedPreferencesStorage().getUserId(),
+        message: await FirebaseService().uploadImageToStorage(
+          titleName: 'image_message',
+          childFolder: AppConstants.imageMessageChild,
+          image: File(imagePath),
+        ),
+        messageType: MessageType.image,
+        time: Timestamp.now(),
+      );
+
+      await _firestore
+          .collection(AppConstants.chatsCollection)
+          .doc(docID)
+          .collection(AppConstants.messageListCollection)
+          .withConverter(
+              fromFirestore: MessageModel.fromFirestore,
+              toFirestore: (MessageModel messageFireStore, options) =>
+                  messageFireStore.toJson())
+          .add(message)
+          .then((value) {
+        if (kDebugMode) {
+          print('docImage ${value.id}');
+        }
+      });
+      await _firestore
+          .collection(AppConstants.chatsCollection)
+          .doc(docID)
+          .update(
+        {
+          'last_message': '📷 photo',
+          'time': message.time,
+          'message_type': setMessageType(message.messageType)
+        },
+      );
+    } else {
+      return;
+    }
+  }
 }

@@ -11,7 +11,7 @@ import '../../../widgets/app_image.dart';
 
 class ChatInfoPage extends StatelessWidget {
   final bool isGroup;
-  final int receiverID;
+  final String receiverID;
   final String name;
   final String? imageUrl;
 

@@ -93,6 +93,7 @@ class AppConstants {
   ///collection in firebase & child folder storage
   static const String userCollection = 'users';
   static const String messageCollection = 'messages';
+  static const String chatsCollection = 'chats';
   static const String messageListCollection = 'message_list';
   static const String imageChild = 'images';
   static const String imageMessageChild = 'messages';

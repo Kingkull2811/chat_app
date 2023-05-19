@@ -1,9 +1,5 @@
-import 'dart:io';
-
-import 'package:chat_app/network/model/message_content_model.dart';
 import 'package:chat_app/network/model/message_model.dart';
 import 'package:chat_app/services/firebase_services.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
@@ -13,48 +9,52 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../network/model/user_from_firebase.dart';
 import '../../../theme.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/app_image.dart';
 import '../chat_info/chat_info.dart';
 
-class ChatRoom extends StatefulWidget {
-  final MessageModel? messageData;
-  final String? docID;
+class MessageView extends StatefulWidget {
+  final String receiverId;
+  final String receiverName;
+  final String receiverAvt;
 
-  final bool isNewMessage;
-  final UserFirebaseData? receiver;
-
-  const ChatRoom({
+  const MessageView({
     Key? key,
-    this.messageData,
-    this.docID,
-    this.isNewMessage = false,
-    this.receiver,
+    required this.receiverId,
+    required this.receiverName,
+    required this.receiverAvt,
   }) : super(key: key);
 
   @override
-  State<ChatRoom> createState() => _ChatRoomState();
+  State<MessageView> createState() => _MessageViewState();
 }
 
-class _ChatRoomState extends State<ChatRoom> {
+class _MessageViewState extends State<MessageView> {
+  final _firebaseService = FirebaseService();
+
   final _inputTextController = TextEditingController();
 
-  bool _isMe = false;
-  bool _isNewMessage = false;
+  var docID;
 
-  final ScrollController _scrollController = ScrollController();
+  final int currentUserId = SharedPreferencesStorage().getUserId();
 
-  String docID = '';
+  void _checkMessage() async {
+    var docId = await _firebaseService.checkMessageExists(
+      currentUserId: currentUserId,
+      receiverId: widget.receiverId,
+      receiverAvt: widget.receiverAvt,
+      receiverName: widget.receiverName,
+    );
+    setState(() {
+      docID = docId;
+    });
+  }
 
   @override
   void initState() {
-    _isMe =
-        widget.messageData?.fromId == SharedPreferencesStorage().getUserId();
-    docID = widget.docID ?? '';
-    _isNewMessage = widget.isNewMessage;
     super.initState();
+    _checkMessage();
   }
 
   @override
@@ -63,122 +63,12 @@ class _ChatRoomState extends State<ChatRoom> {
     super.dispose();
   }
 
-  void _scrollToEnd() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        Future.delayed(const Duration(milliseconds: 0), () {
-          _scrollController
-              .jumpTo(_scrollController.position.maxScrollExtent + 500);
-        });
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0.5,
-          backgroundColor: Theme.of(context).primaryColor,
-          leadingWidth: 30,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              size: 24,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Row(
-            children: [
-              Container(
-                height: 45,
-                width: 45,
-                decoration: BoxDecoration(
-                  // borderRadius: BorderRadius.circular(25),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: AppImage(
-                    isOnline: true,
-                    localPathOrUrl: widget.isNewMessage
-                        ? widget.receiver?.fileUrl
-                        : _isMe
-                            ? widget.messageData?.toAvatar
-                            : widget.messageData?.fromAvatar,
-                    boxFit: BoxFit.cover,
-                    errorWidget: const Icon(
-                      CupertinoIcons.person,
-                      size: 30,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Text(
-                  (widget.isNewMessage
-                          ? widget.receiver?.fullName
-                          : _isMe
-                              ? widget.messageData?.toName
-                              : widget.messageData?.fromName) ??
-                      '',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.info_outline,
-                size: 24,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatInfoPage(
-                      name: (widget.isNewMessage
-                              ? widget.receiver?.fullName
-                              : _isMe
-                                  ? widget.messageData?.toName
-                                  : widget.messageData?.fromName) ??
-                          '',
-                      imageUrl: widget.isNewMessage
-                          ? widget.receiver?.fileUrl
-                          : _isMe
-                              ? widget.messageData?.toAvatar
-                              : widget.messageData?.fromAvatar,
-                      isGroup: false,
-                      receiverID: (widget.isNewMessage
-                          ? widget.receiver?.id
-                          : _isMe
-                              ? widget.messageData?.toId
-                              : widget.messageData?.fromId)!,
-                    ),
-                  ),
-                );
-                // Add the action you want to perform when the icon is tapped
-              },
-            ),
-          ],
-        ),
+        appBar: _appBar(),
         resizeToAvoidBottomInset: true,
         body: Column(
           children: <Widget>[
@@ -193,57 +83,48 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   Widget _bodyChat() {
-    List<MessageContentModel> listMessageContent = [];
-    return _isNewMessage
-        ? Container(
-            child: _listMessage(listMessageContent),
-          )
-        : StreamBuilder(
-            stream: FirebaseService().getListMessageInChatRoom(docID),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) {
-                return const AnimationLoading();
-              } else {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return const AnimationLoading();
-
-                  case ConnectionState.active:
-                  case ConnectionState.done:
-                    if (snapshot.data!.docs.isEmpty) {
-                      return _helloMessage();
-                    } else {
-                      _scrollToEnd();
-
-                      final data = snapshot.data?.docs;
-
-                      for (var doc in data!) {
-                        if (doc.exists) {
-                          if (doc.data() is Map<String, dynamic>) {
-                            final message = MessageContentModel.fromJson(
-                              doc.data() as Map<String, dynamic>,
-                            );
-                            listMessageContent.add(message);
-                          }
-                        }
-                      }
-                      return _listMessage(listMessageContent);
-                    }
-                }
-              }
-            },
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firebaseService.getMessage(docID),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Something went wrong"),
           );
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const AnimationLoading();
+        }
+
+        if (snapshot.hasData) {
+          List<MessageModel> listMessage = [];
+
+          final data = snapshot.data?.docs;
+
+          for (var doc in data!) {
+            if (doc.exists) {
+              if (doc.data() is Map<String, dynamic>) {
+                final message = MessageModel.fromJson(
+                  doc.data() as Map<String, dynamic>,
+                );
+                listMessage.add(message);
+              }
+            }
+          }
+          return _listMessage(listMessage);
+        } else {
+          return _helloMessage();
+        }
+      },
+    );
   }
 
-  Widget _listMessage(List<MessageContentModel>? listMessage) {
+  Widget _listMessage(List<MessageModel>? listMessage) {
     if (isNullOrEmpty(listMessage)) {
       return _helloMessage();
     } else {
       return ListView.builder(
+        reverse: true,
         scrollDirection: Axis.vertical,
-        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         itemCount: listMessage!.length,
         itemBuilder: (context, index) {
@@ -262,20 +143,17 @@ class _ChatRoomState extends State<ChatRoom> {
             height: 150,
             width: 150,
             decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  width: 1.5,
-                  color: AppColors.primaryColor,
-                )
-                // borderRadius: BorderRadius.circular(50),
-                ),
+              shape: BoxShape.circle,
+              border: Border.all(
+                width: 1.5,
+                color: AppColors.primaryColor,
+              ),
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(75),
               child: AppImage(
                 isOnline: true,
-                localPathOrUrl: widget.isNewMessage
-                    ? widget.receiver?.fileUrl
-                    : widget.messageData?.toAvatar,
+                localPathOrUrl: widget.receiverAvt,
                 boxFit: BoxFit.cover,
                 errorWidget: const Icon(
                   CupertinoIcons.person,
@@ -286,22 +164,20 @@ class _ChatRoomState extends State<ChatRoom> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 16.0),
+            padding: const EdgeInsets.only(top: 16.0),
             child: Text(
-              (widget.isNewMessage
-                      ? widget.receiver?.fullName
-                      : widget.messageData?.toName) ??
-                  '',
+              widget.receiverName,
               style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 30,
-                  color: Colors.black),
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+                color: Colors.black,
+              ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
-              'Say hi 👋 to start chat with @${widget.isNewMessage ? widget.receiver?.fullName : widget.messageData?.toName}',
+              'Say hi 👋 to start chat with ${widget.receiverName}',
               style: const TextStyle(
                 fontWeight: FontWeight.normal,
                 fontSize: 16,
@@ -336,14 +212,14 @@ class _ChatRoomState extends State<ChatRoom> {
                 color: AppColors.primaryColor,
               ),
             ),
-            IconButton(
-              iconSize: 30,
-              onPressed: () {},
-              icon: const Icon(
-                Icons.mic_none_outlined,
-                color: AppColors.primaryColor,
-              ),
-            ),
+            // IconButton(
+            //   iconSize: 30,
+            //   onPressed: () {},
+            //   icon: const Icon(
+            //     Icons.mic_none_outlined,
+            //     color: AppColors.primaryColor,
+            //   ),
+            // ),
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -351,7 +227,6 @@ class _ChatRoomState extends State<ChatRoom> {
                   maxHeight: 40,
                 ),
                 child: TextFormField(
-                  onTap: () {},
                   controller: _inputTextController,
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -392,7 +267,16 @@ class _ChatRoomState extends State<ChatRoom> {
             IconButton(
               iconSize: 30,
               onPressed: () async {
-                await _sendTextMessage();
+                if (_inputTextController.text.isEmpty) {
+                  return;
+                } else {
+                  await _firebaseService.sendTextMessage(
+                    docID,
+                    _inputTextController.text.trim(),
+                    currentUserId,
+                  );
+                  _inputTextController.clear();
+                }
               },
               icon: const Icon(
                 Icons.send_outlined,
@@ -407,10 +291,10 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Widget _chatItem(
     BuildContext context,
-    MessageContentModel message,
+    MessageModel message,
   ) {
     final isMe = message.fromId == SharedPreferencesStorage().getUserId();
-    Widget messageContain(MessageContentModel itemMessage) {
+    Widget messageContain(MessageModel itemMessage) {
       switch (itemMessage.messageType) {
         case MessageType.text:
           return textMessage(itemMessage, isMe);
@@ -452,7 +336,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget textMessage(MessageContentModel message, bool isMe) {
+  Widget textMessage(MessageModel message, bool isMe) {
     return Padding(
       padding: EdgeInsets.only(left: isMe ? 50.0 : 0, right: isMe ? 0 : 50),
       child: Container(
@@ -480,7 +364,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget imageMessage(MessageContentModel itemMessage, bool isMe) {
+  Widget imageMessage(MessageModel itemMessage, bool isMe) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.65,
       child: Container(
@@ -515,7 +399,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget videoMessage(MessageContentModel itemMessage, bool isMe) {
+  Widget videoMessage(MessageModel itemMessage, bool isMe) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.65,
       child: AspectRatio(
@@ -560,7 +444,7 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Widget audioMessage(MessageContentModel itemMessage, bool isMe) {
+  Widget audioMessage(MessageModel itemMessage, bool isMe) {
     return Container(
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
@@ -625,55 +509,6 @@ class _ChatRoomState extends State<ChatRoom> {
     );
   }
 
-  Future<void> _sendTextMessage() async {
-    if (_inputTextController.text.isNotEmpty) {
-      MessageContentModel message = MessageContentModel(
-        fromId: SharedPreferencesStorage().getUserId(),
-        message: _inputTextController.text.trim(),
-        messageType: MessageType.text,
-        time: Timestamp.now(),
-      );
-      if (_isNewMessage) {
-        MessageModel messageModel = MessageModel(
-          fromId: SharedPreferencesStorage().getUserId(),
-          fromAvatar: SharedPreferencesStorage().getImageAvartarUrl(),
-          //todo
-          fromName: "SharedPreferencesStorage().getFullName()",
-          lastMessage: _inputTextController.text.trim(),
-          messageType: MessageType.text,
-          lastTime: Timestamp.now(),
-          toId: widget.receiver?.id,
-          toName: widget.receiver?.fullName,
-          toAvatar: widget.receiver?.fileUrl,
-          sent: 'f',
-          read: 'ff',
-        );
-      } else {
-        await FirebaseService().sendMessageToFirebase(docID, message);
-      }
-      _inputTextController.clear();
-    }
-  }
-
-  Future<void> _sendMessageImage(String? imagePath) async {
-    if (imagePath != null) {
-      MessageContentModel message = MessageContentModel(
-        fromId: SharedPreferencesStorage().getUserId(),
-        message: await FirebaseService().uploadImageToStorage(
-          titleName: 'image_message',
-          childFolder: AppConstants.imageMessageChild,
-          image: File(imagePath),
-        ),
-        messageType: MessageType.image,
-        time: Timestamp.now(),
-      );
-      await FirebaseService().sendMessageToFirebase(
-        docID,
-        message,
-      );
-    }
-  }
-
   _pickImageToSend(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
@@ -684,7 +519,7 @@ class _ChatRoomState extends State<ChatRoom> {
               onPressed: () async {
                 Navigator.pop(context);
                 String? imagePath = await pickPhoto(ImageSource.camera);
-                await _sendMessageImage(imagePath);
+                _firebaseService.sendImageMessage(docID, imagePath);
               },
               child: const Text(
                 'Take a photo from camera',
@@ -698,7 +533,7 @@ class _ChatRoomState extends State<ChatRoom> {
               onPressed: () async {
                 Navigator.pop(context);
                 String? imagePath = await pickPhoto(ImageSource.gallery);
-                await _sendMessageImage(imagePath);
+                _firebaseService.sendImageMessage(docID, imagePath);
               },
               child: const Text(
                 'Choose a photo from gallery',
@@ -723,6 +558,86 @@ class _ChatRoomState extends State<ChatRoom> {
           ),
         );
       },
+    );
+  }
+
+  PreferredSizeWidget _appBar() {
+    return AppBar(
+      elevation: 0.5,
+      backgroundColor: AppColors.primaryColor,
+      leadingWidth: 30,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios_new,
+          size: 24,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+      title: Row(
+        children: [
+          Container(
+            height: 45,
+            width: 45,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white,
+                width: 1.5,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: AppImage(
+                isOnline: true,
+                localPathOrUrl: widget.receiverAvt,
+                boxFit: BoxFit.cover,
+                errorWidget: const Icon(
+                  CupertinoIcons.person,
+                  size: 30,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Text(
+              widget.receiverName,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.info_outline,
+            size: 24,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatInfoPage(
+                  name: widget.receiverName,
+                  imageUrl: widget.receiverAvt,
+                  isGroup: false,
+                  receiverID: widget.receiverId,
+                ),
+              ),
+            );
+            // Add the action you want to perform when the icon is tapped
+          },
+        ),
+      ],
     );
   }
 }
