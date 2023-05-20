@@ -1,6 +1,7 @@
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -48,6 +49,9 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
           data: event.userData,
         );
         if (response is UserInfoModel) {
+          await SharedPreferencesStorage().setFullName(response.fullName ?? '');
+          await SharedPreferencesStorage()
+              .setImageAvartarUrl(response.fileUrl ?? '');
           final List<StudentFirebase>? listStudentFireBase = response.parentOf
               ?.map(
                 (student) => StudentFirebase(

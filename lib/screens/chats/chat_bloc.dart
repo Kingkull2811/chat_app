@@ -29,13 +29,9 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
               await _firebaseService.getUserDetails(
             userId: SharedPreferencesStorage().getUserId(),
           );
-          // log('user: $userInfo');
           final List<UserFirebaseData> listUser =
               await _firebaseService.getAllProfile();
           listUser.removeWhere((user) => user.id == userInfo?.id);
-
-          // log('user: $userInfo');
-          // log('list user: $listUser');
 
           if (userInfo != null) {
             emit(state.copyWith(

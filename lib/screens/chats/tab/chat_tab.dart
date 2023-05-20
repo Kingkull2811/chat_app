@@ -1,20 +1,28 @@
+import 'package:chat_app/network/model/chat_model.dart';
+import 'package:chat_app/screens/chats/chat_room/message_view.dart';
+import 'package:chat_app/screens/chats/tab/new_message.dart';
+import 'package:chat_app/widgets/app_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../on_chatting/on_chatting.dart';
-import '../on_chatting/on_chatting_bloc.dart';
+import '../../../network/model/user_from_firebase.dart';
+import '../../../services/firebase_services.dart';
+import '../../../theme.dart';
+import '../../../utilities/shared_preferences_storage.dart';
+import '../../../utilities/utils.dart';
+import '../../../widgets/animation_loading.dart';
 
 class ChatTab extends StatefulWidget {
-  const ChatTab({Key? key}) : super(key: key);
+  final List<UserFirebaseData>? listUser;
+
+  const ChatTab({Key? key, this.listUser}) : super(key: key);
 
   @override
   State<ChatTab> createState() => _ChatTabState();
 }
 
 class _ChatTabState extends State<ChatTab> {
-  final _searchController = TextEditingController();
-
-  bool _showSearchResult = false;
+  final int currentUserId = SharedPreferencesStorage().getUserId();
 
   @override
   void initState() {
@@ -23,299 +31,224 @@ class _ChatTabState extends State<ChatTab> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
+  }
+
+  List<ChatModel> convertListChat(
+    AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
+  ) {
+    List<ChatModel> listChat = [];
+    final data = snapshot.data?.docs;
+    for (var doc in data!) {
+      if (doc.exists) {
+        Map<String, dynamic> docData = doc.data() as Map<String, dynamic>;
+        Map<String, dynamic> userId = docData['members'];
+        Map<String, dynamic> names = docData['names'];
+        Map<String, dynamic> imageUrls = docData['imageUrls'];
+        userId.remove('$currentUserId');
+        names.remove('$currentUserId');
+        imageUrls.remove('$currentUserId');
+
+        final Map<String, dynamic> mapDoc = {
+          "receiver_id": userId.keys.first,
+          "receiver_avt": imageUrls.values.first,
+          "receiver_name": names.values.first,
+          "last_message": docData['last_message'],
+          "message_type": docData['message_type'],
+          "time": docData['time']
+        };
+
+        listChat.add(ChatModel.fromJson(mapDoc));
+      }
+    }
+    return listChat;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _searchBox(context),
-        Expanded(
-          child: _showSearchResult
-              ? _searchResult()
-              : SizedBox(
-                  height: 71 * (itemList.length).toDouble(),
-                  child: ListView.separated(
-                    reverse: false,
-                    separatorBuilder: (context, index) {
-                      if (index == 0) {
-                        return const Divider(
-                          height: 1,
-                          color: Colors.transparent,
-                        );
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16.0),
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey[200],
-                        ),
-                      );
-                    },
-                    itemCount: itemList.length,
-                    itemBuilder: (context, index) {
-                      return _cardChat(context, itemList[index]);
-                    },
-                  ),
+    return StreamBuilder(
+      stream: FirebaseService().getListChat(currentUserId),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return const Center(
+            child: Text("Something went wrong"),
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const AnimationLoading();
+        }
+
+        if (snapshot.hasData) {
+          List<ChatModel> listChat = convertListChat(snapshot);
+          return _listChat(listChat);
+        } else {
+          return const Center(
+            child: Text(
+              'no messages yet',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primaryColor,
+              ),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _listChat(List<ChatModel>? listChat) {
+    return Scaffold(
+      body: isNullOrEmpty(listChat)
+          ? const Center(
+              child: Text(
+                'no messages yet',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppColors.primaryColor,
                 ),
-        ),
-      ],
-    );
-  }
-
-  Widget _searchBox(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 10, 24, 10),
-      child: SizedBox(
-        height: 40,
-        child: TextField(
-          onTap: () {
-            setState(() {
-              _showSearchResult = !_showSearchResult;
-            });
-          },
-          controller: _searchController,
-          onSubmitted: (_) {
-            if (_searchController.text.isEmpty) {
-              setState(() {
-                _showSearchResult = false;
-              });
-            }
-          },
-          decoration: InputDecoration(
-            hintText: 'Search',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24.0),
-            ),
-            prefixIcon: Icon(
-              Icons.search,
-              color: Theme.of(context).primaryColor,
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24),
-              borderSide: BorderSide(
-                width: 1,
-                color: Theme.of(context).primaryColor,
               ),
+            )
+          : ListView.builder(
+              scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
+              itemCount: listChat!.length,
+              itemBuilder: (context, index) =>
+                  _itemChat(context, listChat[index]),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24),
-              borderSide: const BorderSide(
-                width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _searchResult() {
-    return Container(color: Colors.blue);
-  }
-
-  Widget _cardChat(
-    BuildContext context,
-    CustomListItem item,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0),
-      child: InkWell(
+      floatingActionButton: InkWell(
+        borderRadius: BorderRadius.circular(25),
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BlocProvider<OnChattingBloc>(
-                create: (context) => OnChattingBloc(context),
-                child: OnChattingPage(item: item),
-              ),
+              builder: (context) => NewMessage(listUser: widget.listUser),
             ),
           );
         },
-        child: SizedBox(
-          height: 70,
-          child: ListTile(
-            leading: Container(
-              height: 60,
-              width: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
+        child: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            color: AppColors.primaryColor,
+          ),
+          child: const Icon(
+            Icons.add,
+            size: 36,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  _navToChatRoom(ChatModel chatItem) => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MessageView(
+            receiverId: chatItem.receiverId ?? '',
+            receiverName: chatItem.receiverName ?? '',
+            receiverAvt: chatItem.receiverAvt ?? '',
+          ),
+        ),
+      );
+
+  Widget _itemChat(BuildContext context, ChatModel chatItem) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            bottom: BorderSide(
+              width: 0.5,
+              color: Colors.grey.withOpacity(0.3),
+            ),
+          ),
+        ),
+        child: ListTile(
+          onTap: () {
+            _navToChatRoom(chatItem);
+          },
+          leading: Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                width: 1,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: AppImage(
+                isOnline: true,
+                localPathOrUrl: chatItem.receiverAvt,
+                boxFit: BoxFit.cover,
+                errorWidget: Container(
+                  color: Colors.grey.withOpacity(0.2),
+                  child: const Icon(
+                    Icons.person_outline,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  chatItem.receiverName ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ),
+              Text(
+                formatDateUtcToTime(chatItem.time),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
                   color: Colors.grey,
-                  width: 2,
                 ),
-              ),
-              child: CircleAvatar(
-                radius: 50,
-                child: Image.asset(
-                  item.imageUrlAvt,
-                ),
-              ),
-            ),
-            title: Text(
-              item.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            subtitle: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.45,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.45,
-                    ),
-                    child: Text(
-                      item.lastMessage,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey,
-                      ),
+              )
+            ],
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    chatItem.lastMessage ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(
-                      item.time,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            trailing: SizedBox(
-              width: 16,
-              child: Icon(
-                item.isRead ? Icons.check_circle : Icons.check_circle_outline,
-                size: 16,
-                color: Colors.grey,
-              ),
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 10),
+                //   child: Icon(
+                //     isRead ? Icons.check_circle : Icons.check_circle_outline,
+                //     size: 16,
+                //     color: Colors.grey,
+                //   ),
+                // ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
-}
-
-List<CustomListItem> itemList = [
-  CustomListItem(
-    name: 'Item 1',
-    lastMessage: 'Subtitle 1',
-    time: '12:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_1.png',
-    isRead: false,
-  ),
-  CustomListItem(
-    name: 'Item 2',
-    lastMessage: 'Subtitle 2 1as asd ef ca cas c s',
-    time: '1:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_2.png',
-    isRead: true,
-  ),
-  CustomListItem(
-    name: 'Item 3',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_3.png',
-    isRead: false,
-  ),
-  CustomListItem(
-    name: 'Item 4',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_4.png',
-    isRead: true,
-  ),
-  CustomListItem(
-    name: 'Item 5',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_5.png',
-    isRead: false,
-  ),
-  CustomListItem(
-    name: 'Item 6',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_6.png',
-    isRead: true,
-  ),
-  CustomListItem(
-    name: 'Item 7',
-    lastMessage: 'Subtitle 1',
-    time: '12:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_1.png',
-    isRead: false,
-  ),
-  CustomListItem(
-    name: 'Item 8',
-    lastMessage: 'Subtitle 2',
-    time: '1:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_2.png',
-    isRead: true,
-  ),
-  CustomListItem(
-    name: 'Item 9',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_3.png',
-    isRead: false,
-  ),
-  CustomListItem(
-    name: 'Item 10',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_4.png',
-    isRead: true,
-  ),
-  CustomListItem(
-    name: 'Item 11',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_5.png',
-    isRead: false,
-  ),
-  CustomListItem(
-    name: 'Item 12',
-    lastMessage: 'Subtitle 3',
-    time: '2:00 PM',
-    imageUrlAvt: 'assets/images/image_profile_6.png',
-    isRead: true,
-  ),
-];
-
-class CustomListItem {
-  final String name;
-  final String lastMessage;
-  final String time;
-  final String imageUrlAvt;
-  final bool isRead;
-  final bool isActive;
-
-  CustomListItem({
-    required this.name,
-    required this.lastMessage,
-    required this.time,
-    required this.imageUrlAvt,
-    this.isRead = false,
-    this.isActive = false,
-  });
 }

@@ -195,7 +195,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             if (value.isNotEmpty && value.length < 6) {
                               return 'Password must be at least 6 characters';
                             } else if (value.length > 40) {
-                              return 'Password must be more than 40 characters';
+                              return 'Password must be less than 40 characters';
                             }
                             return null;
                           },
@@ -220,7 +220,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             } else if (value.length < 6) {
                               return 'Confirm password must be at least 6 characters';
                             } else if (value.length > 40) {
-                              return 'Confirm new password must be more than 40 characters';
+                              return 'Confirm new password must be less than 40 characters';
                             } else if (value != _passwordController.text) {
                               return 'Password and confirm password do not match';
                             }

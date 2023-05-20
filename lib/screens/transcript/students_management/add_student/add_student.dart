@@ -426,16 +426,11 @@ class _AddStudentState extends State<AddStudent> {
     final Map<String, dynamic> data = {
       "classId": _classId,
       "dateOfBirth": _calendarController.text.trim(),
-      "imageUrl": _isOnline
-          ? imagePath
-          : await FirebaseService().uploadImageToStorage(
-              titleName: 'student_image',
-              image: File(imagePath!),
-            ),
+      "imageUrl": _isOnline ? imagePath : await _sendImageToStorage(imagePath!),
       "name": _nameController.text.trim(),
       "semesterYear": _yearController.text.trim()
     };
-    // _studentBloc.add(AddStudentsEvent(data: data));
+
     final response = await _studentRepository.addStudent(data: data);
     if (response is Student) {
       await showCupertinoMessageDialog(this.context, 'Add new student success',
@@ -472,19 +467,11 @@ class _AddStudentState extends State<AddStudent> {
       "classId": _classId,
       "code": _codeController.text.trim().toUpperCase(),
       "dateOfBirth": _calendarController.text.trim(),
-      "imageUrl": _isOnline
-          ? imagePath
-          : await FirebaseService().uploadImageToStorage(
-              titleName: 'student_image',
-              image: File(imagePath!),
-            ),
+      "imageUrl": _isOnline ? imagePath : await _sendImageToStorage(imagePath!),
       "name": _nameController.text.trim(),
       "semesterYear": _yearController.text.trim()
     };
-    // _studentBloc.add(EditStudentsEvent(
-    //   studentID: (widget.student?.id)!,
-    //   data: data,
-    // ));
+
     final response = await _studentRepository.editStudent(
       studentId: (widget.student?.id)!,
       data: data,
@@ -504,6 +491,14 @@ class _AddStudentState extends State<AddStudent> {
     } else {
       showCupertinoMessageDialog(this.context, 'Update student failed');
     }
+  }
+
+  Future _sendImageToStorage(String imagePath) async {
+    return await FirebaseService().uploadImageToStorage(
+      titleName: 'student_image',
+      childFolder: AppConstants.imageStudentsChild,
+      image: File(imagePath),
+    );
   }
 
   Widget _listSchoolYear(List<String> listSchoolYear) {

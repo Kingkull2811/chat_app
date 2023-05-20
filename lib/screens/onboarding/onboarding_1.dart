@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme.dart';
+
 class OnBoarding1Page extends StatelessWidget {
   const OnBoarding1Page({
     Key? key,
@@ -25,14 +27,26 @@ class OnBoarding1Page extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.only(top: 50.0),
             child: Text(
-              'title of onboarding 1',
+              'Learning Results Tracking',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
-                color: Colors.black,
+                fontSize: 20,
+                fontStyle: FontStyle.italic,
+                color: AppColors.primaryColor,
               ),
             ),
-          )
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 32.0),
+            child: Text(
+              'Our app allows teachers to easily record and track student\'s learning outcomes. Teachers can assess individual progress, identify areas of improvement, and tailor their teaching strategies accordingly. With comprehensive analytics and visualizations, educators can gain valuable insights into student performance.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primaryColor,
+              ),
+            ),
+          ),
         ],
       ),
     );

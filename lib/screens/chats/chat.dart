@@ -10,7 +10,6 @@ import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/app_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -64,9 +63,6 @@ class ChatsPageState extends State<ChatsPage>
             context,
             'Error!',
             content: 'Internal Server Error',
-            // onCloseDialog: () {
-            //   reloadPage();
-            // },
           );
         }
       },
@@ -90,7 +86,7 @@ class ChatsPageState extends State<ChatsPage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            ChatTab(),
+            ChatTab(listUser: state.listUser),
             ContactTab(listUser: state.listUser),
           ],
         ),
@@ -100,276 +96,6 @@ class ChatsPageState extends State<ChatsPage>
 
   void reloadPage() {
     _chatsBloc.add(ChatInit());
-  }
-
-  _createNewMessage(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      enableDrag: true,
-      isDismissible: true,
-      isScrollControlled: true,
-      builder: (value) {
-        return Container(
-          height: MediaQuery.of(context).copyWith().size.height * 0.9,
-          color: AppColors.grey630,
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width * 0.45,
-                    top: 6,
-                    right: MediaQuery.of(context).size.width * 0.45,
-                    bottom: 10,
-                  ),
-                  child: Container(
-                    height: 4,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(2),
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Cancel',
-                            style: TextStyle(fontSize: 14),
-                          )),
-                      const Text(
-                        'New Message',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          //todo:::
-                          if (kDebugMode) {
-                            print('go to on chatting');
-                          }
-                          // Navigator.pushReplacement(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => BlocProvider<OnChattingBloc>(
-                          //       create: (context) => OnChattingBloc(context),
-                          //       child: OnChattingPage(
-                          //         item: CustomListItem(
-                          //           name: 'Item 1',
-                          //           lastMessage: 'Subtitle 1',
-                          //           time: '12:00 PM',
-                          //           imageUrlAvt:
-                          //               'assets/images/image_profile_1.png',
-                          //           isRead: false,
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // );
-                        },
-                        child: Text(
-                          'Create',
-                          style:
-                              TextStyle(fontSize: 14, color: Colors.blue[300]),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                  child: SizedBox(
-                    height: 35,
-                    child: TextField(
-                      controller: _searchNewMessageController,
-                      onSubmitted: (_) {},
-                      decoration: InputDecoration(
-                        hintText: 'To:',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24.0),
-                        ),
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16.0),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: const BorderSide(
-                            width: 1,
-                            color: Color.fromARGB(128, 130, 130, 130),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                  child: isAdmin
-                      ? InkWell(
-                          onTap: () {
-                            //todo::::
-                            if (kDebugMode) {
-                              print('create new group');
-                            }
-                          },
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                height: 40,
-                                width: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Icon(
-                                  Icons.groups,
-                                  size: 24,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                              ),
-                              const Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    'Create a new group',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                Icons.arrow_forward_ios_outlined,
-                                size: 20,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-                // Expanded(
-                //   child: ListView.separated(
-                //     physics: const BouncingScrollPhysics(),
-                //     itemCount: itemList.length + 1,
-                //     separatorBuilder: (context, index) {
-                //       if (index == 0) {
-                //         return Padding(
-                //           padding: const EdgeInsets.symmetric(horizontal: 16),
-                //           child: Divider(
-                //             color: Theme.of(context).primaryColor,
-                //             height: 0.5,
-                //           ),
-                //         );
-                //       }
-                //       return Padding(
-                //         padding: const EdgeInsets.only(left: 80, right: 16),
-                //         child: Divider(
-                //           color: Theme.of(context).primaryColor,
-                //           height: 0.5,
-                //         ),
-                //       );
-                //     },
-                //     itemBuilder: (context, index) {
-                //       if (index == 0) {
-                //         return Padding(
-                //           padding: const EdgeInsets.only(
-                //               left: 16, top: 10, bottom: 10),
-                //           child: Text(
-                //             'Suggest',
-                //             style: TextStyle(
-                //               fontSize: 14,
-                //               color: Theme.of(context).primaryColor,
-                //             ),
-                //           ),
-                //         );
-                //       }
-                //       return Padding(
-                //         padding: const EdgeInsets.only(top: 6, bottom: 6),
-                //         child: Container(
-                //           height: 50,
-                //           padding: const EdgeInsets.symmetric(
-                //               horizontal: 16, vertical: 5),
-                //           child: Row(
-                //             crossAxisAlignment: CrossAxisAlignment.center,
-                //             children: <Widget>[
-                //               Container(
-                //                 width: 40,
-                //                 decoration: BoxDecoration(
-                //                     borderRadius: BorderRadius.circular(20)),
-                //                 child: CircleAvatar(
-                //                   child: Image.asset(
-                //                     itemList[index - 1].imageUrlAvt,
-                //                   ),
-                //                 ),
-                //               ),
-                //               Expanded(
-                //                 child: Padding(
-                //                   padding: const EdgeInsets.only(left: 10),
-                //                   child: Text(
-                //                     itemList[index - 1].name,
-                //                     style: const TextStyle(
-                //                       fontSize: 20,
-                //                       fontWeight: FontWeight.bold,
-                //                       color: Colors.black,
-                //                     ),
-                //                     maxLines: 1,
-                //                     overflow: TextOverflow.ellipsis,
-                //                   ),
-                //                 ),
-                //               ),
-                //               Text(
-                //                 'email\nphone',
-                //                 style: TextStyle(
-                //                   fontSize: 14,
-                //                   fontWeight: FontWeight.normal,
-                //                   color: Theme.of(context).primaryColor,
-                //                 ),
-                //               ),
-                //               const Padding(
-                //                 padding: EdgeInsets.only(left: 10),
-                //               )
-                //             ],
-                //           ),
-                //         ),
-                //       );
-                //     },
-                //   ),
-                // ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   PreferredSizeWidget _appBar(UserFirebaseData? userData) {
@@ -385,7 +111,7 @@ class ChatsPageState extends State<ChatsPage>
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 width: 1,
-                color: Theme.of(context).primaryColor,
+                color: AppColors.primaryColor,
               ),
             ),
             child: ClipRRect(
@@ -417,7 +143,7 @@ class ChatsPageState extends State<ChatsPage>
             color: Colors.grey[50],
             border: Border.all(
               width: 1,
-              color: Theme.of(context).primaryColor,
+              color: AppColors.primaryColor,
             )),
         child: TabBar(
           controller: _tabController,
@@ -428,7 +154,7 @@ class ChatsPageState extends State<ChatsPage>
           indicatorWeight: 0,
           indicatorColor: Colors.black,
           indicator: BoxDecoration(
-            color: Theme.of(context).primaryColor,
+            color: AppColors.primaryColor,
             borderRadius: BorderRadius.circular(20),
           ),
           tabs: const [
@@ -437,21 +163,6 @@ class ChatsPageState extends State<ChatsPage>
           ],
         ),
       ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
-          child: GestureDetector(
-            onTap: () {
-              _createNewMessage(context);
-            },
-            child: Icon(
-              Icons.add_comment_outlined,
-              size: 28,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

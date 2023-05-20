@@ -131,10 +131,10 @@ class _EnterPointPageState extends State<EnterPointPage> {
 
   Widget _body(BuildContext context, EnterPointSubjectState state) {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       scrollDirection: Axis.vertical,
       child: Padding(
-        padding: EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -179,7 +179,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
               ),
             ),
             state.isLoading
-                ? AnimationLoading()
+                ? const AnimationLoading()
                 : _listEnterPoint(state.listLearningInfo),
           ],
         ),

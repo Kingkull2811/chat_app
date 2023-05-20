@@ -6,6 +6,7 @@ import 'package:chat_app/network/repository/news_repository.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/theme.dart';
+import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -351,6 +352,7 @@ class _NewsInfoState extends State<NewsInfo> {
   Future<String> getMediaUrl(String filePath) async {
     return await FirebaseService().uploadImageToStorage(
       titleName: 'image_news',
+      childFolder: AppConstants.imageNewsChild,
       image: File(filePath),
     );
   }

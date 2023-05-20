@@ -148,7 +148,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                         if (value.isNotEmpty && value.length < 6) {
                           return 'New password  must be at least 6 characters';
                         } else if (value.length > 40) {
-                          return 'Confirm new password must be more than 40 characters';
+                          return 'New password must be less than 40 characters';
                         }
                         return null;
                       },
@@ -170,7 +170,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                         } else if (value.length < 6) {
                           return 'Confirm new password must be at least 6 characters';
                         } else if (value.length > 40) {
-                          return 'Confirm new password must be more than 40 characters';
+                          return 'Confirm new password must be less than 40 characters';
                         } else if (value != _passwordController.text) {
                           return 'New password and confirm new password do not match';
                         }

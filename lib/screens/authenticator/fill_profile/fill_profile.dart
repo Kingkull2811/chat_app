@@ -718,7 +718,6 @@ class _FillProfilePageState extends State<FillProfilePage> {
               borderRadius: BorderRadius.circular(100),
               child: AppImage(
                 isOnline: _isOnline,
-                // localPathOrUrl: _isOnline ? userData?.fileUrl : _image,
                 localPathOrUrl: _image,
                 height: 200,
                 width: 200,
@@ -825,6 +824,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
   Future<String> getUrlImage({required File file}) async {
     return await FirebaseService().uploadImageToStorage(
       titleName: 'image_userid_${SharedPreferencesStorage().getUserId()}',
+      childFolder: AppConstants.imageProfilesChild,
       image: file,
     );
   }

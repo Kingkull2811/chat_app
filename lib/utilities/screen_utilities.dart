@@ -13,30 +13,22 @@ import '../widgets/message_dialog.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/text_edit_dialog_widget.dart';
 
-void showBlankPage(BuildContext context) {
-  showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return Container();
-      });
-}
-
 void showLoading(BuildContext context) {
   showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Center(
-            child: CircularProgressIndicator(
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-            ),
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor:
+                AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
           ),
-        );
-      });
+        ),
+      );
+    },
+  );
 }
 
 void logout(BuildContext? context) async {

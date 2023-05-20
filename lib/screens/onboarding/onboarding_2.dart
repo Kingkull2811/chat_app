@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme.dart';
+
 class OnBoarding2Page extends StatelessWidget {
   const OnBoarding2Page({
     Key? key,
@@ -25,14 +27,26 @@ class OnBoarding2Page extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.only(top: 50.0),
             child: Text(
-              'title of onboarding 2',
+              'Information Exchange',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
-                color: Colors.black,
+                fontSize: 20,
+                fontStyle: FontStyle.italic,
+                color: AppColors.primaryColor,
               ),
             ),
-          )
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 32.0),
+            child: Text(
+              'We understand the importance of effective communication between teachers and parents. Our app facilitates seamless information exchange, enabling teachers to share important updates, homework assignments, and upcoming assessments directly with parents. Parents can stay informed about their child\'s academic progress and provide necessary support.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.primaryColor,
+              ),
+            ),
+          ),
         ],
       ),
     );

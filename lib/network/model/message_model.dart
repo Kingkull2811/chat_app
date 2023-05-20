@@ -1,44 +1,50 @@
+import 'package:chat_app/utilities/enum/message_type.dart';
+import 'package:chat_app/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../utilities/enum/message_type.dart';
-import '../../utilities/utils.dart';
-
 class MessageModel {
-  final String? uId;
-  final String? sender;
+  final int? fromId;
   final String? message;
   final MessageType? messageType;
-  final DateTime? timestamp;
+  final Timestamp? time;
 
   MessageModel({
-    this.uId,
-    this.sender,
+    this.fromId,
     this.message,
-    this.messageType = MessageType.text,
-    this.timestamp,
+    this.messageType,
+    this.time,
   });
 
-  factory MessageModel.formFirestore(
+  factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(
+        fromId: int.parse(json['from_id'].toString()),
+        message: json['message'],
+        messageType: getMessageType(json['message_type']),
+        time: json['time'],
+      );
+  factory MessageModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
     final data = snapshot.data();
     return MessageModel(
-      uId: data?['uId'],
-      sender: data?['sender'],
+      fromId: data?['from_id'],
       message: data?['message'],
-      messageType: getMessageType(data?['messesType']),
-      timestamp: data?['timestamp'],
+      messageType: getMessageType(data?['message_type']),
+      time: data?['time'],
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toJson() {
     return {
-      'uId': uId,
-      'sender': sender,
+      'from_id': fromId,
       'message': message,
-      'messageType': setMessageType(messageType),
-      'timestamp': timestamp,
+      'message_type': setMessageType(messageType),
+      'time': time
     };
+  }
+
+  @override
+  String toString() {
+    return 'MessageModel{fromId: $fromId, message: $message, messageType: $messageType, time: $time}';
   }
 }

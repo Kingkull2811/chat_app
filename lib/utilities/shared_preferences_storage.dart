@@ -64,17 +64,12 @@ class SharedPreferencesStorage {
       await _prefs.setString(
           AppConstants.usernameKey, signInData.username ?? '');
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
+      await _prefs.setString(AppConstants.emailKey, signInData.email ?? '');
 
       await _prefs.setStringList(
           AppConstants.rolesKey, signInData.roles ?? ['ROLE_USER']);
 
       await checkRoles(signInData.roles ?? ['ROLE_USER']);
-
-      await _prefs.setBool(
-          AppConstants.isFillProfileKey, signInData.isFillProfileKey);
-      await _prefs.setString(AppConstants.userPhoneKey, signInData.phone ?? '');
-      await _prefs.setString(
-          AppConstants.fullNameKey, signInData.fullName ?? '');
     }
   }
 
@@ -113,7 +108,7 @@ class SharedPreferencesStorage {
 
   bool getUserRole() => !getAdminRole() && !getTeacherRole();
 
-  Future<void> setImageAvartarUrl({required String imageUrl}) async {
+  Future<void> setImageAvartarUrl(String imageUrl) async {
     await _prefs.setString(AppConstants.imageAvartarUrlKey, imageUrl);
   }
 
@@ -128,10 +123,14 @@ class SharedPreferencesStorage {
     return int.parse(userID);
   }
 
-  Future<String> getUserEmail() async =>
-      await _secureStorage.readSecureData(AppConstants.emailKey) ?? '';
+  String getUserEmail() => _prefs.getString(AppConstants.emailKey) ?? '';
+
+  Future<void> setFullName(String fullName) async =>
+      await _prefs.setString(AppConstants.fullNameKey, fullName);
 
   String getUserName() => _prefs.getString(AppConstants.usernameKey) ?? '';
+
+  String getFullName() => _prefs.getString(AppConstants.fullNameKey) ?? '';
 
   Future<String> getAccessToken() async {
     final token = await _secureStorage.readSecureData(

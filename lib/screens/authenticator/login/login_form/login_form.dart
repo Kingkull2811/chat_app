@@ -97,7 +97,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                 scrollDirection: Axis.vertical,
                 physics: const BouncingScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.only(top: 16, bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -206,7 +206,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                   if (value.isNotEmpty && value.length < 6) {
                     return 'Password must be at least 6 characters';
                   } else if (value.length > 40) {
-                    return 'Password must be more than 40 characters';
+                    return 'Password must be less than 40 characters';
                   }
                   return null;
                 },
@@ -230,6 +230,10 @@ class _LoginFormPageState extends State<LoginFormPage> {
         final userInfo = await _authRepository.getUserInfo(
             userId: SharedPreferencesStorage().getUserId());
         if (userInfo is UserInfoModel) {
+          // print(userInfo.fullName);
+          await SharedPreferencesStorage().setFullName(userInfo.fullName ?? '');
+          await SharedPreferencesStorage()
+              .setImageAvartarUrl(userInfo.fileUrl ?? '');
           userInfo.isFillProfileKey
               ? _navigateToMainPage()
               : _navigateToFillProfilePage(userInfo);
