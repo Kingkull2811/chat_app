@@ -1,32 +1,19 @@
-import 'package:chat_app/network/model/base_auth_result.dart';
-import 'package:chat_app/network/provider/auth_provider.dart';
 import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/login_response.dart';
+import 'package:chat_app/network/response/refresh_token_response.dart';
+
+import '../provider/auth_provider.dart';
 
 class AuthRepository {
   final _authProvider = AuthProvider();
 
-  Future<BaseAuthResult> refreshToken({
+  Future<RefreshTokenResponse> refreshToken({
     required String refreshToken,
   }) async {
-    final response =
-        await _authProvider.refreshToken(refreshToken: refreshToken);
+    // final response =
+    return await _authProvider.refreshToken(refreshToken: refreshToken);
 
     // log('login response: ${response.toString()}');
-
-    if (response.httpStatus == 200) {
-      //_saveUserInfo(response.data);
-      return BaseAuthResult(
-        isSuccess: true,
-        message: response.message,
-        errors: null,
-      );
-    }
-    return BaseAuthResult(
-      isSuccess: false,
-      message: null,
-      errors: response.errors,
-    );
   }
 
   Future<LoginResponse> login({

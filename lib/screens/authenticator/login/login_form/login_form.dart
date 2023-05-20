@@ -206,7 +206,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                   if (value.isNotEmpty && value.length < 6) {
                     return 'Password must be at least 6 characters';
                   } else if (value.length > 40) {
-                    return 'Password must be more than 40 characters';
+                    return 'Password must be less than 40 characters';
                   }
                   return null;
                 },

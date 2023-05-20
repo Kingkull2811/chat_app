@@ -3,6 +3,8 @@ import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
+import 'package:chat_app/screens/settings/terms_policies/terms_policies.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,6 +17,7 @@ class AppRoutes {
   static const setting = '/setting';
   static const profile = '/settings/profile';
   static const login = '/login';
+  static const terms = '/settings/term_policy';
 
   Map<String, Widget Function(BuildContext)> routes(context,
       {required bool isLoggedIn}) {
@@ -42,7 +45,7 @@ class AppRoutes {
       AppRoutes.profile: (context) {
         return BlocProvider<ProfileBloc>(
           create: (context) => ProfileBloc(context),
-          child: const ProfilePage(),
+          child: ProfilePage(userID: SharedPreferencesStorage().getUserId()),
         );
       },
       AppRoutes.login: (context) {
@@ -50,6 +53,9 @@ class AppRoutes {
           create: (context) => LoginBloc(context),
           child: const LoginPage(),
         );
+      },
+      AppRoutes.terms: (context) {
+        return const TermPolicyPage();
       }
     };
   }

@@ -2,7 +2,10 @@ import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../settings/profile/profile.dart';
+import '../../settings/profile/profile_bloc.dart';
 import '../chat_room/message_view.dart';
 
 class ContactTab extends StatefulWidget {
@@ -81,126 +84,138 @@ class _ContactTabState extends State<ContactTab> {
   Widget _createItemUser(UserFirebaseData item) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: SizedBox(
+      child: Container(
         height: 70,
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.5),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            width: 1,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: AppImage(
-                            isOnline: true,
-                            localPathOrUrl: item.fileUrl,
-                            boxFit: BoxFit.cover,
-                            errorWidget: Image.asset(
-                              'assets/images/ic_account_circle.png',
-                              color: Colors.grey.withOpacity(0.6),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            item.fullName ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            item.email ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MessageView(
-                                receiverId: item.id.toString(),
-                                receiverName: item.fullName ?? '',
-                                receiverAvt: item.fileUrl ?? '',
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          height: 35,
-                          width: 35,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          child: const Icon(
-                            Icons.message_outlined,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () {},
-                        child: Container(
-                          height: 35,
-                          width: 35,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          child: const Icon(
-                            Icons.call,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+        decoration: BoxDecoration(
+          border: BorderDirectional(
+            top: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.4)),
+            bottom: BorderSide(width: 0.5, color: Colors.grey.withOpacity(0.4)),
+          ),
+        ),
+        child: InkWell(
+          onTap: () {
+            if (item.id == null) {
+              return;
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider<ProfileBloc>(
+                  create: (context) => ProfileBloc(context),
+                  child: ProfilePage(userID: item.id!),
                 ),
               ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                        width: 1,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: AppImage(
+                        isOnline: true,
+                        localPathOrUrl: item.fileUrl,
+                        boxFit: BoxFit.cover,
+                        errorWidget: Image.asset(
+                          'assets/images/ic_account_circle.png',
+                          color: Colors.grey.withOpacity(0.6),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        item.fullName ?? '',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        item.email ?? '',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MessageView(
+                            receiverId: item.id.toString(),
+                            receiverName: item.fullName ?? '',
+                            receiverAvt: item.fileUrl ?? '',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: const Icon(
+                        Icons.message_outlined,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () {},
+                    child: Container(
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: const Icon(
+                        Icons.call,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Divider(
-              height: 1,
-              color: Colors.grey.withOpacity(0.3),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,11 +1,11 @@
-import 'package:chat_app/screens/settings/profile/profile.dart';
-import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
+import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/settings/security/security.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../utilities/utils.dart';
 
@@ -19,7 +19,6 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -58,6 +57,8 @@ class _SettingPageState extends State<SettingPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              _profile(),
+
               // ButtonSwitchIcon(
               //   title: 'Night mode',
               //   onToggle: (value) {
@@ -71,22 +72,6 @@ class _SettingPageState extends State<SettingPage> {
               //   ),
               //   inActiveIcon: const Icon(Icons.sunny),
               // ),
-              _itemWithIcon(
-                title: 'Profile',
-                iconPath: '',
-                icon: Icons.person_outline,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                        create: (context) => ProfileBloc(context),
-                        child: const ProfilePage(),
-                      ),
-                    ),
-                  );
-                },
-              ),
               // _itemWithIcon(
               //   title: 'Notification & Sound',
               //   iconPath: '',
@@ -119,10 +104,12 @@ class _SettingPageState extends State<SettingPage> {
                 },
               ),
               _itemWithIcon(
-                title: 'Legal & Policy',
+                title: 'Terms & Policies:',
                 iconPath: '',
                 icon: Icons.policy_outlined,
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.terms);
+                },
               ),
               _itemWithIcon(
                 hasColor: true,
@@ -187,6 +174,128 @@ class _SettingPageState extends State<SettingPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _profile() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.profile);
+        },
+        child: Container(
+          height: 130,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            border: Border.all(width: 0.1, color: AppColors.greyLight),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Text(
+                  'Profile',
+                  style: TextStyle(fontSize: 16, color: AppColors.primaryColor),
+                ),
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(40),
+                          child: AppImage(
+                            isOnline: true,
+                            localPathOrUrl:
+                                SharedPreferencesStorage().getImageAvartarUrl(),
+                            boxFit: BoxFit.cover,
+                            errorWidget: Container(
+                              height: 80,
+                              width: 80,
+                              child: Image.asset(
+                                'assets/images/ic_account_circle.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _itemText(
+                                'Username:',
+                                '@${SharedPreferencesStorage().getUserName()}',
+                              ),
+                              _itemText(
+                                'Email:',
+                                SharedPreferencesStorage().getUserEmail(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.navigate_next,
+                        size: 24,
+                        color: Colors.grey,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _itemText(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

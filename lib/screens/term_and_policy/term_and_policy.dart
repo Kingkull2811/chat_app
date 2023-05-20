@@ -1,8 +1,9 @@
 import 'package:chat_app/screens/main/main_app.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 
-import '../../utilities/app_constants.dart';
+import '../../network/model/term_policy_model.dart';
 import '../../widgets/custom_check_box.dart';
 import '../../widgets/primary_button.dart';
 import '../onboarding/onboarding_screen.dart';
@@ -26,7 +27,7 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
         backgroundColor: Colors.transparent,
         centerTitle: true,
         title: const Text(
-          'Term and Policy',
+          'Terms and Policies',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -39,33 +40,21 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
         child: Column(
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height * 0.45,
-              padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+              height: MediaQuery.of(context).size.height * 0.65,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color.fromARGB(255, 230, 230, 230),
-                  width: 1,
-                ),
+                border: Border.all(color: AppColors.greyLight, width: 1),
                 borderRadius: BorderRadius.circular(20),
                 color: Colors.white,
               ),
-              child: const SingleChildScrollView(
-                child: Text(
-                  AppConstants.longText,
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
-                    color: Colors.black,
-                  ),
-                ),
+              child: ListView.builder(
+                itemCount: listTermPolicy.length,
+                itemBuilder: (context, index) {
+                  return _itemTermPolicy(listTermPolicy[index]);
+                },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                top: 16,
-                right: 16,
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: GestureDetector(
                 onTap: () {
                   setState(() {
@@ -107,6 +96,33 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
             _nextButton(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _itemTermPolicy(TermPolicyModel item) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              '${item.index}. ${item.title}',
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Text(
+            item.content,
+            style: const TextStyle(fontSize: 14, color: Colors.black),
+          )
+        ],
       ),
     );
   }

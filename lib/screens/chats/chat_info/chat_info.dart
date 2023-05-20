@@ -2,9 +2,12 @@ import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
 import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
+import 'package:chat_app/screens/settings/profile/profile.dart';
+import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/app_image.dart';
@@ -51,13 +54,12 @@ class ChatInfoPage extends StatelessWidget {
                 height: 150,
                 width: 150,
                 decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 1.5,
-                      color: Theme.of(context).primaryColor,
-                    )
-                    // borderRadius: BorderRadius.circular(50),
-                    ),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    width: 1.5,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(75),
                   child: AppImage(
@@ -126,7 +128,17 @@ class ChatInfoPage extends StatelessWidget {
                       context,
                       icon: Icons.person_outline,
                       itemTitle: 'Profile',
-                      onTapItemControl: () {},
+                      onTapItemControl: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider<ProfileBloc>(
+                              create: (context) => ProfileBloc(context),
+                              child: ProfilePage(userID: int.parse(receiverID)),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                 ],
               ),

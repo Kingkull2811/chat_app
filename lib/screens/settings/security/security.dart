@@ -1,5 +1,6 @@
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/network/response/base_response.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -25,6 +26,8 @@ class _SecurityPageState extends State<SecurityPage> {
   bool _isShowNew = false;
   bool _isShowConf = false;
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +48,7 @@ class _SecurityPageState extends State<SecurityPage> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0.5,
-          backgroundColor: Colors.grey[50],
+          backgroundColor: AppColors.primaryColor,
           leading: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -53,7 +56,7 @@ class _SecurityPageState extends State<SecurityPage> {
             icon: const Icon(
               Icons.arrow_back_ios_outlined,
               size: 24,
-              color: Colors.black,
+              color: Colors.white,
             ),
           ),
           centerTitle: true,
@@ -62,7 +65,7 @@ class _SecurityPageState extends State<SecurityPage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Colors.white,
             ),
           ),
         ),
@@ -88,52 +91,96 @@ class _SecurityPageState extends State<SecurityPage> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: Colors.grey.withOpacity(0.2),
+                      color: Colors.grey.withOpacity(0.1),
                     ),
                     child: Padding(
                       padding:
                           const EdgeInsets.only(left: 16, top: 16, right: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          _itemPass(
-                            controller: _oldPassController,
-                            obscureText: !_isShowOld,
-                            onTapSuffix: () {
-                              setState(() {
-                                _isShowOld = !_isShowOld;
-                              });
-                            },
-                            hintText: 'Enter old password',
-                          ),
-                          _itemPass(
-                            controller: _newPassController,
-                            obscureText: !_isShowNew,
-                            onTapSuffix: () {
-                              setState(() {
-                                _isShowNew = !_isShowNew;
-                              });
-                            },
-                            hintText: 'Enter new password',
-                          ),
-                          _itemPass(
-                            controller: _confPassController,
-                            obscureText: !_isShowConf,
-                            onTapSuffix: () {
-                              setState(() {
-                                _isShowConf = !_isShowConf;
-                              });
-                            },
-                            hintText: 'Enter confirm password',
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20, bottom: 16),
-                            child: PrimaryButton(
-                              text: 'Change password',
-                              onTap: () async {},
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            _itemPass(
+                              controller: _oldPassController,
+                              obscureText: !_isShowOld,
+                              onTapSuffix: () {
+                                setState(() {
+                                  _isShowOld = !_isShowOld;
+                                });
+                              },
+                              hintText: 'Enter old password',
+                              labelText: 'Old password',
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter old password';
+                                }
+                                if (value.isNotEmpty && value.length < 6) {
+                                  return 'Old password  must be at least 6 characters';
+                                } else if (value.length > 40) {
+                                  return 'Old password must be more than 40 characters';
+                                }
+                                return null;
+                              },
                             ),
-                          ),
-                        ],
+                            _itemPass(
+                              controller: _newPassController,
+                              obscureText: !_isShowNew,
+                              onTapSuffix: () {
+                                setState(() {
+                                  _isShowNew = !_isShowNew;
+                                });
+                              },
+                              hintText: 'Enter new password',
+                              labelText: 'New password',
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter new password';
+                                }
+                                if (value.isNotEmpty && value.length < 6) {
+                                  return 'New password  must be at least 6 characters';
+                                } else if (value.length > 40) {
+                                  return 'New password must be more than 40 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            _itemPass(
+                              controller: _confPassController,
+                              obscureText: !_isShowConf,
+                              onTapSuffix: () {
+                                setState(() {
+                                  _isShowConf = !_isShowConf;
+                                });
+                              },
+                              hintText: 'Enter confirm new password',
+                              labelText: 'Confirm new password',
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter new password';
+                                }
+                                if (value.isNotEmpty && value.length < 6) {
+                                  return 'New password  must be at least 6 characters';
+                                } else if (value.length > 40) {
+                                  return 'Confirm new password must be less than 40 characters';
+                                } else if (value != _newPassController.text) {
+                                  return 'New password and confirm new password do not match';
+                                }
+                                return null;
+                              },
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 20, bottom: 16),
+                              child: PrimaryButton(
+                                text: 'Change password',
+                                onTap: () async {
+                                  await handleButton(context);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -148,53 +195,43 @@ class _SecurityPageState extends State<SecurityPage> {
   Future<void> handleButton(BuildContext context) async {
     final connectivityResult = await Connectivity().checkConnectivity();
 
-    if ((_oldPassController.text.isEmpty ||
-            _newPassController.text.isEmpty ||
-            _confPassController.text.isEmpty) &&
-        mounted) {
-      showCupertinoMessageDialog(context, "Password must not be empty");
-    } else if (_newPassController.text != _confPassController.text) {
-      showCupertinoMessageDialog(
-        context,
-        'The new password and confirm password must be the same',
-      );
-    } else if (_oldPassController.text == _newPassController.text ||
-        _oldPassController.text == _confPassController.text) {
-      showCupertinoMessageDialog(
-          context, 'The old password and the new password must be different');
-    } else if (connectivityResult == ConnectivityResult.none) {
-      showMessageNoInternetDialog(context);
-    } else {
-      final response = await AuthRepository().changePassword(
-        oldPass: _oldPassController.text.trim(),
-        newPass: _newPassController.text.trim(),
-        confPass: _confPassController.text.trim(),
-      );
-      if (response is BaseResponse) {
-        if (response.httpStatus == 200) {
-          showCupertinoMessageDialog(
-            this.context,
-            'Change password successfully',
-            onCloseDialog: () {
-              _oldPassController.clear();
-              _newPassController.clear();
-              _confPassController.clear();
-              Navigator.pop(context);
-            },
-          );
+    if (_formKey.currentState!.validate()) {
+      if (connectivityResult == ConnectivityResult.none) {
+        showMessageNoInternetDialog(this.context);
+      } else {
+        final response = await AuthRepository().changePassword(
+          oldPass: _oldPassController.text.trim(),
+          newPass: _newPassController.text.trim(),
+          confPass: _confPassController.text.trim(),
+        );
+        if (response is BaseResponse) {
+          if (response.httpStatus == 200) {
+            showCupertinoMessageDialog(
+              this.context,
+              'Change password successfully',
+              onCloseDialog: () {
+                _oldPassController.clear();
+                _newPassController.clear();
+                _confPassController.clear();
+                Navigator.pop(context);
+              },
+            );
+          } else if (response is ExpiredTokenResponse) {
+            logoutIfNeed(this.context);
+          } else {
+            showCupertinoMessageDialog(
+              this.context,
+              'Error!',
+              content: response.message,
+            );
+          }
         } else {
           showCupertinoMessageDialog(
             this.context,
             'Error!',
-            content: response.message,
+            content: 'Internal_server_error',
           );
         }
-      } else {
-        showCupertinoMessageDialog(
-          this.context,
-          'Error!',
-          content: 'Internal_server_error',
-        );
       }
     }
   }
@@ -205,20 +242,21 @@ class _SecurityPageState extends State<SecurityPage> {
     bool obscureText = false,
     Function()? onTapSuffix,
     String? hintText,
+    String? labelText,
+    String? Function(String?)? validator,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: SizedBox(
-        height: 60,
-        child: InputPasswordField(
-          controller: controller,
-          obscureText: obscureText,
-          onChanged: (_) {},
-          textInputAction: action ?? TextInputAction.done,
-          prefixIcon: Icons.lock_outline,
-          onTapSuffixIcon: onTapSuffix,
-          hint: hintText,
-        ),
+      padding: const EdgeInsets.only(bottom: 16),
+      child: InputPasswordField(
+        controller: controller,
+        obscureText: obscureText,
+        onChanged: (_) {},
+        textInputAction: action ?? TextInputAction.done,
+        prefixIcon: Icons.lock_outline,
+        onTapSuffixIcon: onTapSuffix,
+        hint: hintText,
+        labelText: labelText,
+        validator: validator,
       ),
     );
   }
@@ -266,7 +304,7 @@ class _SecurityPageState extends State<SecurityPage> {
               child: Icon(
                 isShow ? Icons.expand_more : Icons.navigate_next,
                 size: 24,
-                color: Colors.black,
+                color: Colors.grey,
               ),
             ),
           ],

@@ -1,16 +1,21 @@
 import 'package:chat_app/network/model/chat_model.dart';
 import 'package:chat_app/screens/chats/chat_room/message_view.dart';
+import 'package:chat_app/screens/chats/tab/new_message.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../../network/model/user_from_firebase.dart';
 import '../../../services/firebase_services.dart';
+import '../../../theme.dart';
 import '../../../utilities/shared_preferences_storage.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/animation_loading.dart';
 
 class ChatTab extends StatefulWidget {
-  const ChatTab({Key? key}) : super(key: key);
+  final List<UserFirebaseData>? listUser;
+
+  const ChatTab({Key? key, this.listUser}) : super(key: key);
 
   @override
   State<ChatTab> createState() => _ChatTabState();
@@ -77,12 +82,12 @@ class _ChatTabState extends State<ChatTab> {
           List<ChatModel> listChat = convertListChat(snapshot);
           return _listChat(listChat);
         } else {
-          return Center(
+          return const Center(
             child: Text(
               'no messages yet',
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context).primaryColor,
+                color: AppColors.primaryColor,
               ),
             ),
           );
@@ -94,12 +99,12 @@ class _ChatTabState extends State<ChatTab> {
   Widget _listChat(List<ChatModel>? listChat) {
     return Scaffold(
       body: isNullOrEmpty(listChat)
-          ? Center(
+          ? const Center(
               child: Text(
                 'no messages yet',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Theme.of(context).primaryColor,
+                  color: AppColors.primaryColor,
                 ),
               ),
             )
@@ -112,13 +117,20 @@ class _ChatTabState extends State<ChatTab> {
             ),
       floatingActionButton: InkWell(
         borderRadius: BorderRadius.circular(25),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewMessage(listUser: widget.listUser),
+            ),
+          );
+        },
         child: Container(
           height: 50,
           width: 50,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
-            color: Theme.of(context).primaryColor,
+            color: AppColors.primaryColor,
           ),
           child: const Icon(
             Icons.add,
@@ -164,7 +176,7 @@ class _ChatTabState extends State<ChatTab> {
               borderRadius: BorderRadius.circular(25),
               border: Border.all(
                 width: 1,
-                color: Theme.of(context).primaryColor,
+                color: AppColors.primaryColor,
               ),
             ),
             child: ClipRRect(

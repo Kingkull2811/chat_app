@@ -64,6 +64,7 @@ class SharedPreferencesStorage {
       await _prefs.setString(
           AppConstants.usernameKey, signInData.username ?? '');
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
+      await _prefs.setString(AppConstants.emailKey, signInData.email ?? '');
 
       await _prefs.setStringList(
           AppConstants.rolesKey, signInData.roles ?? ['ROLE_USER']);
@@ -122,8 +123,7 @@ class SharedPreferencesStorage {
     return int.parse(userID);
   }
 
-  Future<String> getUserEmail() async =>
-      await _secureStorage.readSecureData(AppConstants.emailKey) ?? '';
+  String getUserEmail() => _prefs.getString(AppConstants.emailKey) ?? '';
 
   Future<void> setFullName(String fullName) async =>
       await _prefs.setString(AppConstants.fullNameKey, fullName);

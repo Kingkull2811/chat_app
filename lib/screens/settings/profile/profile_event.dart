@@ -5,6 +5,10 @@ abstract class ProfileEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class GetUserInfo extends ProfileEvent {}
+class GetUserInfo extends ProfileEvent {
+  final int userID;
+
+  GetUserInfo(this.userID);
+}
 
 class EditProfile extends ProfileEvent {}
