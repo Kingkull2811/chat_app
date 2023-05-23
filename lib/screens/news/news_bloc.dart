@@ -27,7 +27,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
           ));
         } else {
           final response = await _newsRepository.getListNews();
-          // log('response News: $response ');
 
           if (response is NewsResponse) {
             emit(state.copyWith(

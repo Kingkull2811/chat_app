@@ -236,45 +236,38 @@ class FirebaseService {
     );
   }
 
-  Future<void> sendImageMessage(var docID, String? imagePath) async {
-    if (imagePath != null) {
-      MessageModel message = MessageModel(
-        fromId: SharedPreferencesStorage().getUserId(),
-        message: await FirebaseService().uploadImageToStorage(
-          titleName: 'image_message',
-          childFolder: AppConstants.imageMessageChild,
-          image: File(imagePath),
-        ),
-        messageType: MessageType.image,
-        time: Timestamp.now(),
-      );
+  Future<void> sendImageMessage(var docID, String imagePath) async {
+    MessageModel message = MessageModel(
+      fromId: SharedPreferencesStorage().getUserId(),
+      message: await FirebaseService().uploadImageToStorage(
+        titleName: 'image_message',
+        childFolder: AppConstants.imageMessageChild,
+        image: File(imagePath),
+      ),
+      messageType: MessageType.image,
+      time: Timestamp.now(),
+    );
 
-      await _firestore
-          .collection(AppConstants.chatsCollection)
-          .doc(docID)
-          .collection(AppConstants.messageListCollection)
-          .withConverter(
-              fromFirestore: MessageModel.fromFirestore,
-              toFirestore: (MessageModel messageFireStore, options) =>
-                  messageFireStore.toJson())
-          .add(message)
-          .then((value) {
-        if (kDebugMode) {
-          print('docImage ${value.id}');
-        }
-      });
-      await _firestore
-          .collection(AppConstants.chatsCollection)
-          .doc(docID)
-          .update(
-        {
-          'last_message': '📷 photo',
-          'time': message.time,
-          'message_type': setMessageType(message.messageType)
-        },
-      );
-    } else {
-      return;
-    }
+    await _firestore
+        .collection(AppConstants.chatsCollection)
+        .doc(docID)
+        .collection(AppConstants.messageListCollection)
+        .withConverter(
+            fromFirestore: MessageModel.fromFirestore,
+            toFirestore: (MessageModel messageFireStore, options) =>
+                messageFireStore.toJson())
+        .add(message)
+        .then((value) {
+      if (kDebugMode) {
+        print('docImage ${value.id}');
+      }
+    });
+    await _firestore.collection(AppConstants.chatsCollection).doc(docID).update(
+      {
+        'last_message': '📷 photo',
+        'time': message.time,
+        'message_type': setMessageType(message.messageType)
+      },
+    );
   }
 }

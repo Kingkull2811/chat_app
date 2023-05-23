@@ -3,13 +3,13 @@ import 'package:chat_app/network/repository/news_repository.dart';
 import 'package:chat_app/screens/news/news_bloc.dart';
 import 'package:chat_app/screens/news/news_event.dart';
 import 'package:chat_app/screens/news/news_state.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/photo_view.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:readmore/readmore.dart';
 
 import '../../utilities/enum/api_error_result.dart';
@@ -32,6 +32,11 @@ class NewsPageState extends State<NewsPage> {
   final bool isAdmin = SharedPreferencesStorage().getAdminRole() ||
       SharedPreferencesStorage().getTeacherRole();
 
+  void _reloadPage() {
+    BlocProvider.of<NewsBloc>(context).add(GetListNewEvent());
+    setState(() {});
+  }
+
   @override
   void initState() {
     BlocProvider.of<NewsBloc>(context).add(GetListNewEvent());
@@ -45,64 +50,69 @@ class NewsPageState extends State<NewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<NewsBloc, NewsState>(
-      listenWhen: (preState, curState) {
-        return curState.apiError != ApiError.noError;
-      },
-      listener: (context, curState) {
-        if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
-        }
-        if (curState.apiError == ApiError.noInternetConnection) {
-          showMessageNoInternetDialog(context);
-        }
-      },
-      builder: (context, curState) {
-        return Scaffold(
-          appBar: AppBar(
-            elevation: 0.5,
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            title: const Text(
-              'News',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0.5,
+        backgroundColor: AppColors.primaryColor,
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        title: const Text(
+          'News',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        actions: [
+          if (isAdmin)
+            IconButton(
+              onPressed: () async {
+                final bool result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NewsInfo(
+                      isEdit: false,
+                    ),
+                  ),
+                );
+
+                if (result) {
+                  _reloadPage();
+                } else {
+                  return;
+                }
+              },
+              icon: const Icon(
+                Icons.edit_outlined,
+                size: 30,
                 color: Colors.white,
               ),
             ),
-            actions: [
-              isAdmin
-                  ? IconButton(
-                      onPressed: () async {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NewsInfo(
-                              isEdit: false,
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.edit_outlined,
-                        size: 30,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ],
-          ),
-          body: curState.isLoading
+        ],
+      ),
+      body: BlocConsumer<NewsBloc, NewsState>(
+        listenWhen: (preState, curState) {
+          return curState.apiError != ApiError.noError;
+        },
+        listener: (context, curState) {
+          if (curState.apiError == ApiError.internalServerError) {
+            showCupertinoMessageDialog(
+              context,
+              'Error!',
+              content: 'Internal_server_error',
+            );
+          }
+          if (curState.apiError == ApiError.noInternetConnection) {
+            showMessageNoInternetDialog(context);
+          }
+        },
+        builder: (context, curState) {
+          return curState.isLoading
               ? const AnimationLoading()
-              : _body(context, curState.listNews),
-        );
-      },
+              : _body(context, curState.listNews);
+        },
+      ),
     );
   }
 
@@ -115,8 +125,7 @@ class NewsPageState extends State<NewsPage> {
       child: RefreshIndicator(
         onRefresh: () async {
           await Future.delayed(const Duration(milliseconds: 300));
-          BlocProvider.of<NewsBloc>(this.context).add(GetListNewEvent());
-          setState(() {});
+          _reloadPage();
         },
         child: ListView.builder(
           scrollDirection: Axis.vertical,
@@ -126,13 +135,6 @@ class NewsPageState extends State<NewsPage> {
         ),
       ),
     );
-  }
-
-  String formatTimestamp(String timestamp) {
-    DateTime dateTime = DateTime.parse(timestamp);
-    String formattedTime = DateFormat.Hm().format(dateTime);
-    String formattedDate = DateFormat('hh:mm A dd/MM/yyyy').format(dateTime);
-    return '$formattedTime $formattedDate';
   }
 
   Widget _listNoItem() {
@@ -146,15 +148,15 @@ class NewsPageState extends State<NewsPage> {
             'assets/images/ic_no_content.png',
             width: 150,
             height: 150,
-            color: Theme.of(context).primaryColor,
+            color: AppColors.primaryColor,
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 16),
+          const Padding(
+            padding: EdgeInsets.only(top: 24, bottom: 16),
             child: Text(
               'No news available',
               style: TextStyle(
                 fontSize: 20,
-                color: Theme.of(context).primaryColor,
+                color: AppColors.primaryColor,
               ),
             ),
           ),
@@ -196,24 +198,35 @@ class NewsPageState extends State<NewsPage> {
                           height: 50,
                           width: 50,
                           decoration: BoxDecoration(
-                            color: Colors.grey,
+                            color: Colors.grey.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(25),
-                            // image: DecorationImage(
-                            //   image: AssetImage(items.avtUserCreate),
-                            //   fit: BoxFit.cover,
-                            // ),
                             border: Border.all(
                               width: 1,
-                              color: Theme.of(context).primaryColor,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: AppImage(
+                              isOnline: true,
+                              localPathOrUrl: item.createdImage,
+                              boxFit: BoxFit.cover,
+                              errorWidget: Image.asset(
+                                'assets/images/ic_account_circle.png',
+                                fit: BoxFit.cover,
+                                width: 50,
+                                height: 50,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         ),
                       ),
                       title: Transform.translate(
                         offset: const Offset(-16, 0),
-                        child: const Text(
-                          'items.createBy??' '',
-                          style: TextStyle(
+                        child: Text(
+                          item.createdName ?? '',
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -222,12 +235,12 @@ class NewsPageState extends State<NewsPage> {
                       ),
                       subtitle: Transform.translate(
                         offset: const Offset(-16, 0),
-                        child: const Text(
-                          "items.createTime??''",
-                          style: TextStyle(
+                        child: Text(
+                          formatDateTime(item.createdAt),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.normal,
-                            color: Colors.black,
+                            color: AppColors.primaryColor,
                           ),
                         ),
                       ),
@@ -272,15 +285,15 @@ class NewsPageState extends State<NewsPage> {
                   trimMode: TrimMode.Line,
                   trimCollapsedText: ' show more',
                   trimExpandedText: ' show less',
-                  lessStyle: TextStyle(
+                  lessStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
-                    color: Theme.of(context).primaryColor,
+                    color: AppColors.primaryColor,
                   ),
-                  moreStyle: TextStyle(
+                  moreStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
-                    color: Theme.of(context).primaryColor,
+                    color: AppColors.primaryColor,
                   ),
                   style: const TextStyle(
                     fontSize: 14,
@@ -334,7 +347,7 @@ class NewsPageState extends State<NewsPage> {
             CupertinoActionSheetAction(
               onPressed: () async {
                 Navigator.pop(context);
-                Navigator.push(
+                final bool result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => NewsInfo(
@@ -343,6 +356,12 @@ class NewsPageState extends State<NewsPage> {
                     ),
                   ),
                 );
+
+                if (result) {
+                  _reloadPage();
+                } else {
+                  return;
+                }
               },
               child: _itemOption(
                 icon: Icons.edit_note,
@@ -393,8 +412,7 @@ class NewsPageState extends State<NewsPage> {
     if (mounted) {}
     await showCupertinoMessageDialog(context, 'The news has been deleted',
         onCloseDialog: () {
-      BlocProvider.of<NewsBloc>(context).add(GetListNewEvent());
-      setState(() {});
+      _reloadPage();
       Navigator.pop(context);
     });
   }
@@ -407,14 +425,14 @@ class NewsPageState extends State<NewsPage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, size: 26, color: Theme.of(context).primaryColor),
+        Icon(icon, size: 26, color: AppColors.primaryColor),
         Padding(
           padding: const EdgeInsets.only(left: 16),
           child: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
-              color: Theme.of(context).primaryColor,
+              color: AppColors.primaryColor,
             ),
           ),
         ),

@@ -16,7 +16,6 @@ class NewsProvider with ProviderMixin {
         ApiPath.listNews,
         options: await defaultOptions(url: ApiPath.listNews),
       );
-
       return NewsResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorGetResponse(error, stacktrace, ApiPath.listNews);

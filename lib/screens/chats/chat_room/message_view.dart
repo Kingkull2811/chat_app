@@ -519,7 +519,11 @@ class _MessageViewState extends State<MessageView> {
               onPressed: () async {
                 Navigator.pop(context);
                 String? imagePath = await pickPhoto(ImageSource.camera);
-                _firebaseService.sendImageMessage(docID, imagePath);
+                if (isNullOrEmpty(imagePath)) {
+                  return;
+                } else {
+                  _firebaseService.sendImageMessage(docID, imagePath);
+                }
               },
               child: const Text(
                 'Take a photo from camera',
@@ -533,7 +537,11 @@ class _MessageViewState extends State<MessageView> {
               onPressed: () async {
                 Navigator.pop(context);
                 String? imagePath = await pickPhoto(ImageSource.gallery);
-                _firebaseService.sendImageMessage(docID, imagePath);
+                if (isNullOrEmpty(imagePath)) {
+                  return;
+                } else {
+                  _firebaseService.sendImageMessage(docID, imagePath);
+                }
               },
               child: const Text(
                 'Choose a photo from gallery',

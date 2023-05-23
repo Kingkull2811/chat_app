@@ -1,11 +1,17 @@
+import 'package:chat_app/utilities/enum/meida_type.dart';
+
+import '../../utilities/utils.dart';
+
 class NewsModel {
   final int? id;
   final String? title;
   final String? content;
   final String? mediaUrl;
-  final int? typeMedia;
-  final String? createTime;
-  final String? createBy;
+  final MediaType? typeMedia;
+  final int? createdId;
+  final String? createdName;
+  final String? createdImage;
+  final DateTime? createdAt;
 
   NewsModel({
     this.id,
@@ -13,8 +19,10 @@ class NewsModel {
     this.content,
     this.mediaUrl,
     this.typeMedia,
-    this.createTime,
-    this.createBy,
+    this.createdId,
+    this.createdName,
+    this.createdImage,
+    this.createdAt,
   });
 
   factory NewsModel.fromJson(Map<String, dynamic> json) {
@@ -23,12 +31,16 @@ class NewsModel {
       title: json['title'],
       content: json['content'],
       mediaUrl: json['mediaUrl'],
-      typeMedia: json['typeMedia'],
+      typeMedia: getMediaType(json['typeMedia'] as int? ?? 1),
+      createdId: json['createdId'] as int? ?? 0,
+      createdName: json['createdName'] as String? ?? '',
+      createdImage: json['createdFile'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String? ?? ''),
     );
   }
 
   @override
   String toString() {
-    return 'NewsModel{id: $id, title: $title, content: $content, mediaUrl: $mediaUrl, typeMedia: $typeMedia, createTime: $createTime, createBy: $createBy}';
+    return 'NewsModel{id: $id, title: $title, content: $content, mediaUrl: $mediaUrl, typeMedia: $typeMedia, createdId: $createdId, createdName: $createdName, createdImage: $createdImage, createdAt: $createdAt}';
   }
 }
