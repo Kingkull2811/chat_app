@@ -6,7 +6,7 @@ import 'package:chat_app/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:local_auth_android/types/auth_messages_android.dart';
+import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
 import '../widgets/message_dialog.dart';

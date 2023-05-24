@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
 import '../theme.dart';
 import '../utilities/enum/message_type.dart';
@@ -38,6 +39,7 @@ class FirebaseService {
   ///*************initial fcm******************
 
   Future<void> initialFCM() async {
+    // if (Platform.isIOS) {_messaging.requestPermission(IosNotificationSettings())}
     if (kIsWeb) {
       await Firebase.initializeApp(
         options: const FirebaseOptions(
@@ -210,6 +212,8 @@ class FirebaseService {
     }
   }
 
+  ///user
+
   Future uploadUserData({
     int? userId,
     required Map<String, dynamic> data,
@@ -259,6 +263,31 @@ class FirebaseService {
       }
     });
     return profiles;
+  }
+
+  ///message - chat
+
+  Future<List<MessageModel>> getListMessage(String docId) async {
+    List<MessageModel> listMessage = [];
+    await _firestore
+        .collection(AppConstants.messageCollection)
+        .doc(docId)
+        .collection(AppConstants.messageListCollection)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      for (var element in snapshot.docChanges) {
+        final doc = element.doc;
+        if (doc.exists) {
+          log('data: ${doc.data().toString()}');
+          if (doc.data() is Map<String, dynamic>) {
+            final message =
+                MessageModel.fromJson(doc.data() as Map<String, dynamic>);
+            listMessage.add(message);
+          }
+        }
+      }
+    });
+    return listMessage;
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getListChat(int currentUserId) {
@@ -408,6 +437,29 @@ class FirebaseService {
         "android_channel_id": "chats"
       },
     };
+    //onTap:
+    _messaging.subscribeToTopic('topic');
+
+    const url = 'https://fcm.googleapis.com/fcm/send';
+
+    final data2 = {
+      'to': '/topics/topic', //fcmToken
+      "notification": {
+        "title": senderName, //our name should be send
+        "body": message,
+        // "android_channel_id": "chats"
+      },
+      'data': {
+        'type': 'dataType',
+        'id': 'id',
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      }
+    };
+
+    final headers = {
+      'content-type': 'application/json',
+      'Authorization': 'key=serverKey',
+    };
   }
 
   Future<String> getFCMToken() async {
@@ -421,6 +473,85 @@ class FirebaseService {
       }
     });
     return fcmToken;
+  }
+
+  ///call - video - audio
+
+  Stream<DocumentSnapshot> callStream({required String uid}) =>
+      _firestore.collection(AppConstants.callCollection).doc(uid).snapshots();
+
+  Future<bool> makeVideoCall({required CallModel call}) async {
+    try {
+      call.hasDialled = true;
+      call.isCall = "video";
+      Map<String, dynamic> hasDialledMap = call.toMap(call);
+
+      call.hasDialled = false;
+      call.isCall = "video";
+      Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.callerId)
+          .set(hasDialledMap);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.receiverId)
+          .set(hasNotDialledMap);
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+
+      return false;
+    }
+  }
+
+  Future<bool> makeVoiceCall({required CallModel call}) async {
+    try {
+      call.hasDialled = true;
+      call.isCall = "audio";
+      Map<String, dynamic> hasDialledMap = call.toMap(call);
+
+      call.hasDialled = false;
+      call.isCall = "audio";
+      Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.callerId)
+          .set(hasDialledMap);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.receiverId)
+          .set(hasNotDialledMap);
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> endCall({required CallModel call}) async {
+    try {
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.callerId)
+          .delete();
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.receiverId)
+          .delete();
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
   }
 
   ///************** FCM Notification*******

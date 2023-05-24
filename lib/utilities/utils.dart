@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
-import 'package:chat_app/utilities/enum/meida_type.dart';
+import 'package:chat_app/utilities/enum/media_type.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';

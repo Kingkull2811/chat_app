@@ -1,4 +1,4 @@
-import 'package:chat_app/utilities/enum/meida_type.dart';
+import 'package:chat_app/utilities/enum/media_type.dart';
 
 import '../../utilities/utils.dart';
 

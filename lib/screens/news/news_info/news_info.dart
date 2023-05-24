@@ -2,8 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_app/network/model/news_model.dart';
+import 'package:chat_app/network/repository/news_repository.dart';
+import 'package:chat_app/services/firebase_services.dart';
+import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
-import 'package:chat_app/utilities/enum/meida_type.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,9 +16,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
-import '../../../network/repository/news_repository.dart';
-import '../../../services/firebase_services.dart';
-import '../../../theme.dart';
+import '../../../utilities/enum/media_type.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/app_image.dart';
 

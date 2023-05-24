@@ -14,6 +14,7 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+
 	<key>CFBundleName</key>
 	<string>chat_app</string>
 	<key>CFBundlePackageType</key>
@@ -26,6 +27,9 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+<<<<<<< HEAD
+
+=======
 	<key>NSCameraUsageDescription</key>
 	<string>Take  photo from camera.</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -36,6 +40,7 @@
 	<array>
 		<string>fetch</string>
 	</array>
+>>>>>>> chat
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -55,5 +60,24 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+<<<<<<< HEAD
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Choose photo from gallery.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Take  photo from camera.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Use to capture audio for image picker plugin.</string>
+
+     <key>UIBackgroundModes</key>
+     <array>
+     <string>processing</string>
+     <string>remote-notification</string>
+     <string>voip</string>
+     </array>
+=======
+>>>>>>> chat
 </dict>
 </plist>
