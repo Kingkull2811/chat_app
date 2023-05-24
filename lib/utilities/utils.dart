@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
+import 'package:chat_app/utilities/enum/media_type.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -114,7 +115,8 @@ String formatDateUtcToTime(Timestamp? timestamp) {
   DateTime dateTime =
       DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
 
-  return DateFormat('hh:mm a').format(DateTime.parse(dateTime.toString()));
+  return DateFormat('dd/MM/yy hh:mm a')
+      .format(DateTime.parse(dateTime.toString()));
 }
 
 MessageType getMessageType(String? type) {
@@ -147,4 +149,37 @@ String formatDate(String? value) {
     return '';
   }
   return DateFormat('dd-MM-yyyy').format(dateTime!);
+}
+
+String formatDateTime(DateTime? time) {
+  if (time == null) {
+    return '';
+  }
+  DateFormat formatter = DateFormat('HH:mm dd/MM/yyyy');
+  String formattedDateTime = formatter.format(time);
+  return formattedDateTime;
+}
+
+MediaType getMediaType(int type) {
+  switch (type) {
+    case 1:
+      return MediaType.image;
+    case 2:
+      return MediaType.video;
+    default:
+      MediaType.image;
+      throw Exception('Invalid mediaType type: $type');
+  }
+}
+
+int setMediaType(MediaType type) {
+  switch (type) {
+    case MediaType.image:
+      return 1;
+    case MediaType.video:
+      return 2;
+    default:
+      //
+      throw Exception('Invalid mediaType type: $type');
+  }
 }

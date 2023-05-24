@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../services/database.dart';
 import '../chats/chat.dart';
 import '../chats/chat_bloc.dart';
 import '../chats/chat_event.dart';
@@ -277,25 +276,25 @@ class MainAppState extends State<MainApp>
       case 0:
         currentTab = BlocProvider(
           create: (context) => ChatsBloc(context)..add(ChatInit()),
-          child: ChatsPage(
-            key: DatabaseService().chatKey,
-          ),
+          child: const ChatsPage(
+              // key: DatabaseService().chatKey,
+              ),
         );
         break;
       case 1:
         currentTab = BlocProvider<NewsBloc>(
           create: (context) => NewsBloc(context),
-          child: NewsPage(
-            key: DatabaseService().newsKey,
-          ),
+          child: const NewsPage(
+              // key: DatabaseService().newsKey,
+              ),
         );
         break;
       case 2:
         currentTab = BlocProvider<TranscriptBloc>(
           create: (context) => TranscriptBloc(context),
-          child: TranscriptPage(
-            key: DatabaseService().transcriptKey,
-          ),
+          child: const TranscriptPage(
+              // key: DatabaseService().transcriptKey,
+              ),
         );
         break;
       case 3:
@@ -304,9 +303,9 @@ class MainAppState extends State<MainApp>
       default:
         currentTab = BlocProvider(
           create: (context) => ChatsBloc(context),
-          child: ChatsPage(
-            key: DatabaseService().chatKey,
-          ),
+          child: const ChatsPage(
+              // key: DatabaseService().chatKey,
+              ),
         );
     }
     return currentTab;

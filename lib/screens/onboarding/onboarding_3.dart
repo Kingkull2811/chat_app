@@ -50,6 +50,7 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                     style: TextStyle(
                       fontSize: 20,
                       fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold,
                       color: AppColors.primaryColor,
                     ),
                   ),

@@ -213,6 +213,8 @@ class _EnterPointPageState extends State<EnterPointPage> {
   }
 
   Widget _cardLearningInfo(List<LearningResultInfo> listLearningInfo) {
+    listResult = listLearningInfo;
+
     final columns = [
       'Subject name',
       'Oral Test',
@@ -289,14 +291,14 @@ class _EnterPointPageState extends State<EnterPointPage> {
           ),
           dataRowHeight: 50,
           columns: getColumns(columns),
-          rows: getRows(listLearningInfo),
+          rows: getRows(listResult),
         ),
       ),
     );
   }
 
   Future editOralPoint(LearningResultInfo dataEdit) async {
-    final oralTestPoint = await showTextDialog(
+    final String oralTestPoint = await showTextDialog(
       context,
       title: 'Change Oral Test Point',
       value: dataEdit.oralTestScore.toString(),
@@ -307,7 +309,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
 
           return isEditResult
               ? LearningResultInfo().copyWith(
-                  oralTestScore: double.tryParse(oralTestPoint ?? '0'),
+                  oralTestScore: double.parse(oralTestPoint),
                 )
               : result;
         }).toList());

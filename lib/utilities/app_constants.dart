@@ -37,6 +37,10 @@ class AppConstants {
 
   static const String isFillProfileKey = 'IS_FILL_PROFILE_STATUS';
 
+  static const String fcmTokenKey = 'FCM_TOKEN_KEY';
+  static const String fcmTokenServerKey =
+      'Bearer AAAAGApBmAk:APA91bGZbEsMeiFQTfQBsmW3FAecVwTELTEait9h_kCtVmaCznv3GyfdK6E1ZyEVUt2ZZHTHv2W7nrxEbu736PxDOmNCI_3XcaMU9wUZR0adAIEhPu1h_3NPcLmZwTJe5eXttZsDnrXg';
+
   static const String nightMode = 'IS_NIGHT_MODE';
   static const String soundModeKey = 'IS_TURN_ON_SOUND';
   static const String previewModeKey = 'IS_TURN_ON_PREVIEW_NOTIFICATION';

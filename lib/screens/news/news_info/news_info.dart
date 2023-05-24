@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:chat_app/network/model/news_model.dart';
 import 'package:chat_app/network/repository/news_repository.dart';
-import 'package:chat_app/routes.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -17,6 +16,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
+import '../../../utilities/enum/media_type.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/app_image.dart';
 
@@ -46,7 +46,7 @@ class _NewsInfoState extends State<NewsInfo> {
   String videoThumbPath = '';
 
   /// [mediaType] = 1- image, 2 - video
-  int? mediaType;
+  MediaType mediaType = MediaType.image;
 
   final NewsRepository _newsRepository = NewsRepository();
 
@@ -82,23 +82,23 @@ class _NewsInfoState extends State<NewsInfo> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0.5,
-          backgroundColor: Colors.grey[50],
+          backgroundColor: AppColors.primaryColor,
           centerTitle: true,
           leading: IconButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop(true);
             },
             icon: const Icon(
               Icons.arrow_back_ios_outlined,
               size: 24,
-              color: Colors.black,
+              color: Colors.white,
             ),
           ),
           title: Text(
             isEdit ? 'Edit News' : 'Add News',
             style: const TextStyle(
               fontSize: 20,
-              color: Colors.black,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -181,7 +181,9 @@ class _NewsInfoState extends State<NewsInfo> {
                           borderRadius: BorderRadius.circular(15),
                           child: Container(
                             constraints: const BoxConstraints(
-                                maxHeight: 300, minHeight: 150),
+                              maxHeight: 300,
+                              minHeight: 150,
+                            ),
                             width: MediaQuery.of(context).size.width -
                                 16 * 2 -
                                 6 * 2,
@@ -238,33 +240,31 @@ class _NewsInfoState extends State<NewsInfo> {
                           ),
                         ),
                       ),
-                      // (isNotNullOrEmpty(widget.newsInfo?.mediaUrl) ||
-                      isNotNullOrEmpty(mediaUrl)
-                          ? Positioned(
-                              right: 0,
-                              top: 0,
-                              child: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      mediaUrl = '';
-                                      mediaType = 1;
-                                      isOnline = true;
-                                      videoThumbPath = '';
-                                      isChangeMedia = true;
-                                    });
-                                  },
-                                  child: const Icon(
-                                    Icons.cancel_outlined,
-                                    size: 20,
-                                    color: AppColors.red700,
-                                  ),
-                                ),
+                      if (isNotNullOrEmpty(mediaUrl))
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  mediaUrl = '';
+                                  mediaType = MediaType.image;
+                                  isOnline = true;
+                                  videoThumbPath = '';
+                                  isChangeMedia = true;
+                                });
+                              },
+                              child: const Icon(
+                                Icons.cancel_outlined,
+                                size: 20,
+                                color: AppColors.red700,
                               ),
-                            )
-                          : const SizedBox.shrink(),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -275,9 +275,9 @@ class _NewsInfoState extends State<NewsInfo> {
                     onTap: () async {
                       showLoading(context);
                       if (isEdit) {
-                        await updateNews(widget.newsInfo?.id);
+                        await updateNews(context, widget.newsInfo?.id);
                       } else {
-                        await postNews();
+                        await postNews(context);
                       }
                     },
                   ),
@@ -290,12 +290,12 @@ class _NewsInfoState extends State<NewsInfo> {
     );
   }
 
-  Future<void> postNews() async {
+  Future<void> postNews(BuildContext context) async {
     final response = await _newsRepository.postNews(
       title: _titleController.text.trim().toString(),
       content: _contentController.text.trim().toString(),
       mediaUrl: await getMediaUrl(mediaUrl),
-      mediaType: mediaType ?? 1,
+      mediaType: setMediaType(mediaType),
     );
 
     if (response is NewsModel) {
@@ -303,9 +303,13 @@ class _NewsInfoState extends State<NewsInfo> {
         this.context,
         'Post news successfully',
         barrierDismiss: true,
-        buttonLabel: 'Go to news page',
         onCloseDialog: () {
-          Navigator.pushNamed(this.context, AppRoutes.news);
+          Navigator.pop(context);
+          setState(() {
+            _titleController.clear();
+            _contentController.clear();
+            mediaUrl = '';
+          });
         },
       );
     } else {
@@ -317,7 +321,7 @@ class _NewsInfoState extends State<NewsInfo> {
     }
   }
 
-  updateNews(int? newsId) async {
+  updateNews(BuildContext context, int? newsId) async {
     if (newsId == null) {
       showCupertinoMessageDialog(this.context, 'the news is not found');
     }
@@ -327,7 +331,7 @@ class _NewsInfoState extends State<NewsInfo> {
       title: _titleController.text.trim().toString(),
       content: _contentController.text.trim().toString(),
       mediaUrl: isChangeMedia ? await getMediaUrl(mediaUrl) : mediaUrl,
-      mediaType: mediaType ?? 1,
+      mediaType: setMediaType(mediaType),
     );
 
     if (response is NewsModel) {
@@ -337,7 +341,8 @@ class _NewsInfoState extends State<NewsInfo> {
         barrierDismiss: true,
         buttonLabel: 'Go to news page',
         onCloseDialog: () {
-          Navigator.pushNamed(this.context, AppRoutes.news);
+          Navigator.pop(context);
+          Navigator.of(context).pop(true);
         },
       );
     } else {
@@ -370,7 +375,7 @@ class _NewsInfoState extends State<NewsInfo> {
                 if (isNotNullOrEmpty(image)) {
                   setState(() {
                     mediaUrl = image;
-                    mediaType = 1;
+                    mediaType = MediaType.image;
                     isOnline = false;
                   });
                 }
@@ -390,7 +395,7 @@ class _NewsInfoState extends State<NewsInfo> {
                 if (isNotNullOrEmpty(image)) {
                   setState(() {
                     mediaUrl = image;
-                    mediaType = 1;
+                    mediaType = MediaType.image;
                     isOnline = false;
                   });
                 }

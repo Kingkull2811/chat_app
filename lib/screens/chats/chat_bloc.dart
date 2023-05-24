@@ -34,6 +34,14 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
           listUser.removeWhere((user) => user.id == userInfo?.id);
 
           if (userInfo != null) {
+            if (userInfo.fcmToken == null) {
+              userInfo.fcmToken = SharedPreferencesStorage().getFCMToken();
+              await FirebaseService().sendFCMTokenToDB(
+                SharedPreferencesStorage().getFCMToken(),
+                userInfo.id!,
+              );
+            }
+
             emit(state.copyWith(
               isLoading: false,
               apiError: ApiError.noError,

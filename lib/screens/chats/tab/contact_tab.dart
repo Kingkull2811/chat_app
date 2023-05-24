@@ -174,6 +174,7 @@ class _ContactTabState extends State<ContactTab> {
                             receiverId: item.id.toString(),
                             receiverName: item.fullName ?? '',
                             receiverAvt: item.fileUrl ?? '',
+                            receiverFCMToken: item.fcmToken ?? '',
                           ),
                         ),
                       );

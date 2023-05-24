@@ -139,6 +139,11 @@ class SharedPreferencesStorage {
     return token;
   }
 
+  Future<void> setFCMToken(String token) async =>
+      await _prefs.setString(AppConstants.fcmTokenKey, token);
+
+  String getFCMToken() => _prefs.getString(AppConstants.fcmTokenKey) ?? '';
+
   String getAccessTokenExpired() {
     return _prefs.getString(AppConstants.accessTokenExpiredKey) ?? '';
   }

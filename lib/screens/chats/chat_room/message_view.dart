@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat_app/network/model/message_model.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
@@ -5,7 +7,9 @@ import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/photo_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,15 +19,14 @@ import '../../../widgets/app_image.dart';
 import '../chat_info/chat_info.dart';
 
 class MessageView extends StatefulWidget {
-  final String receiverId;
-  final String receiverName;
-  final String receiverAvt;
+  final String receiverId, receiverName, receiverAvt, receiverFCMToken;
 
   const MessageView({
     Key? key,
     required this.receiverId,
     required this.receiverName,
     required this.receiverAvt,
+    required this.receiverFCMToken,
   }) : super(key: key);
 
   @override
@@ -39,12 +42,15 @@ class _MessageViewState extends State<MessageView> {
 
   final int currentUserId = SharedPreferencesStorage().getUserId();
 
+  bool showEmoji = false;
+
   void _checkMessage() async {
     var docId = await _firebaseService.checkMessageExists(
       currentUserId: currentUserId,
       receiverId: widget.receiverId,
       receiverAvt: widget.receiverAvt,
       receiverName: widget.receiverName,
+      receiverFCMToken: widget.receiverFCMToken,
     );
     setState(() {
       docID = docId;
@@ -67,16 +73,27 @@ class _MessageViewState extends State<MessageView> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: _appBar(),
-        resizeToAvoidBottomInset: true,
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: _bodyChat(),
-            ),
-            _chatInput(),
-          ],
+      child: WillPopScope(
+        onWillPop: () async {
+          if (showEmoji) {
+            setState(() => showEmoji = !showEmoji);
+            return Future.value(false);
+          } else {
+            return Future.value(true);
+          }
+        },
+        child: Scaffold(
+          appBar: _appBar(),
+          resizeToAvoidBottomInset: true,
+          body: Column(
+            children: <Widget>[
+              Expanded(
+                child: _bodyChat(),
+              ),
+              _chatInput(),
+              _emojiPick(),
+            ],
+          ),
         ),
       ),
     );
@@ -203,30 +220,39 @@ class _MessageViewState extends State<MessageView> {
         child: Row(
           children: [
             IconButton(
-              onPressed: () {
-                _pickImageToSend(context);
-              },
+              onPressed: () => _pickImageToSend(context),
               iconSize: 30,
               icon: const Icon(
                 Icons.image_outlined,
                 color: AppColors.primaryColor,
               ),
             ),
-            // IconButton(
-            //   iconSize: 30,
-            //   onPressed: () {},
-            //   icon: const Icon(
-            //     Icons.mic_none_outlined,
-            //     color: AppColors.primaryColor,
-            //   ),
-            // ),
+            GestureDetector(
+              onTap: () {},
+              onLongPress: () async {},
+              onLongPressEnd: (_) {},
+              child: const Icon(
+                Icons.mic_none_outlined,
+                size: 30,
+                color: AppColors.primaryColor,
+              ),
+            ),
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white,
+                ),
                 constraints: const BoxConstraints(
                   maxHeight: 40,
                 ),
                 child: TextFormField(
+                  onTap: () {
+                    if (showEmoji) {
+                      setState(() => showEmoji = !showEmoji);
+                    }
+                  },
                   controller: _inputTextController,
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -238,7 +264,7 @@ class _MessageViewState extends State<MessageView> {
                       color: Colors.grey[250],
                     ),
                     suffixIcon: GestureDetector(
-                      onTap: () {},
+                      onTap: () => setState(() => showEmoji = !showEmoji),
                       child: const Icon(
                         Icons.emoji_emotions_outlined,
                         size: 24,
@@ -271,9 +297,10 @@ class _MessageViewState extends State<MessageView> {
                   return;
                 } else {
                   await _firebaseService.sendTextMessage(
-                    docID,
-                    _inputTextController.text.trim(),
-                    currentUserId,
+                    docID: docID,
+                    messageText: _inputTextController.text.trim(),
+                    currentUserId: currentUserId,
+                    receiverFCMToken: widget.receiverFCMToken,
                   );
                   _inputTextController.clear();
                 }
@@ -284,6 +311,51 @@ class _MessageViewState extends State<MessageView> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _emojiPick() {
+    return Offstage(
+      offstage: !showEmoji,
+      child: SizedBox(
+        height: 250,
+        child: EmojiPicker(
+          textEditingController: _inputTextController,
+          config: Config(
+            columns: 7,
+            emojiSizeMax: 32 *
+                (foundation.defaultTargetPlatform == TargetPlatform.iOS ||
+                        Platform.isIOS
+                    ? 1.30
+                    : 1.0),
+            verticalSpacing: 0,
+            horizontalSpacing: 0,
+            gridPadding: EdgeInsets.zero,
+            initCategory: Category.RECENT,
+            bgColor: AppColors.primaryColor.withOpacity(0.1),
+            indicatorColor: AppColors.primaryColor,
+            iconColor: Colors.grey.withOpacity(0.3),
+            iconColorSelected: AppColors.primaryColor,
+            backspaceColor: AppColors.primaryColor,
+            skinToneDialogBgColor: Colors.white,
+            skinToneIndicatorColor: Colors.grey,
+            enableSkinTones: true,
+            showRecentsTab: true,
+            recentsLimit: 28,
+            replaceEmojiOnLimitExceed: false,
+            noRecents: const Text(
+              'No Recents',
+              style: TextStyle(fontSize: 20, color: Colors.black26),
+              textAlign: TextAlign.center,
+            ),
+            loadingIndicator: const SizedBox.shrink(),
+            tabIndicatorAnimDuration: kTabScrollDuration,
+            categoryIcons: const CategoryIcons(),
+            buttonMode: ButtonMode.MATERIAL,
+            checkPlatformCompatibility: true,
+          ),
         ),
       ),
     );
@@ -519,7 +591,15 @@ class _MessageViewState extends State<MessageView> {
               onPressed: () async {
                 Navigator.pop(context);
                 String? imagePath = await pickPhoto(ImageSource.camera);
-                _firebaseService.sendImageMessage(docID, imagePath);
+                if (isNullOrEmpty(imagePath)) {
+                  return;
+                } else {
+                  _firebaseService.sendImageMessage(
+                    docID,
+                    imagePath,
+                    widget.receiverFCMToken,
+                  );
+                }
               },
               child: const Text(
                 'Take a photo from camera',
@@ -533,7 +613,15 @@ class _MessageViewState extends State<MessageView> {
               onPressed: () async {
                 Navigator.pop(context);
                 String? imagePath = await pickPhoto(ImageSource.gallery);
-                _firebaseService.sendImageMessage(docID, imagePath);
+                if (isNullOrEmpty(imagePath)) {
+                  return;
+                } else {
+                  _firebaseService.sendImageMessage(
+                    docID,
+                    imagePath,
+                    widget.receiverFCMToken,
+                  );
+                }
               },
               child: const Text(
                 'Choose a photo from gallery',
