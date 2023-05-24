@@ -629,7 +629,6 @@ class _MessageViewState extends State<MessageView> {
                 builder: (context) => ChatInfoPage(
                   name: widget.receiverName,
                   imageUrl: widget.receiverAvt,
-                  isGroup: false,
                   receiverID: widget.receiverId,
                 ),
               ),

@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
+import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
 import '../utilities/enum/message_type.dart';
 
@@ -71,6 +72,8 @@ class FirebaseService {
     }
   }
 
+  ///user
+
   Future uploadUserData({
     int? userId,
     required Map<String, dynamic> data,
@@ -121,6 +124,8 @@ class FirebaseService {
     });
     return profiles;
   }
+
+  ///message - chat
 
   Future<List<MessageModel>> getListMessage(String docId) async {
     List<MessageModel> listMessage = [];
@@ -275,6 +280,85 @@ class FirebaseService {
       );
     } else {
       return;
+    }
+  }
+
+  ///call - video - audio
+
+  Stream<DocumentSnapshot> callStream({required String uid}) =>
+      _firestore.collection(AppConstants.callCollection).doc(uid).snapshots();
+
+  Future<bool> makeVideoCall({required CallModel call}) async {
+    try {
+      call.hasDialled = true;
+      call.isCall = "video";
+      Map<String, dynamic> hasDialledMap = call.toMap(call);
+
+      call.hasDialled = false;
+      call.isCall = "video";
+      Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.callerId)
+          .set(hasDialledMap);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.receiverId)
+          .set(hasNotDialledMap);
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+
+      return false;
+    }
+  }
+
+  Future<bool> makeVoiceCall({required CallModel call}) async {
+    try {
+      call.hasDialled = true;
+      call.isCall = "audio";
+      Map<String, dynamic> hasDialledMap = call.toMap(call);
+
+      call.hasDialled = false;
+      call.isCall = "audio";
+      Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.callerId)
+          .set(hasDialledMap);
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.receiverId)
+          .set(hasNotDialledMap);
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> endCall({required CallModel call}) async {
+    try {
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.callerId)
+          .delete();
+
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(call.receiverId)
+          .delete();
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
     }
   }
 }
