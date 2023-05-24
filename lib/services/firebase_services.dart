@@ -437,6 +437,29 @@ class FirebaseService {
         "android_channel_id": "chats"
       },
     };
+    //onTap:
+    _messaging.subscribeToTopic('topic');
+
+    const url = 'https://fcm.googleapis.com/fcm/send';
+
+    final data2 = {
+      'to': '/topics/topic', //fcmToken
+      "notification": {
+        "title": senderName, //our name should be send
+        "body": message,
+        // "android_channel_id": "chats"
+      },
+      'data': {
+        'type': 'dataType',
+        'id': 'id',
+        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+      }
+    };
+
+    final headers = {
+      'content-type': 'application/json',
+      'Authorization': 'key=serverKey',
+    };
   }
 
   Future<String> getFCMToken() async {
