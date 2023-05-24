@@ -1,4 +1,4 @@
-import 'package:chat_app/screens/main/main_app.dart';
+import 'package:chat_app/routes.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import '../../network/model/term_policy_model.dart';
 import '../../widgets/custom_check_box.dart';
 import '../../widgets/primary_button.dart';
-import '../onboarding/onboarding_screen.dart';
 
 class TermPolicyPage extends StatefulWidget {
   const TermPolicyPage({Key? key}) : super(key: key);
@@ -31,12 +30,12 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: AppColors.primaryColor,
           ),
         ),
       ),
       body: Container(
-        padding: EdgeInsets.fromLTRB(16, padding.top, 16, 16 + padding.bottom),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 16 + padding.bottom),
         child: Column(
           children: <Widget>[
             Container(
@@ -141,39 +140,12 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
               if (isFirstTimeOpenApp) {
                 await SharedPreferencesStorage().setFirstTimeOpen(false);
                 if (mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const OnBoardingPage()),
-                  );
+                  Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
                 }
               } else {
                 if (mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MainApp(currentTab: 0),
-                    ),
-                  );
+                  Navigator.pushReplacementNamed(context, AppRoutes.chat);
                 }
-                // if (DatabaseService().chatKey != null) {
-                //   if (mounted) {
-                //     backToChat(context);
-                //   }
-                // } else {
-                //   if (mounted) {
-                //     // log('isFill: ${SharedPreferencesStorage().getFillProfileStatus()}');
-                //     Navigator.pushReplacement(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => BlocProvider<TabBloc>(
-                //           create: (BuildContext context) => TabBloc(),
-                //           child: MainApp(navFromStart: true),
-                //         ),
-                //       ),
-                //     );
-                //   }
-                // }
               }
             },
     );

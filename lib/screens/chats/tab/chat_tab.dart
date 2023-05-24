@@ -45,9 +45,11 @@ class _ChatTabState extends State<ChatTab> {
         Map<String, dynamic> userId = docData['members'];
         Map<String, dynamic> names = docData['names'];
         Map<String, dynamic> imageUrls = docData['imageUrls'];
+        Map<String, dynamic> fcmToken = docData['fcm_token'] ?? {};
         userId.remove('$currentUserId');
         names.remove('$currentUserId');
         imageUrls.remove('$currentUserId');
+        fcmToken.remove('$currentUserId');
 
         final Map<String, dynamic> mapDoc = {
           "receiver_id": userId.keys.first,
@@ -55,7 +57,8 @@ class _ChatTabState extends State<ChatTab> {
           "receiver_name": names.values.first,
           "last_message": docData['last_message'],
           "message_type": docData['message_type'],
-          "time": docData['time']
+          "time": docData['time'],
+          "fcm_token": fcmToken.values.first ?? '',
         };
 
         listChat.add(ChatModel.fromJson(mapDoc));
@@ -149,6 +152,7 @@ class _ChatTabState extends State<ChatTab> {
             receiverId: chatItem.receiverId ?? '',
             receiverName: chatItem.receiverName ?? '',
             receiverAvt: chatItem.receiverAvt ?? '',
+            receiverFCMToken: chatItem.fcmToken ?? '',
           ),
         ),
       );

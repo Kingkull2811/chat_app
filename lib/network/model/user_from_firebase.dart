@@ -9,6 +9,7 @@ class UserFirebaseData {
   final String? phone;
   final String? fileUrl;
   final List<StudentFirebase>? parentOf;
+  String? fcmToken;
 
   UserFirebaseData({
     this.id,
@@ -18,6 +19,7 @@ class UserFirebaseData {
     this.email,
     this.phone,
     this.parentOf,
+    this.fcmToken,
   });
 
   factory UserFirebaseData.fromFirebase(Map<String, dynamic> json) =>
@@ -33,10 +35,11 @@ class UserFirebaseData {
             : List.from(
                 (json['parentOf']).map((e) => StudentFirebase.fromJson(e)),
               ),
+        fcmToken: json['fcm_token'],
       );
 
   @override
   String toString() {
-    return 'UserFirebaseData{id: $id, username: $username, email: $email, fullName: $fullName, phone: $phone, fileUrl: $fileUrl, parentOf: $parentOf}';
+    return 'UserFirebaseData{id: $id, username: $username, email: $email, fullName: $fullName, phone: $phone, fileUrl: $fileUrl, parentOf: $parentOf, fcmToken: $fcmToken}';
   }
 }

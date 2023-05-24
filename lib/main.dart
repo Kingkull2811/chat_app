@@ -1,16 +1,12 @@
 import 'dart:io';
 
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/screens/chats/chat.dart';
-import 'package:chat_app/screens/news/news.dart';
-import 'package:chat_app/screens/transcript/transcript.dart';
-import 'package:chat_app/services/database.dart';
+import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/theme.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,32 +14,20 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _removeBadgeWhenOpenApp();
-
+  await Firebase.initializeApp();
+  FirebaseService().initialFCM();
+  FirebaseMessaging.onBackgroundMessage(
+      FirebaseService().firebaseMessagingBackgroundHandler);
   //init global key for tabs
-  DatabaseService().chatKey = GlobalKey<ChatsPageState>();
-  DatabaseService().newsKey = GlobalKey<NewsPageState>();
-  DatabaseService().transcriptKey = GlobalKey<TranscriptPageState>();
+  // DatabaseService().chatKey = GlobalKey<ChatsPageState>();
+  // DatabaseService().newsKey = GlobalKey<NewsPageState>();
+  // DatabaseService().transcriptKey = GlobalKey<TranscriptPageState>();
   // DatabaseService().profileKey = GlobalKey<ProfilePageState>();
 
   // Init SharedPreferences storage
   await SharedPreferencesStorage.init();
 
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: AppConstants.apiKey,
-        appId: AppConstants.appId,
-        messagingSenderId: AppConstants.messagingSenderId,
-        projectId: AppConstants.projectId,
-      ),
-    );
-  } else {
-    await Firebase.initializeApp();
-  }
-
-  runApp(MyApp(
-      //appTheme: AppTheme(),
-      ));
+  runApp(MyApp(/*appTheme: AppTheme(),*/));
 }
 
 _removeBadgeWhenOpenApp() async {
@@ -63,13 +47,29 @@ class MyApp extends StatefulWidget {
   State<StatefulWidget> createState() => _MyAppState();
 }
 
+Future<void> saveTokenToDB(String token) async {
+  await SharedPreferencesStorage().setFCMToken(token);
+}
+
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
 
+  Future<void> setupToken() async {
+    // Get the token each time the application loads
+    String? token = await FirebaseMessaging.instance.getToken();
+
+    // Save the initial token to the database
+    await saveTokenToDB(token!);
+
+    // Any time the token refreshes, store this in the database too.
+    FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDB);
+  }
+
   @override
   void initState() {
-    super.initState();
     getUserLoggedInStatus();
+    super.initState();
+    setupToken();
   }
 
   @override

@@ -9,6 +9,7 @@ import '../../../network/model/student_firebase.dart';
 import '../../../network/model/user_info_model.dart';
 import '../../../network/repository/student_repository.dart';
 import '../../../services/firebase_services.dart';
+import '../../../utilities/utils.dart';
 import 'fill_profile_event.dart';
 import 'fill_profile_state.dart';
 
@@ -66,6 +67,10 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
 
           final List<Map<String, dynamic>>? listToFirestore =
               listStudentFireBase?.map((e) => e.toFirestore()).toList();
+          String fcmToken = SharedPreferencesStorage().getFCMToken();
+          if (isNullOrEmpty(fcmToken)) {
+            fcmToken = await FirebaseService().getFCMToken();
+          }
 
           final Map<String, dynamic> data = {
             'id': response.id,
@@ -74,7 +79,8 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
             'fullName': response.fullName,
             'phone': response.phone,
             'fileUrl': response.fileUrl,
-            'parentOf': listToFirestore
+            'parentOf': listToFirestore,
+            'fcm_token': fcmToken,
           };
 
           await FirebaseService().uploadUserData(

@@ -115,7 +115,8 @@ String formatDateUtcToTime(Timestamp? timestamp) {
   DateTime dateTime =
       DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
 
-  return DateFormat('hh:mm a').format(DateTime.parse(dateTime.toString()));
+  return DateFormat('dd/MM/yy hh:mm a')
+      .format(DateTime.parse(dateTime.toString()));
 }
 
 MessageType getMessageType(String? type) {

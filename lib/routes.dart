@@ -1,6 +1,7 @@
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/main/main_app.dart';
+import 'package:chat_app/screens/onboarding/onboarding_screen.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/screens/settings/terms_policies/terms_policies.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AppRoutes {
   static const main = '/';
 
+  static const onboarding = '/onboarding';
   static const chat = '/chat';
   static const news = '/news';
   static const transcript = '/transcript';
@@ -41,6 +43,9 @@ class AppRoutes {
       },
       AppRoutes.setting: (context) {
         return MainApp(currentTab: 3);
+      },
+      AppRoutes.onboarding: (context) {
+        return const OnBoardingPage();
       },
       AppRoutes.profile: (context) {
         return BlocProvider<ProfileBloc>(

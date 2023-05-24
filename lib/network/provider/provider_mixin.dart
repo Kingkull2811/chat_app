@@ -56,6 +56,7 @@ mixin ProviderMixin {
 
   Future<Options> defaultOptions({
     required String url,
+    String? fcmTokenServer,
   }) async {
     String token =
         await SecureStorage().readSecureData(AppConstants.accessTokenKey);
@@ -67,7 +68,7 @@ mixin ProviderMixin {
     }
     return Options(
       headers: {
-        'Authorization': token,
+        'Authorization': (fcmTokenServer != null) ? fcmTokenServer : token,
       },
     );
   }

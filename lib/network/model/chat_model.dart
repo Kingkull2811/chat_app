@@ -10,6 +10,7 @@ class ChatModel {
   final String? lastMessage;
   final MessageType? messageType;
   final Timestamp? time;
+  final String? fcmToken;
 
   ChatModel({
     this.receiverId,
@@ -18,6 +19,7 @@ class ChatModel {
     this.lastMessage,
     this.messageType,
     this.time,
+    this.fcmToken,
   });
 
   factory ChatModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class ChatModel {
       lastMessage: json['last_message'],
       messageType: getMessageType(json['messes_type']),
       time: json['time'],
+      fcmToken: json['fcm_token'],
     );
   }
 
