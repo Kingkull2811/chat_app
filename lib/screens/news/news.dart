@@ -225,7 +225,7 @@ class NewsPageState extends State<NewsPage> {
                       title: Transform.translate(
                         offset: const Offset(-16, 0),
                         child: Text(
-                          item.createdName ?? '',
+                          item.createdName ?? 'Admin',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

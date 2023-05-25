@@ -3,11 +3,11 @@ class LearningResultInfo {
   final int? subjectId;
   final String? subjectName;
   final int? learningResultId;
-  final double? oralTestScore;
-  final double? m15TestScore;
-  final double? m45TestScore;
-  final double? semesterTestScore;
-  final double? semesterSummaryScore;
+  double? oralTestScore;
+  double? m15TestScore;
+  double? m45TestScore;
+  double? semesterTestScore;
+  double? semesterSummaryScore;
 
   LearningResultInfo({
     this.id,

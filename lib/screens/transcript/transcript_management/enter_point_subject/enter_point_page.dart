@@ -216,18 +216,12 @@ class _EnterPointPageState extends State<EnterPointPage> {
     listResult = listLearningInfo;
 
     final columns = [
-      'Subject name',
+      'Subject',
       'Oral Test',
       '15m Test',
       '45m Test',
       'Final Exam',
       'Semester GPA',
-      // 'Subject name',
-      // 'Oral Test Point',
-      // '15 Minute Test Point',
-      // '45 Minute Test Point',
-      // 'Final Exam Point',
-      // 'Semester GPA',
     ];
 
     List<DataColumn> getColumns(List<String> columns) =>
@@ -261,10 +255,19 @@ class _EnterPointPageState extends State<EnterPointPage> {
                   child: Text(cell == null ? '-' : cell.toString()),
                 ),
                 showEditIcon: index == 0 ? false : _isEditRow,
-                onTap: () {
+                onTap: () async {
                   switch (index) {
                     case 1:
-                      editOralPoint(data);
+                      await editOralPoint(data);
+                      break;
+                    case 2:
+                      return;
+                    case 3:
+                      return;
+                    case 4:
+                      return;
+                    case 5:
+                      return;
                   }
                 },
               );
@@ -301,7 +304,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
     final String oralTestPoint = await showTextDialog(
       context,
       title: 'Change Oral Test Point',
-      value: dataEdit.oralTestScore.toString(),
+      value: (dataEdit.oralTestScore ?? '0').toString(),
     );
 
     setState(() => listResult = listResult.map((result) {

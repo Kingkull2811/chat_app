@@ -20,18 +20,24 @@ class TextDialogWidgetState extends State<TextDialogWidget> {
   @override
   void initState() {
     super.initState();
-
     controller = TextEditingController(text: widget.value);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) => AlertDialog(
         title: Text(widget.title),
-        content: TextField(
+        content: TextFormField(
           controller: controller,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
           ),
+          keyboardType: TextInputType.number,
         ),
         actions: [
           ElevatedButton(

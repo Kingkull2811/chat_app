@@ -4,7 +4,7 @@ class ApiPath {
 
   //change [useMac] - false: ip window
   //                - true: ip mac
-  static const bool useMac = true;
+  static const bool useMac = false;
 
   static const String domain = useMac ? apiDomainMac : apiDomain;
 

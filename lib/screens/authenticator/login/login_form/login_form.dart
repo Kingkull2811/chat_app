@@ -230,10 +230,12 @@ class _LoginFormPageState extends State<LoginFormPage> {
         final userInfo = await _authRepository.getUserInfo(
             userId: SharedPreferencesStorage().getUserId());
         if (userInfo is UserInfoModel) {
-          // print(userInfo.fullName);
           await SharedPreferencesStorage().setFullName(userInfo.fullName ?? '');
-          await SharedPreferencesStorage()
-              .setImageAvartarUrl(userInfo.fileUrl ?? '');
+          await SharedPreferencesStorage().setImageAvartarUrl(
+            userInfo.fileUrl ?? '',
+          );
+
+          //navigate
           userInfo.isFillProfileKey
               ? _navigateToMainPage()
               : _navigateToFillProfilePage(userInfo);
@@ -324,8 +326,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
         await _goToTermPolicy();
       } else {
         showCupertinoMessageDialog(
-          this.context, 'Error',
-          // content: response.errors?.first.errorMessage,
+          this.context,
+          'Error',
           content: 'Wrong username or password',
           onCloseDialog: () {
             _loginFormBloc.add(ValidateForm());

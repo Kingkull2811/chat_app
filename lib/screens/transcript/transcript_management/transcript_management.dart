@@ -100,7 +100,82 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                 ),
               ),
             ),
-            body: _body(context, curState),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: _searchBox(context),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        child: InputField(
+                          context: context,
+                          controller: _schoolYearController,
+                          readOnly: true,
+                          showSuffix: true,
+                          textAlign: TextAlign.center,
+                          onTap: () {
+                            _dialogSelectSchoolYear(
+                                AppConstants.listSchoolYear);
+                          },
+                          labelText: 'School Year',
+                        ),
+                      ),
+                      SizedBox(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: InputField(
+                          context: context,
+                          controller: _classController,
+                          readOnly: true,
+                          showSuffix: true,
+                          textAlign: TextAlign.center,
+                          onTap: () {
+                            _dialogSelectClass(curState.listClass);
+                          },
+                          labelText: 'Class',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                  child: InkWell(
+                    onTap: () async {
+                      _onTapButtonSearch();
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 200,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      child: const Text(
+                        'Search',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(child: _body(context, curState)),
+              ],
+            ),
           ),
         );
       },
@@ -108,84 +183,16 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
   }
 
   Widget _body(BuildContext context, TranscriptManagementState state) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _searchBox(context),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    height: 40,
-                    width: MediaQuery.of(context).size.width * 0.45,
-                    child: InputField(
-                      context: context,
-                      controller: _schoolYearController,
-                      readOnly: true,
-                      showSuffix: true,
-                      textAlign: TextAlign.center,
-                      onTap: () {
-                        _dialogSelectSchoolYear(AppConstants.listSchoolYear);
-                      },
-                      labelText: 'School Year',
-                    ),
-                  ),
-                  SizedBox(
-                    height: 40,
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    child: InputField(
-                      context: context,
-                      controller: _classController,
-                      readOnly: true,
-                      showSuffix: true,
-                      textAlign: TextAlign.center,
-                      onTap: () {
-                        _dialogSelectClass(state.listClass);
-                      },
-                      labelText: 'Class',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-              child: InkWell(
-                onTap: () async {
-                  _onTapButtonSearch();
-                },
-                child: Container(
-                  height: 40,
-                  width: 200,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  child: const Text(
-                    'Search',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-            state.isLoading
-                ? const AnimationLoading()
-                : _listStudentView(state.listStudent),
-          ],
+    return RefreshIndicator(
+      onRefresh: () async => await _reloadPage(),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: state.isLoading
+              ? const AnimationLoading()
+              : _listStudentView(state.listStudent),
         ),
       ),
     );
@@ -212,6 +219,15 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
         itemBuilder: (context, index) => _createItemStudent(listStudent[index]),
       ),
     );
+  }
+
+  _reloadPage() {
+    _transcriptBloc.add(SearchEvent(
+      searchQuery: _searchController.text.trim(),
+      schoolYear: _schoolYearController.text,
+      classId: classIdSelected,
+    ));
+    setState(() {});
   }
 
   _navToEnterPointPage(Student student) => Navigator.push(
@@ -326,21 +342,21 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 9, 0, 0),
                           child: _itemPoint(
-                            title: 'Point average semester 1:',
+                            title: 'Semester 1 GPA:',
                             value: student.hk1SubjectMediumScore ?? '-',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
                           child: _itemPoint(
-                            title: 'Point average semester 2:',
+                            title: 'Semester 2 GPA:',
                             value: student.hk2SubjectMediumScore ?? '-',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
                           child: _itemPoint(
-                            title: 'Point average school year:',
+                            title: 'school year GPA',
                             value: student.mediumScore ?? '-',
                           ),
                         ),

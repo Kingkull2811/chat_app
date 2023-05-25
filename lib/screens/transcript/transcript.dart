@@ -58,7 +58,7 @@ class TranscriptPageState extends State<TranscriptPage> {
   void dispose() {
     _semesterController.dispose();
     super.dispose();
-    _transcriptBloc.close();
+    if (_isUser) _transcriptBloc.close();
   }
 
   @override

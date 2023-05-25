@@ -1,28 +1,32 @@
 import 'dart:io';
 
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/services/firebase_services.dart';
+import 'package:chat_app/services/notification_services.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  if (kDebugMode) {
+    print('Handling a background message ${message.messageId}');
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _removeBadgeWhenOpenApp();
   await Firebase.initializeApp();
-  FirebaseService().initialFCM();
-  FirebaseMessaging.onBackgroundMessage(
-      FirebaseService().firebaseMessagingBackgroundHandler);
-  //init global key for tabs
-  // DatabaseService().chatKey = GlobalKey<ChatsPageState>();
-  // DatabaseService().newsKey = GlobalKey<NewsPageState>();
-  // DatabaseService().transcriptKey = GlobalKey<TranscriptPageState>();
-  // DatabaseService().profileKey = GlobalKey<ProfilePageState>();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // Init SharedPreferences storage
   await SharedPreferencesStorage.init();
@@ -47,29 +51,26 @@ class MyApp extends StatefulWidget {
   State<StatefulWidget> createState() => _MyAppState();
 }
 
-Future<void> saveTokenToDB(String token) async {
-  await SharedPreferencesStorage().setFCMToken(token);
-}
-
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
 
-  Future<void> setupToken() async {
-    // Get the token each time the application loads
-    String? token = await FirebaseMessaging.instance.getToken();
-
-    // Save the initial token to the database
-    await saveTokenToDB(token!);
-
-    // Any time the token refreshes, store this in the database too.
-    FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDB);
-  }
+  NotificationServices notificationServices = NotificationServices();
 
   @override
   void initState() {
     getUserLoggedInStatus();
     super.initState();
-    setupToken();
+    notificationServices.requestNotificationPermission();
+    notificationServices.foregroundMessage();
+    notificationServices.firebaseInit(context);
+    notificationServices.setupInteractMessage(context);
+    notificationServices.isTokenRefresh();
+
+    notificationServices.getDeviceToken().then((value) async {
+      if (kDebugMode) {
+        print('device FCMToken: $value');
+      }
+    });
   }
 
   @override

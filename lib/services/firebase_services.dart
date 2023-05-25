@@ -9,16 +9,13 @@ import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
-import '../theme.dart';
 import '../utilities/enum/message_type.dart';
 
 class FirebaseService {
@@ -37,56 +34,6 @@ class FirebaseService {
   final _prefs = SharedPreferencesStorage();
 
   ///*************initial fcm******************
-
-  Future<void> initialFCM() async {
-    // if (Platform.isIOS) {_messaging.requestPermission(IosNotificationSettings())}
-    if (kIsWeb) {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(
-          apiKey: AppConstants.apiKey,
-          appId: AppConstants.appId,
-          messagingSenderId: AppConstants.messagingSenderId,
-          projectId: AppConstants.projectId,
-        ),
-      );
-    } else {
-      await Firebase.initializeApp();
-    }
-    const SystemUiOverlayStyle(statusBarColor: AppColors.primaryColor);
-
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
-    if (!kIsWeb) {
-      await setupFlutterNotifications();
-    }
-  }
-
-  @pragma('vm:entry-point')
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp();
-    await setupFlutterNotifications();
-    showFlutterNotification(message);
-    // If you're going to use other Firebase services in the background, such as Firestore,
-    // make sure you call `initializeApp` before using other Firebase services.
-    print('Handling a background message ${message.messageId}');
-
-    await _messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-    await _messaging.setForegroundNotificationPresentationOptions(
-      alert: true, // Required to display a heads up notification
-      badge: true,
-      sound: true,
-    );
-  }
-
   late AndroidNotificationChannel channel;
 
   /// Initialize the [FlutterLocalNotificationsPlugin] package.
@@ -160,7 +107,9 @@ class FirebaseService {
     FirebaseMessaging.onMessage.listen(showFlutterNotification);
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('A new onMessageOpenedApp event was published!');
+      if (kDebugMode) {
+        print('A new onMessageOpenedApp event was published!');
+      }
     });
   }
 
@@ -469,7 +418,9 @@ class FirebaseService {
     await _messaging.getToken().then((token) {
       if (token != null) {
         fcmToken = token;
-        print('fcmToken: $token');
+        if (kDebugMode) {
+          print('fcmToken: $token');
+        }
       }
     });
     return fcmToken;
@@ -579,9 +530,12 @@ class FirebaseService {
   }
 
   String? _token;
+
   Future<void> sendPushMessage() async {
     if (_token == null) {
-      print('Unable to send FCM message, no token exists.');
+      if (kDebugMode) {
+        print('Unable to send FCM message, no token exists.');
+      }
       return;
     }
 
@@ -595,9 +549,13 @@ class FirebaseService {
           },
         ),
       );
-      print('FCM request for device sent!');
+      if (kDebugMode) {
+        print('FCM request for device sent!');
+      }
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 
@@ -619,37 +577,51 @@ class FirebaseService {
     switch (value) {
       case 'subscribe':
         {
-          print(
-            'FlutterFire Messaging Example: Subscribing to topic "fcm_test".',
-          );
+          if (kDebugMode) {
+            print(
+              'FlutterFire Messaging Example: Subscribing to topic "fcm_test".',
+            );
+          }
           await FirebaseMessaging.instance.subscribeToTopic('fcm_test');
-          print(
-            'FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.',
-          );
+          if (kDebugMode) {
+            print(
+              'FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.',
+            );
+          }
         }
         break;
       case 'unsubscribe':
         {
-          print(
-            'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".',
-          );
+          if (kDebugMode) {
+            print(
+              'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".',
+            );
+          }
           await FirebaseMessaging.instance.unsubscribeFromTopic('fcm_test');
-          print(
-            'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.',
-          );
+          if (kDebugMode) {
+            print(
+              'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.',
+            );
+          }
         }
         break;
       case 'get_apns_token':
         {
           if (defaultTargetPlatform == TargetPlatform.iOS ||
               defaultTargetPlatform == TargetPlatform.macOS) {
-            print('FlutterFire Messaging Example: Getting APNs token...');
+            if (kDebugMode) {
+              print('FlutterFire Messaging Example: Getting APNs token...');
+            }
             String? token = await FirebaseMessaging.instance.getAPNSToken();
-            print('FlutterFire Messaging Example: Got APNs token: $token');
+            if (kDebugMode) {
+              print('FlutterFire Messaging Example: Got APNs token: $token');
+            }
           } else {
-            print(
-              'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.',
-            );
+            if (kDebugMode) {
+              print(
+                'FlutterFire Messaging Example: Getting an APNs token is only supported on iOS and macOS platforms.',
+              );
+            }
           }
         }
         break;
