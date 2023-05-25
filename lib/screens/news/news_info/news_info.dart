@@ -303,7 +303,7 @@ class _NewsInfoState extends State<NewsInfo> {
         this.context,
         'Post news successfully',
         barrierDismiss: true,
-        onCloseDialog: () {
+        onClose: () {
           Navigator.pop(context);
           setState(() {
             _titleController.clear();
@@ -340,7 +340,7 @@ class _NewsInfoState extends State<NewsInfo> {
         'Update news successfully',
         barrierDismiss: true,
         buttonLabel: 'Go to news page',
-        onCloseDialog: () {
+        onClose: () {
           Navigator.pop(context);
           Navigator.of(context).pop(true);
         },

@@ -343,21 +343,26 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                           padding: const EdgeInsets.fromLTRB(0, 9, 0, 0),
                           child: _itemPoint(
                             title: 'Semester 1 GPA:',
-                            value: student.hk1SubjectMediumScore ?? '-',
+                            value: student.hk1SubjectMediumScore
+                                    ?.toStringAsFixed(3) ??
+                                '___',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
                           child: _itemPoint(
                             title: 'Semester 2 GPA:',
-                            value: student.hk2SubjectMediumScore ?? '-',
+                            value: student.hk2SubjectMediumScore
+                                    ?.toStringAsFixed(3) ??
+                                '___',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
                           child: _itemPoint(
-                            title: 'school year GPA',
-                            value: student.mediumScore ?? '-',
+                            title: 'School year GPA:',
+                            value: student.mediumScore?.toStringAsFixed(3) ??
+                                '___',
                           ),
                         ),
                       ],

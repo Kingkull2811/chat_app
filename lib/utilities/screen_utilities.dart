@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
-import '../widgets/message_dialog.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/text_edit_dialog_widget.dart';
 
@@ -141,21 +140,34 @@ Future<void> showCupertinoMessageDialog(
   BuildContext context,
   String? title, {
   String? content,
-  Function()? onCloseDialog,
+  Function()? onClose,
   String? buttonLabel,
 
   /// false = user must tap button, true = tap outside dialog
   bool barrierDismiss = false,
 }) async {
-  await showDialog(
+  await showCupertinoDialog(
       barrierDismissible: barrierDismiss,
       context: context,
       builder: (context) {
-        return MessageDialog(
-          title: title,
-          content: content,
-          buttonLabel: buttonLabel,
-          onClose: onCloseDialog,
+        return CupertinoAlertDialog(
+          title: title == null ? null : Text(title),
+          content: content == null
+              ? null
+              : Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Text(content),
+                ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  if (onClose != null) {
+                    onClose();
+                  }
+                },
+                child: Text(buttonLabel ?? 'OK')),
+          ],
         );
       });
 }
@@ -172,7 +184,7 @@ Future<void> showMessageTwoOption(
   /// false = user must tap button, true = tap outside dialog
   bool barrierDismiss = false,
 }) async {
-  await showDialog(
+  await showCupertinoDialog(
       barrierDismissible: barrierDismiss,
       context: context,
       builder: (context) {
@@ -293,12 +305,12 @@ Future<void> showSuccessBottomSheet(
   );
 }
 
-Future<T?> showTextDialog<T>(
+Future<String?> showTextDialog<T>(
   BuildContext context, {
   required String title,
   required String value,
 }) =>
-    showDialog<T>(
+    showDialog<String>(
       context: context,
       builder: (context) => TextDialogWidget(
         title: title,

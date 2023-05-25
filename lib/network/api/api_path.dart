@@ -4,7 +4,7 @@ class ApiPath {
 
   //change [useMac] - false: ip window
   //                - true: ip mac
-  static const bool useMac = false;
+  static const bool useMac = true;
 
   static const String domain = useMac ? apiDomainMac : apiDomain;
 
@@ -39,5 +39,7 @@ class ApiPath {
   static const String learningResult = '$domain/api/v1/learning-result';
 
   static const String fcmGoogle =
-      'POST https://fcm.googleapis.com/v1/projects/myproject-b5ae1/messages:send';
+      'https://fcm.googleapis.com/v1/projects/chatapp-97dbc/messages:send';
+
+  static const String fcmServer = 'https://fcm.googleapis.com/fcm/send';
 }

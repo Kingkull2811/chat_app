@@ -389,8 +389,6 @@ class FirebaseService {
     //onTap:
     _messaging.subscribeToTopic('topic');
 
-    const url = 'https://fcm.googleapis.com/fcm/send';
-
     final data2 = {
       'to': '/topics/topic', //fcmToken
       "notification": {
@@ -403,11 +401,6 @@ class FirebaseService {
         'id': 'id',
         'click_action': 'FLUTTER_NOTIFICATION_CLICK',
       }
-    };
-
-    final headers = {
-      'content-type': 'application/json',
-      'Authorization': 'key=serverKey',
     };
   }
 

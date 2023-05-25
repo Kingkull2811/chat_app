@@ -183,3 +183,10 @@ int setMediaType(MediaType type) {
       throw Exception('Invalid mediaType type: $type');
   }
 }
+
+double matchGPA(double? oral, m15, m45, finalE) {
+  double gpa =
+      ((oral ?? 0.0) + (m15 ?? 0.0) + 2 * (m45 ?? 0.0) + 3 * (finalE ?? 0.0)) /
+          7;
+  return double.parse(gpa.toStringAsFixed(3));
+}

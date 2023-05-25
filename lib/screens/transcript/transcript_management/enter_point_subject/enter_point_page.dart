@@ -1,10 +1,8 @@
 import 'package:chat_app/network/model/student.dart';
-import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_subject_bloc.dart';
-import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_subject_event.dart';
-import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_subject_state.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/data_not_found.dart';
 import 'package:chat_app/widgets/input_field_with_ontap.dart';
+import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +11,9 @@ import '../../../../utilities/enum/api_error_result.dart';
 import '../../../../utilities/screen_utilities.dart';
 import '../../../../utilities/utils.dart';
 import '../../../../widgets/app_image.dart';
+import 'enter_point_subject_bloc.dart';
+import 'enter_point_subject_event.dart';
+import 'enter_point_subject_state.dart';
 
 class EnterPointPage extends StatefulWidget {
   final Student student;
@@ -48,6 +49,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
       SemesterYear(semester: 1, title: 'Semester 1 ${widget.schoolYear}'),
       SemesterYear(semester: 2, title: 'Semester 2 ${widget.schoolYear}'),
     ];
+
     super.initState();
   }
 
@@ -181,6 +183,33 @@ class _EnterPointPageState extends State<EnterPointPage> {
             state.isLoading
                 ? const AnimationLoading()
                 : _listEnterPoint(state.listLearningInfo),
+            if (isNotNullOrEmpty(state.listLearningInfo))
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: PrimaryButton(
+                    text: 'Save',
+                    onTap: () async {
+                      if (listResult.isNotEmpty) {
+                        _enterPointSubjectBloc.add(UpdatePointEvent(
+                          listResult: listResult,
+                          schoolYear: widget.schoolYear,
+                          studentID: widget.student.id!,
+                        ));
+                        setState(() {
+                          if (_isEditRow) {
+                            _isEditRow = !_isEditRow;
+                          }
+                        });
+                      } else {
+                        showCupertinoMessageDialog(
+                            this.context, 'No change in the transcript yet.');
+                      }
+                    },
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -213,7 +242,9 @@ class _EnterPointPageState extends State<EnterPointPage> {
   }
 
   Widget _cardLearningInfo(List<LearningResultInfo> listLearningInfo) {
-    listResult = listLearningInfo;
+    if (listResult.isEmpty) {
+      listResult = listLearningInfo;
+    }
 
     final columns = [
       'Subject',
@@ -254,18 +285,17 @@ class _EnterPointPageState extends State<EnterPointPage> {
                 Center(
                   child: Text(cell == null ? '-' : cell.toString()),
                 ),
-                showEditIcon: index == 0 ? false : _isEditRow,
+                showEditIcon: index == 0 || index == 5 ? false : _isEditRow,
                 onTap: () async {
                   switch (index) {
                     case 1:
-                      await editOralPoint(data);
-                      break;
+                      return _isEditRow ? await editOralPoint(data) : null;
                     case 2:
-                      return;
+                      return _isEditRow ? await editM15Point(data) : null;
                     case 3:
-                      return;
+                      return _isEditRow ? await editM45Point(data) : null;
                     case 4:
-                      return;
+                      return _isEditRow ? await editFinalExam(data) : null;
                     case 5:
                       return;
                   }
@@ -301,27 +331,115 @@ class _EnterPointPageState extends State<EnterPointPage> {
   }
 
   Future editOralPoint(LearningResultInfo dataEdit) async {
-    final String oralTestPoint = await showTextDialog(
-      context,
-      title: 'Change Oral Test Point',
-      value: (dataEdit.oralTestScore ?? '0').toString(),
-    );
+    String result = await showTextDialog(
+          context,
+          title: 'Change Oral Test Point',
+          value: (dataEdit.oralTestScore ?? '').toString(),
+        ) ??
+        '';
 
-    setState(() => listResult = listResult.map((result) {
-          final isEditResult = result == dataEdit;
+    double? oral = double.tryParse(result);
 
-          return isEditResult
-              ? LearningResultInfo().copyWith(
-                  oralTestScore: double.parse(oralTestPoint),
-                )
-              : result;
-        }).toList());
+    listResult = listResult.map((result) {
+      return (result == dataEdit)
+          ? result.copyWith(
+              oralTestScore: oral ?? dataEdit.oralTestScore,
+              semesterSummaryScore: matchGPA(
+                oral ?? dataEdit.oralTestScore,
+                result.m15TestScore,
+                result.m45TestScore,
+                result.semesterTestScore,
+              ),
+            )
+          : result;
+    }).toList();
+
+    setState(() {});
+  }
+
+  Future editM15Point(LearningResultInfo dataEdit) async {
+    String m15Input = await showTextDialog<String>(
+          context,
+          title: 'Change 15 Minutes Test Point',
+          value: (dataEdit.m15TestScore ?? '').toString(),
+        ) ??
+        '';
+    double? m15 = double.tryParse(m15Input);
+
+    listResult = listResult.map((result) {
+      return (result == dataEdit)
+          ? result.copyWith(
+              m15TestScore: m15 ?? dataEdit.m15TestScore,
+              semesterSummaryScore: matchGPA(
+                result.oralTestScore,
+                m15 ?? dataEdit.m15TestScore,
+                result.m45TestScore,
+                result.semesterTestScore,
+              ),
+            )
+          : result;
+    }).toList();
+
+    setState(() {});
+  }
+
+  Future editM45Point(LearningResultInfo dataEdit) async {
+    String result = await showTextDialog(
+          context,
+          title: 'Change 45 Minutes Test Point',
+          value: (dataEdit.m45TestScore ?? '').toString(),
+        ) ??
+        '';
+    double? m45 = double.tryParse(result);
+
+    listResult = listResult.map((result) {
+      return (result == dataEdit)
+          ? result.copyWith(
+              m45TestScore: m45 ?? dataEdit.m45TestScore,
+              semesterSummaryScore: matchGPA(
+                result.oralTestScore,
+                result.m15TestScore,
+                m45 ?? dataEdit.m45TestScore,
+                result.semesterTestScore,
+              ),
+            )
+          : result;
+    }).toList();
+
+    setState(() {});
+  }
+
+  Future editFinalExam(LearningResultInfo dataEdit) async {
+    String result = await showTextDialog(
+          context,
+          title: 'Change Final Exam Test Point',
+          value: (dataEdit.semesterTestScore ?? '').toString(),
+        ) ??
+        '';
+    double? finalE = double.tryParse(result);
+
+    listResult = listResult.map((result) {
+      return (result == dataEdit)
+          ? result.copyWith(
+              semesterTestScore: finalE ?? dataEdit.semesterTestScore,
+              semesterSummaryScore: matchGPA(
+                result.oralTestScore,
+                result.m15TestScore,
+                result.m45TestScore,
+                finalE ?? dataEdit.semesterTestScore,
+              ),
+            )
+          : result;
+    }).toList();
+
+    setState(() {});
   }
 
   _onTapSelectSemester(SemesterYear semester) {
     setState(() {
       _semesterController.text = semester.title;
       _semesterSelected == semester.semester;
+      listResult.clear();
     });
     _enterPointSubjectBloc.add(GetListSubjectEvent(
       studentId: widget.student.id!,
@@ -361,7 +479,26 @@ class _EnterPointPageState extends State<EnterPointPage> {
             itemCount: listSemester.length,
             itemBuilder: (context, index) => InkWell(
               onTap: () {
-                _onTapSelectSemester(listSemester[index]);
+                if (listResult.isNotEmpty) {
+                  showMessageTwoOption(
+                    context,
+                    'Save changes?',
+                    content:
+                        'The transcript has been changed, do you want to save this changes?',
+                    barrierDismiss: true,
+                    okLabel: "Save",
+                    cancelLabel: 'Not save',
+                    onCancel: () {
+                      //push data to server
+                      _onTapSelectSemester(listSemester[index]);
+                    },
+                    onOk: () {
+                      _onTapSelectSemester(listSemester[index]);
+                    },
+                  );
+                } else {
+                  _onTapSelectSemester(listSemester[index]);
+                }
               },
               child: Container(
                 height: 40,

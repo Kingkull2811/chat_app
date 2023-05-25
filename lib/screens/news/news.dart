@@ -411,7 +411,7 @@ class NewsPageState extends State<NewsPage> {
     await NewsRepository().deleteNews(newsId: newsId!);
     if (mounted) {}
     await showCupertinoMessageDialog(context, 'The news has been deleted',
-        onCloseDialog: () {
+        onClose: () {
       _reloadPage();
       Navigator.pop(context);
     });

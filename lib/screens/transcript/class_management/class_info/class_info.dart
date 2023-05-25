@@ -91,7 +91,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
         }
         if (curState.isAddSuccess) {
           showCupertinoMessageDialog(context, 'Add new class successfully',
-              onCloseDialog: () {
+              onClose: () {
             _codeController.clear();
             _nameController.clear();
             _yearController.clear();
@@ -102,7 +102,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
           showCupertinoMessageDialog(
             context,
             'Update class successfully',
-            onCloseDialog: () {
+            onClose: () {
               Navigator.pop(context);
             },
           );

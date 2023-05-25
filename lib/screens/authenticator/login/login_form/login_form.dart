@@ -329,7 +329,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
           this.context,
           'Error',
           content: 'Wrong username or password',
-          onCloseDialog: () {
+          onClose: () {
             _loginFormBloc.add(ValidateForm());
           },
         );

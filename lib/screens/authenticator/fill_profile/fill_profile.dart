@@ -114,7 +114,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
             showCupertinoMessageDialog(
               context,
               'Your profile has been successfully updated',
-              onCloseDialog: () {
+              onClose: () {
                 _navigateToMainPage();
               },
             );

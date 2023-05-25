@@ -11,7 +11,7 @@ class PhotoViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imageUrl == null) {
-      showCupertinoMessageDialog(context, 'Image not found', onCloseDialog: () {
+      showCupertinoMessageDialog(context, 'Image not found', onClose: () {
         Navigator.pop(context);
         Navigator.pop(context);
       });

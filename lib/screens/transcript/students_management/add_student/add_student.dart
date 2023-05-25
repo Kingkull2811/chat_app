@@ -108,7 +108,7 @@ class _AddStudentState extends State<AddStudent> {
           showCupertinoMessageDialog(
             context,
             curState.message,
-            onCloseDialog: () {
+            onClose: () {
               Navigator.pop(context);
               _navToStudentManagement();
             },
@@ -120,7 +120,7 @@ class _AddStudentState extends State<AddStudent> {
           showCupertinoMessageDialog(
             context,
             curState.message,
-            onCloseDialog: () {
+            onClose: () {
               Navigator.pop(context);
               _navToStudentManagement();
             },
@@ -434,7 +434,7 @@ class _AddStudentState extends State<AddStudent> {
     final response = await _studentRepository.addStudent(data: data);
     if (response is Student) {
       await showCupertinoMessageDialog(this.context, 'Add new student success',
-          onCloseDialog: () {
+          onClose: () {
         setState(() {
           _nameController.clear();
           _calendarController.clear();
@@ -481,7 +481,7 @@ class _AddStudentState extends State<AddStudent> {
       showCupertinoMessageDialog(
         this.context,
         'Update student success',
-        onCloseDialog: () {
+        onClose: () {
           Navigator.pop(context);
           Navigator.of(context).pop(true);
         },

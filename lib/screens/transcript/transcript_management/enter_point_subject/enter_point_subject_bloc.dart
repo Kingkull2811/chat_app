@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:chat_app/network/model/learning_result_info.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/network/response/learning_result_info_response.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
@@ -6,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../network/repository/learning_result_repository.dart';
+import '../../../../network/repository/transcript_repository.dart';
 import '../../../../utilities/enum/api_error_result.dart';
 import 'enter_point_subject_event.dart';
 import 'enter_point_subject_state.dart';
@@ -14,6 +18,7 @@ class EnterPointSubjectBloc
     extends Bloc<EnterPointSubjectEvent, EnterPointSubjectState> {
   final BuildContext context;
   final _learningResultRepository = LearningResultInfoRepository();
+  final _transcriptRepository = TranscriptRepository();
 
   EnterPointSubjectBloc(this.context) : super(EnterPointSubjectState()) {
     on((event, emit) async {
@@ -58,7 +63,29 @@ class EnterPointSubjectBloc
           }
         }
       }
-      if (event is EnterPointSubjectEvent) {}
+      if (event is UpdatePointEvent) {
+        emit(state.copyWith(isLoading: true));
+
+        for (LearningResultInfo learn in event.listResult) {
+          final Map<String, dynamic> data = {
+            "m15TestScore": learn.m15TestScore,
+            "m45TestScore": learn.m45TestScore,
+            "oralTestScore": learn.oralTestScore,
+            "semesterTestScore": learn.semesterTestScore,
+          };
+          final response = await _transcriptRepository.updatePoint(
+            id: learn.id!,
+            data: data,
+          );
+          log('dataSend: $data');
+          log('update: $response');
+        }
+        final mathResponse = await _transcriptRepository.mathGPA(
+          studentID: event.studentID,
+          schoolYear: event.schoolYear,
+        );
+        log('math: $mathResponse}');
+      }
     });
   }
 }

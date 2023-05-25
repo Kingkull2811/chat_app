@@ -52,14 +52,28 @@ class LearningResultInfo {
         subjectName: subjectName ?? this.subjectName,
         learningResultId: learningResultId ?? this.learningResultId,
         oralTestScore: oralTestScore ?? this.oralTestScore,
-        m15TestScore: m45TestScore ?? this.m15TestScore,
+        m15TestScore: m15TestScore ?? this.m15TestScore,
         m45TestScore: m45TestScore ?? this.m45TestScore,
         semesterTestScore: semesterTestScore ?? this.semesterTestScore,
         semesterSummaryScore: semesterSummaryScore ?? this.semesterSummaryScore,
       );
 
   @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is LearningResultInfo && id == other.id;
+  }
+
+  @override
+  int get hashCode => Object.hash(learningResultId, id, subjectId);
+
+  @override
   String toString() {
-    return 'LearningResultInfo{id: $id, subjectId: $subjectId, subjectName: $subjectName, learningResultId: $learningResultId, oralTestScore: $oralTestScore, m15TestScore: $m15TestScore, m45TestScore: $m45TestScore, semesterTestScore: $semesterTestScore, semesterSummaryScore: $semesterSummaryScore}';
+    return '\nLearningResultInfo{id: $id, subjectId: $subjectId, subjectName: $subjectName, learningResultId: $learningResultId, oralTestScore: $oralTestScore, m15TestScore: $m15TestScore, m45TestScore: $m45TestScore, semesterTestScore: $semesterTestScore, semesterSummaryScore: $semesterSummaryScore}';
   }
 }

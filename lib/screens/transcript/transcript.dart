@@ -28,7 +28,6 @@ import '../../utilities/screen_utilities.dart';
 import '../../utilities/utils.dart';
 import '../../widgets/animation_loading.dart';
 import '../../widgets/input_field_with_ontap.dart';
-import '../../widgets/message_dialog.dart';
 import 'class_management/class_management_bloc.dart';
 
 class TranscriptPage extends StatefulWidget {
@@ -80,15 +79,7 @@ class TranscriptPageState extends State<TranscriptPage> {
         actions: [
           if (_isUser)
             IconButton(
-              onPressed: () async {
-                showDialog(
-                  context: context,
-                  builder: (context) => const MessageDialog(
-                    title: 'formula for calculating average score',
-                    content: '',
-                  ),
-                );
-              },
+              onPressed: () async {},
               icon: const Icon(
                 Icons.info_outline,
                 size: 24,
@@ -325,7 +316,7 @@ class TranscriptPageState extends State<TranscriptPage> {
   }
 
   Widget _transcript(List<LearningResultInfo> listLearningInfo) {
-    log('learn: ${listLearningInfo}');
+    log('learn: $listLearningInfo');
 
     final columns = [
       'Subject name',
