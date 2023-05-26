@@ -38,11 +38,15 @@ class Student {
       classResponse: isNotNullOrEmpty(json['classResponse'])
           ? ClassModel.fromJson(json['classResponse'])
           : null,
-      mediumScore: double.tryParse(json['mediumScore'].toString()) ?? 0.0,
-      hk1SubjectMediumScore:
-          double.tryParse(json['hk1SubjectMediumScore'].toString()) ?? 0.0,
-      hk2SubjectMediumScore:
-          double.tryParse(json['hk2SubjectMediumScore'].toString()) ?? 0.0,
+      mediumScore: (json['mediumScore'] == null)
+          ? null
+          : double.tryParse(json['mediumScore'].toString()) ?? 0.0,
+      hk1SubjectMediumScore: (json['hk1SubjectMediumScore'] == null)
+          ? null
+          : double.tryParse(json['hk1SubjectMediumScore'].toString()) ?? 0.0,
+      hk2SubjectMediumScore: (json['hk2SubjectMediumScore'] == null)
+          ? null
+          : double.tryParse(json['hk2SubjectMediumScore'].toString()) ?? 0.0,
     );
   }
 

@@ -8,7 +8,6 @@ import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -264,6 +263,15 @@ class FirebaseService {
           (QuerySnapshot querySnapshot) async {
             if (querySnapshot.docs.isNotEmpty) {
               docID = querySnapshot.docs.single.id;
+              await _firestore
+                  .collection(AppConstants.userCollection)
+                  .doc(docID)
+                  .update({
+                'fcm_token': {
+                  currentUserId.toString(): _prefs.getFCMToken(),
+                  receiverId: receiverFCMToken,
+                }
+              });
             } else {
               await _firestore.collection(AppConstants.chatsCollection).add({
                 "members": {
@@ -305,7 +313,6 @@ class FirebaseService {
     required var docID,
     required String messageText,
     required int currentUserId,
-    required String receiverFCMToken,
   }) async {
     final MessageModel message = MessageModel(
       fromId: currentUserId,
@@ -337,8 +344,7 @@ class FirebaseService {
     );
   }
 
-  Future<void> sendImageMessage(
-      var docID, String imagePath, String fcmToken) async {
+  Future<void> sendImageMessage(var docID, String imagePath) async {
     MessageModel message = MessageModel(
       fromId: _prefs.getUserId(),
       message: await FirebaseService().uploadImageToStorage(
@@ -381,42 +387,31 @@ class FirebaseService {
     final data = {
       'to': receiverFCMToken,
       "notification": {
-        "title": senderName, //our name should be send
         "body": message,
-        "android_channel_id": "chats"
+        "title": senderName, //our name should be send
+        // "android_channel_id": "chats"
       },
     };
     //onTap:
-    _messaging.subscribeToTopic('topic');
+    // _messaging.subscribeToTopic('topic');
+    log('dataSendL $data');
 
-    final data2 = {
-      'to': '/topics/topic', //fcmToken
-      "notification": {
-        "title": senderName, //our name should be send
-        "body": message,
-        // "android_channel_id": "chats"
-      },
-      'data': {
-        'type': 'dataType',
-        'id': 'id',
-        'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-      }
-    };
-  }
+    // await PushNotificationRepository().messagePN(data: data);
 
-  Future<String> getFCMToken() async {
-    String fcmToken = '';
-    await _messaging.requestPermission();
-
-    await _messaging.getToken().then((token) {
-      if (token != null) {
-        fcmToken = token;
-        if (kDebugMode) {
-          print('fcmToken: $token');
-        }
-      }
-    });
-    return fcmToken;
+    ///send to api fcmGoogle
+    // final data2 = {
+    //   'to': '/topics/topic', //fcmToken
+    //   "notification": {
+    //     "title": senderName, //our name should be send
+    //     "body": message,
+    //     // "android_channel_id": "chats"
+    //   },
+    //   'data': {
+    //     'type': 'dataType',
+    //     'id': 'id',
+    //     'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+    //   }
+    // };
   }
 
   ///call - video - audio
@@ -500,56 +495,14 @@ class FirebaseService {
 
   ///************** FCM Notification*******
 
-  Future<void> sendFCMTokenToDB(String token, int userId) async {
+  Future<void> sendFCMTokenToDB(int userId) async {
     await _firestore
         .collection(AppConstants.userCollection)
         .doc('user_id_$userId')
-        .update({'fcm_token': token});
-  }
+        .update({'fcm_token': SharedPreferencesStorage().getFCMToken()});
+    //todo
 
-  Future<void> sendNotification({
-    required String title,
-    required String body,
-    required String fcmToken,
-  }) async {
-    FirebaseMessaging.instance.sendMessage(
-      to: fcmToken,
-      data: {},
-      collapseKey: '',
-      messageId: '',
-      messageType: '',
-      ttl: 0,
-    );
-  }
-
-  String? _token;
-
-  Future<void> sendPushMessage() async {
-    if (_token == null) {
-      if (kDebugMode) {
-        print('Unable to send FCM message, no token exists.');
-      }
-      return;
-    }
-
-    try {
-      await Dio().post(
-        'https://api.rnfirebase.io/messaging/send',
-        data: constructFCMPayload(_token),
-        options: Options(
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-        ),
-      );
-      if (kDebugMode) {
-        print('FCM request for device sent!');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
+    print('device token: ${SharedPreferencesStorage().getFCMToken()}');
   }
 
   String constructFCMPayload(String? token) {

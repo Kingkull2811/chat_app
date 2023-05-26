@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -134,7 +133,7 @@ class NotificationServices {
     messaging.onTokenRefresh.listen((event) async {
       event.toString();
       await SharedPreferencesStorage().setFCMToken(event);
-      log('refresh fcm Token: $event');
+      // log('refresh fcm Token: $event');
     });
   }
 

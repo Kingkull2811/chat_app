@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:chat_app/network/model/learning_result_info.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
+import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/learning_result_info_response.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -79,12 +80,38 @@ class EnterPointSubjectBloc
           );
           log('dataSend: $data');
           log('update: $response');
+
+          if (response is LearningResultInfo) {
+            emit(state.copyWith(
+              isLoading: false,
+              apiError: ApiError.noError,
+              updateDone: true,
+            ));
+          } else if (response is ExpiredTokenResponse) {
+            logoutIfNeed(this.context);
+          } else {
+            emit(state.copyWith(
+              isLoading: false,
+              apiError: ApiError.internalServerError,
+              updateDone: false,
+            ));
+          }
         }
+
+        emit(state.copyWith(isLoading: true));
         final mathResponse = await _transcriptRepository.mathGPA(
           studentID: event.studentID,
           schoolYear: event.schoolYear,
         );
         log('math: $mathResponse}');
+
+        if (mathResponse.isOK()) {
+          emit(state.copyWith(isLoading: false));
+        } else if (mathResponse is ExpiredTokenResponse) {
+          logoutIfNeed(this.context);
+        } else {
+          emit(state.copyWith(isLoading: false));
+        }
       }
     });
   }

@@ -300,7 +300,11 @@ class _MessageViewState extends State<MessageView> {
                     docID: docID,
                     messageText: _inputTextController.text.trim(),
                     currentUserId: currentUserId,
+                  );
+                  await _firebaseService.sendPushNotification(
                     receiverFCMToken: widget.receiverFCMToken,
+                    senderName: SharedPreferencesStorage().getFullName(),
+                    message: _inputTextController.text.trim(),
                   );
                   _inputTextController.clear();
                 }
@@ -594,10 +598,11 @@ class _MessageViewState extends State<MessageView> {
                 if (isNullOrEmpty(imagePath)) {
                   return;
                 } else {
-                  _firebaseService.sendImageMessage(
-                    docID,
-                    imagePath,
-                    widget.receiverFCMToken,
+                  await _firebaseService.sendImageMessage(docID, imagePath);
+                  await _firebaseService.sendPushNotification(
+                    receiverFCMToken: widget.receiverFCMToken,
+                    senderName: SharedPreferencesStorage().getFullName(),
+                    message: '📷 photo',
                   );
                 }
               },
@@ -616,10 +621,11 @@ class _MessageViewState extends State<MessageView> {
                 if (isNullOrEmpty(imagePath)) {
                   return;
                 } else {
-                  _firebaseService.sendImageMessage(
-                    docID,
-                    imagePath,
-                    widget.receiverFCMToken,
+                  await _firebaseService.sendImageMessage(docID, imagePath);
+                  await _firebaseService.sendPushNotification(
+                    receiverFCMToken: widget.receiverFCMToken,
+                    senderName: SharedPreferencesStorage().getFullName(),
+                    message: '📷 photo',
                   );
                 }
               },

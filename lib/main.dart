@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
 
     notificationServices.getDeviceToken().then((value) async {
       if (kDebugMode) {
-        print('device FCMToken: $value');
+        // print('device FCMToken: $value');
       }
     });
   }

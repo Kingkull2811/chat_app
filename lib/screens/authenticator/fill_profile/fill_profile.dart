@@ -119,13 +119,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
               },
             );
           }
-          if (curState.isNotFind) {
-            showCupertinoMessageDialog(
-              context,
-              'Error!',
-              content: 'Can\'t find student with student SSID:  $studentSSID',
-            );
-          }
+
           if (curState.userData == null) {
             logoutIfNeed(context);
           }
@@ -300,6 +294,17 @@ class _FillProfilePageState extends State<FillProfilePage> {
   }
 
   Widget _selectStudent(FillProfileState state) {
+    if (state.isNotFind) {
+      showCupertinoMessageDialog(
+        context,
+        'Error!',
+        content: 'Can\'t find student with student SSID:  $studentSSID',
+        onClose: () => Navigator.pop(context),
+      );
+    } else {
+      Navigator.pop(context);
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Container(
@@ -641,6 +646,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
             _fillProfileBloc.add(SearchStudentBySSID(
               studentSSID: ssid.toUpperCase(),
             ));
+            showLoading(context);
             setState(() {
               studentSSID = ssid;
               _isShowAddedIcon = ssidExists ? false : true;

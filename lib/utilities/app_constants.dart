@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-
 class AppConstants {
   ///for flutter web
   static const apiKey = 'AIzaSyDGD4HfInR7ybpXD7sYguYP-5j-U2vDQ80';
@@ -39,7 +37,7 @@ class AppConstants {
 
   static const String fcmTokenKey = 'FCM_TOKEN_KEY';
   static const String fcmTokenServerKey =
-      'Bearer AAAAGApBmAk:APA91bGZbEsMeiFQTfQBsmW3FAecVwTELTEait9h_kCtVmaCznv3GyfdK6E1ZyEVUt2ZZHTHv2W7nrxEbu736PxDOmNCI_3XcaMU9wUZR0adAIEhPu1h_3NPcLmZwTJe5eXttZsDnrXg';
+      'AAAAGApBmAk:APA91bGZbEsMeiFQTfQBsmW3FAecVwTELTEait9h_kCtVmaCznv3GyfdK6E1ZyEVUt2ZZHTHv2W7nrxEbu736PxDOmNCI_3XcaMU9wUZR0adAIEhPu1h_3NPcLmZwTJe5eXttZsDnrXg';
 
   static const String nightMode = 'IS_NIGHT_MODE';
   static const String soundModeKey = 'IS_TURN_ON_SOUND';
@@ -48,13 +46,6 @@ class AppConstants {
 
   static const String firstTimeOpenKey = 'FIRST_TIME_OPEN';
   static const String agreedWithTermsKey = 'AGREED_WITH_TERMS';
-
-  //for set options timeOut waiting request dio connect to servers
-  static Options options = Options(
-    sendTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 8),
-    receiveDataWhenStatusError: true,
-  );
 
   static const double defaultLoadingNetworkImageSize = 25;
 

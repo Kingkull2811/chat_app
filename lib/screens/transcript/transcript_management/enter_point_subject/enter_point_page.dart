@@ -202,6 +202,27 @@ class _EnterPointPageState extends State<EnterPointPage> {
                             _isEditRow = !_isEditRow;
                           }
                         });
+                        showLoading(context);
+                        Future.delayed(const Duration(seconds: 3), () {
+                          if (state.updateDone) {
+                            showCupertinoMessageDialog(
+                              context,
+                              'Update transcript done',
+                              onClose: () {
+                                _enterPointSubjectBloc.add(GetListSubjectEvent(
+                                  studentId: widget.student.id!,
+                                  semester: _semesterSelected ?? 1,
+                                  schoolYear: widget.schoolYear,
+                                ));
+                                Navigator.pop(context);
+                              },
+                            );
+                            //todo:: fix me after
+                            // } else {
+                            //   showCupertinoMessageDialog(
+                            //       context, 'Update transcript failure');
+                          }
+                        });
                       } else {
                         showCupertinoMessageDialog(
                             this.context, 'No change in the transcript yet.');
@@ -438,7 +459,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
   _onTapSelectSemester(SemesterYear semester) {
     setState(() {
       _semesterController.text = semester.title;
-      _semesterSelected == semester.semester;
+      _semesterSelected = semester.semester;
       listResult.clear();
     });
     _enterPointSubjectBloc.add(GetListSubjectEvent(

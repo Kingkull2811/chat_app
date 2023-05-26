@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/screens/transcript/class_management/class_management.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management_bloc.dart';
@@ -257,20 +255,20 @@ class TranscriptPageState extends State<TranscriptPage> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                          'GPA 1: ${student.hk1SubjectMediumScore ?? '-'}'),
+                          'GPA 1: ${student.hk1SubjectMediumScore ?? '---'}'),
                     ),
                   ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                          'GPA 2:  ${student.hk2SubjectMediumScore ?? '-'}'),
+                          'GPA 2:  ${student.hk2SubjectMediumScore ?? '---'}'),
                     ),
                   ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text('GPA year:  ${student.mediumScore ?? '-'}'),
+                      child: Text('GPA year:  ${student.mediumScore ?? '---'}'),
                     ),
                   ),
                 ],
@@ -316,8 +314,6 @@ class TranscriptPageState extends State<TranscriptPage> {
   }
 
   Widget _transcript(List<LearningResultInfo> listLearningInfo) {
-    log('learn: $listLearningInfo');
-
     final columns = [
       'Subject name',
       'Oral Test',
@@ -354,11 +350,8 @@ class TranscriptPageState extends State<TranscriptPage> {
           return DataRow(
             cells: modelBuilder(cells, (index, cell) {
               return DataCell(
-                Center(
-                  child: Text(cell == null ? '-' : cell.toString()),
-                ),
+                Center(child: Text(cell == null ? '-' : cell.toString())),
                 showEditIcon: false,
-                onTap: () {},
               );
             }),
           );

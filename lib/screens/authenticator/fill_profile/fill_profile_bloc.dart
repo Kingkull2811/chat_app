@@ -9,7 +9,6 @@ import '../../../network/model/student_firebase.dart';
 import '../../../network/model/user_info_model.dart';
 import '../../../network/repository/student_repository.dart';
 import '../../../services/firebase_services.dart';
-import '../../../utilities/utils.dart';
 import 'fill_profile_event.dart';
 import 'fill_profile_state.dart';
 
@@ -35,10 +34,12 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
             studentInfo: response,
           ));
         } else {
-          emit(state.copyWith(
-            isLoading: false,
-            isNotFind: true,
-          ));
+          Future.delayed(const Duration(seconds: 2), () {
+            emit(state.copyWith(
+              isLoading: false,
+              isNotFind: true,
+            ));
+          });
         }
       }
 
@@ -67,10 +68,6 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
 
           final List<Map<String, dynamic>>? listToFirestore =
               listStudentFireBase?.map((e) => e.toFirestore()).toList();
-          String fcmToken = SharedPreferencesStorage().getFCMToken();
-          if (isNullOrEmpty(fcmToken)) {
-            fcmToken = await FirebaseService().getFCMToken();
-          }
 
           final Map<String, dynamic> data = {
             'id': response.id,
@@ -80,7 +77,7 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
             'phone': response.phone,
             'fileUrl': response.fileUrl,
             'parentOf': listToFirestore,
-            'fcm_token': fcmToken,
+            'fcm_token': SharedPreferencesStorage().getFCMToken(),
           };
 
           await FirebaseService().uploadUserData(
@@ -97,6 +94,7 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
         } else {
           emit(state.copyWith(
             isLoading: false,
+            fillSuccess: false,
             userData: null,
             apiError: ApiError.internalServerError,
           ));

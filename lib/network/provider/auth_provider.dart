@@ -91,7 +91,7 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.signup,
         data: data,
-        options: AppConstants.options,
+        options: baseOption(),
       );
       log('signUp: $response');
 
@@ -174,7 +174,7 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.forgotPassword,
         data: {"email": email},
-        options: AppConstants.options,
+        options: baseOption(),
       );
       return BaseResponse.fromJson(response.data);
     } catch (error, stacktrace) {

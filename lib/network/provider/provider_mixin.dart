@@ -72,19 +72,19 @@ mixin ProviderMixin {
     );
   }
 
-  Future<Options> optionsToFCMServer({
-    required String url,
-  }) async {
-    if (kDebugMode) {
-      print('URL: $url');
-    }
-    return Options(
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': AppConstants.fcmTokenServerKey,
-      },
-    );
-  }
+  Options optionsToFCMServer() => Options(
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': AppConstants.fcmTokenServerKey,
+        },
+      );
+
+  //for set options timeOut waiting request dio connect to servers
+  Options baseOption() => Options(
+        sendTimeout: const Duration(seconds: 8),
+        receiveTimeout: const Duration(seconds: 8),
+        receiveDataWhenStatusError: true,
+      );
 
   Future<bool> isExpiredToken() async {
     _authenticationProvider ??= AuthProvider();

@@ -322,8 +322,10 @@ class _LoginFormPageState extends State<LoginFormPage> {
       if (response.httpStatus == 200) {
         await SharedPreferencesStorage().setRememberInfo(true);
         await SharedPreferencesStorage().setSaveUserInfo(response.data);
-        const Duration(milliseconds: 300);
-        await _goToTermPolicy();
+        Future.delayed(
+          const Duration(seconds: 2),
+          () async => await _goToTermPolicy(),
+        );
       } else {
         showCupertinoMessageDialog(
           this.context,

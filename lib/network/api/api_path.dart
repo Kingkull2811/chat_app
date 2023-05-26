@@ -1,10 +1,12 @@
+import 'package:chat_app/utilities/app_constants.dart';
+
 class ApiPath {
   static const String apiDomain = 'http://192.168.1.26:8080';
   static const String apiDomainMac = 'http://10.10.150.54:8080';
 
   //change [useMac] - false: ip window
   //                - true: ip mac
-  static const bool useMac = true;
+  static const bool useMac = false;
 
   static const String domain = useMac ? apiDomainMac : apiDomain;
 
@@ -41,5 +43,7 @@ class ApiPath {
   static const String fcmGoogle =
       'https://fcm.googleapis.com/v1/projects/chatapp-97dbc/messages:send';
 
-  static const String fcmServer = 'https://fcm.googleapis.com/fcm/send';
+  static const String fcmServer = 'https://fcm.googleapis.com/fcm/send'
+      '?Content-Type=application/json'
+      '&Authorization=key=${AppConstants.fcmTokenServerKey}';
 }

@@ -31,7 +31,11 @@ class LearningResultInfo {
       m15TestScore: json['m15TestScore'],
       m45TestScore: json['m45TestScore'],
       semesterTestScore: json['semesterTestScore'],
-      semesterSummaryScore: json['semesterSummaryScore'],
+      semesterSummaryScore: (json['semesterSummaryScore'] == null)
+          ? null
+          : double.parse(
+              (double.tryParse(json['semesterSummaryScore'].toString()) ?? 0.0)
+                  .toStringAsFixed(3)),
     );
   }
 

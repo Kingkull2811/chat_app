@@ -7,9 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import './chat_event.dart';
 import './chat_state.dart';
 import '../../services/firebase_services.dart';
-import '../../services/notification_services.dart';
 import '../../utilities/shared_preferences_storage.dart';
-import '../../utilities/utils.dart';
 
 class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
   final BuildContext context;
@@ -36,14 +34,8 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
           listUser.removeWhere((user) => user.id == userInfo?.id);
 
           if (userInfo != null) {
-            if (userInfo.fcmToken == null) {
-              String fcmToken = SharedPreferencesStorage().getFCMToken();
-              if (isNullOrEmpty(fcmToken)) {
-                fcmToken = await NotificationServices().getDeviceToken();
-              }
-              userInfo.fcmToken = fcmToken;
-              await FirebaseService().sendFCMTokenToDB(fcmToken, userInfo.id!);
-            }
+            //update device fcm token
+            await FirebaseService().sendFCMTokenToDB(userInfo.id!);
 
             emit(state.copyWith(
               isLoading: false,
