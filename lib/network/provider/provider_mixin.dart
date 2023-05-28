@@ -74,7 +74,7 @@ mixin ProviderMixin {
 
   Options optionsToFCMServer() => Options(
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': AppConstants.fcmTokenServerKey,
         },
       );

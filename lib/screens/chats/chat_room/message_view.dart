@@ -45,15 +45,18 @@ class _MessageViewState extends State<MessageView> {
   bool showEmoji = false;
 
   void _checkMessage() async {
-    var docId = await _firebaseService.checkMessageExists(
+    var newDocID = await _firebaseService.checkMessageExists(
       currentUserId: currentUserId,
       receiverId: widget.receiverId,
       receiverAvt: widget.receiverAvt,
       receiverName: widget.receiverName,
       receiverFCMToken: widget.receiverFCMToken,
     );
+
+    await _firebaseService.sendCurrentDeviceFCMToken(docID: newDocID);
+
     setState(() {
-      docID = docId;
+      docID = newDocID;
     });
   }
 
@@ -400,7 +403,7 @@ class _MessageViewState extends State<MessageView> {
             child: messageContain(message),
           ),
           Text(
-            formatDateUtcToTime(message.time),
+            convertTimestampToDateTime(message.time),
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.normal,
@@ -724,6 +727,7 @@ class _MessageViewState extends State<MessageView> {
                   name: widget.receiverName,
                   imageUrl: widget.receiverAvt,
                   receiverID: widget.receiverId,
+                  docID: docID,
                 ),
               ),
             );

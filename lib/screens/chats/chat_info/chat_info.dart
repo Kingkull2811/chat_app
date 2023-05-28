@@ -3,6 +3,7 @@ import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
 import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
+import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +16,14 @@ class ChatInfoPage extends StatelessWidget {
   final String receiverID;
   final String name;
   final String? imageUrl;
+  final String docID;
 
   const ChatInfoPage({
     Key? key,
     required this.receiverID,
     required this.name,
     this.imageUrl,
+    required this.docID,
   }) : super(key: key);
 
   @override
@@ -171,15 +174,22 @@ class ChatInfoPage extends StatelessWidget {
                           context,
                           'Delete chat',
                           content:
-                              'Do you want delete this chat.\nAfter delete, you can\'t restore this chat.',
+                              'Do you want to delete this chat? Once deleted, you cannot restore this chat.'
+                              'At the same time, this conversation will also be deleted for the remaining person in this chat.',
                           okLabel: 'Delete',
-                          onOk: () {
-                            //todo:::
+                          onOk: () async {
                             //delete this chat and go to main app
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              AppRoutes.chat,
-                              (route) => false,
+                            showLoading(context);
+                            FirebaseService().deleteChat(docID);
+                            Future.delayed(
+                              const Duration(seconds: 2),
+                              () {
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  AppRoutes.chat,
+                                  (route) => false,
+                                );
+                              },
                             );
                           },
                         );

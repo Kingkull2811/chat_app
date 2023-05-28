@@ -35,7 +35,8 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
 
           if (userInfo != null) {
             //update device fcm token
-            await FirebaseService().sendFCMTokenToDB(userInfo.id!);
+            await FirebaseService()
+                .sendCurrentDeviceFCMToken(userId: userInfo.id!);
 
             emit(state.copyWith(
               isLoading: false,

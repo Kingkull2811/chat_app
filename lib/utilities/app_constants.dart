@@ -11,6 +11,11 @@ class AppConstants {
   static const agoraToken =
       '007eJxTYGC1kxbkabDg2d9+eYPWm7Y61ZrIGkXvS8GZxdv4Kjb/K1ZgMEkySko0s0gyTTZNMjEzMU00NDVLszAzMktMs0ixNDYTEs5NaQhkZFhpOoeJkQECQXxehuzSnJz45IzEkvjEggIGBgBpeB+/';
 
+  /// FCM Token
+  static const String fcmTokenKey = 'FCM_TOKEN_KEY';
+  static const String fcmTokenServerKey =
+      'AAAAGApBmAk:APA91bGZbEsMeiFQTfQBsmW3FAecVwTELTEait9h_kCtVmaCznv3GyfdK6E1ZyEVUt2ZZHTHv2W7nrxEbu736PxDOmNCI_3XcaMU9wUZR0adAIEhPu1h_3NPcLmZwTJe5eXttZsDnrXg';
+
   static RegExp emailExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]');
   static RegExp passwordExp =
       RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
@@ -34,10 +39,6 @@ class AppConstants {
   static const String imageAvartarUrlKey = 'IMAGE_AVARTAR_URL_KEY';
 
   static const String isFillProfileKey = 'IS_FILL_PROFILE_STATUS';
-
-  static const String fcmTokenKey = 'FCM_TOKEN_KEY';
-  static const String fcmTokenServerKey =
-      'AAAAGApBmAk:APA91bGZbEsMeiFQTfQBsmW3FAecVwTELTEait9h_kCtVmaCznv3GyfdK6E1ZyEVUt2ZZHTHv2W7nrxEbu736PxDOmNCI_3XcaMU9wUZR0adAIEhPu1h_3NPcLmZwTJe5eXttZsDnrXg';
 
   static const String nightMode = 'IS_NIGHT_MODE';
   static const String soundModeKey = 'IS_TURN_ON_SOUND';

@@ -108,16 +108,9 @@ String formatDateString(String? input, {String format = 'yyyy/MM/dd'}) {
   }
 }
 
-String formatDateUtcToTime(Timestamp? timestamp) {
-  if (timestamp == null) {
-    return '';
-  }
-  DateTime dateTime =
-      DateTime.fromMillisecondsSinceEpoch(timestamp.seconds * 1000);
-
-  return DateFormat('dd/MM/yy hh:mm a')
-      .format(DateTime.parse(dateTime.toString()));
-}
+String convertTimestampToDateTime(Timestamp? timestamp) => (timestamp != null)
+    ? DateFormat('dd/MM/yy hh:mm a').format(timestamp.toDate())
+    : '';
 
 MessageType getMessageType(String? type) {
   if (type == MessageType.text.name) {

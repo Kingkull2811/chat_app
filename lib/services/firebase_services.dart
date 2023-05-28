@@ -15,6 +15,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
+import '../network/repository/push_notification_repository.dart';
 import '../utilities/enum/message_type.dart';
 
 class FirebaseService {
@@ -241,6 +242,7 @@ class FirebaseService {
   Stream<QuerySnapshot<Map<String, dynamic>>> getListChat(int currentUserId) {
     return _firestore
         .collection(AppConstants.chatsCollection)
+        // .orderBy('time', descending: true)
         .where('members.$currentUserId', isNull: true)
         .snapshots();
   }
@@ -266,33 +268,32 @@ class FirebaseService {
               await _firestore
                   .collection(AppConstants.userCollection)
                   .doc(docID)
-                  .update({
-                'fcm_token': {
-                  currentUserId.toString(): _prefs.getFCMToken(),
-                  receiverId: receiverFCMToken,
-                }
-              });
+                  .update(
+                {
+                  'fcm_token_$currentUserId': _prefs.getFCMToken(),
+                  'fcm_token_$receiverId': receiverFCMToken,
+                },
+              );
             } else {
-              await _firestore.collection(AppConstants.chatsCollection).add({
-                "members": {
-                  currentUserId.toString(): null,
-                  receiverId: null,
+              await _firestore.collection(AppConstants.chatsCollection).add(
+                {
+                  "members": {
+                    currentUserId.toString(): null,
+                    receiverId: null,
+                  },
+                  'names': {
+                    currentUserId.toString(): _prefs.getFullName(),
+                    receiverId: receiverName,
+                  },
+                  'imageUrls': {
+                    currentUserId.toString(): _prefs.getImageAvartarUrl(),
+                    receiverId: receiverAvt,
+                  },
+                  'fcm_token_$currentUserId': _prefs.getFCMToken(),
+                  'fcm_token_$receiverId': receiverFCMToken,
+                  'time': Timestamp.now(),
                 },
-                'names': {
-                  currentUserId.toString(): _prefs.getFullName(),
-                  receiverId: receiverName,
-                },
-                'imageUrls': {
-                  currentUserId.toString(): _prefs.getImageAvartarUrl(),
-                  receiverId: receiverAvt,
-                },
-                'fcm_token': {
-                  currentUserId.toString(): _prefs.getFCMToken(),
-                  receiverId: receiverFCMToken,
-                },
-              }).then((value) {
-                docID = value.id;
-              });
+              ).then((value) => docID = value.id);
             }
           },
         )
@@ -307,6 +308,13 @@ class FirebaseService {
         .collection(AppConstants.messageListCollection)
         .orderBy('time', descending: true)
         .snapshots();
+  }
+
+  Future<void> deleteChat(String docID) async {
+    await _firestore
+        .collection(AppConstants.chatsCollection)
+        .doc(docID)
+        .delete();
   }
 
   Future<void> sendTextMessage({
@@ -396,7 +404,11 @@ class FirebaseService {
     // _messaging.subscribeToTopic('topic');
     log('dataSendL $data');
 
-    // await PushNotificationRepository().messagePN(data: data);
+    await PushNotificationRepository().messagePN(
+      fcmToken: receiverFCMToken,
+      title: senderName,
+      message: message,
+    );
 
     ///send to api fcmGoogle
     // final data2 = {
@@ -495,14 +507,26 @@ class FirebaseService {
 
   ///************** FCM Notification*******
 
-  Future<void> sendFCMTokenToDB(int userId) async {
-    await _firestore
-        .collection(AppConstants.userCollection)
-        .doc('user_id_$userId')
-        .update({'fcm_token': SharedPreferencesStorage().getFCMToken()});
-    //todo
+  Future<void> sendCurrentDeviceFCMToken({int? userId, String? docID}) async {
+    if (userId != null) {
+      await _firestore
+          .collection(AppConstants.userCollection)
+          .doc('user_id_$userId')
+          .update({'fcm_token': _prefs.getFCMToken()});
+    }
 
-    print('device token: ${SharedPreferencesStorage().getFCMToken()}');
+    if (isNotNullOrEmpty(docID)) {
+      await _firestore
+          .collection(AppConstants.chatsCollection)
+          .doc(docID)
+          .update(
+        {
+          'fcm_token_${_prefs.getUserId()}': _prefs.getFCMToken().toString(),
+        },
+      );
+    }
+    //todo
+    print('device token: ${_prefs.getFCMToken()}');
   }
 
   String constructFCMPayload(String? token) {
