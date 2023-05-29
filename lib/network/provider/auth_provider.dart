@@ -9,12 +9,12 @@ import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
+import '../../utilities/app_constants.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../response/base_get_response.dart';
 import '../response/login_response.dart';
 
 class AuthProvider with ProviderMixin {
-  final SecureStorage _secureStorage = SecureStorage();
   final SharedPreferencesStorage _pref = SharedPreferencesStorage();
 
   Future<bool> checkAuthenticationStatus() async {
@@ -24,8 +24,8 @@ class AuthProvider with ProviderMixin {
       String refreshTokenExpired = _pref.getRefreshTokenExpired();
 
       if (DateTime.parse(refreshTokenExpired).isAfter(DateTime.now())) {
-        String? refreshToken = _pref.getRefreshToken();
-        // await _secureStorage.readSecureData(AppConstants.refreshTokenKey);
+        String? refreshToken = //_pref.getRefreshToken();
+            await SecureStorage().readSecureData(AppConstants.refreshTokenKey);
 
         final response = await AuthProvider().refreshToken(
           refreshToken: refreshToken!,

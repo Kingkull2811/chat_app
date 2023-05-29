@@ -56,17 +56,17 @@ class SharedPreferencesStorage {
 
   Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
     if (signInData != null) {
-      // await _secureStorage.writeSecureData(
-      //     AppConstants.accessTokenKey, signInData.accessToken);
-      // await _secureStorage.writeSecureData(
-      //     AppConstants.refreshTokenKey, signInData.refreshToken);
+      await _secureStorage.writeSecureData(
+          AppConstants.accessTokenKey, signInData.accessToken);
+      await _secureStorage.writeSecureData(
+          AppConstants.refreshTokenKey, signInData.refreshToken);
       // await _secureStorage.writeSecureData(
       //     AppConstants.emailKey, signInData.email.toString());
 
-      await _prefs.setString(
-          AppConstants.accessTokenKey, signInData.accessToken ?? '');
-      await _prefs.setString(
-          AppConstants.refreshTokenKey, signInData.refreshToken ?? '');
+      // await _prefs.setString(
+      //     AppConstants.accessTokenKey, signInData.accessToken ?? '');
+      // await _prefs.setString(
+      //     AppConstants.refreshTokenKey, signInData.refreshToken ?? '');
 
       await _prefs.setString(AppConstants.accessTokenExpiredKey,
           signInData.expiredAccessToken ?? '');
@@ -86,15 +86,15 @@ class SharedPreferencesStorage {
 
   Future<void> saveInfoWhenRefreshToken(
       {required TokenDataResponse? refreshTokenData}) async {
-    // await _secureStorage.writeSecureData(
-    //     AppConstants.accessTokenKey, refreshTokenData?.accessToken);
-    // await _secureStorage.writeSecureData(
-    //     AppConstants.refreshTokenKey, refreshTokenData?.refreshToken);
+    await _secureStorage.writeSecureData(
+        AppConstants.accessTokenKey, refreshTokenData?.accessToken);
+    await _secureStorage.writeSecureData(
+        AppConstants.refreshTokenKey, refreshTokenData?.refreshToken);
 
-    await _prefs.setString(
-        AppConstants.accessTokenKey, refreshTokenData?.accessToken ?? '');
-    await _prefs.setString(
-        AppConstants.refreshTokenKey, refreshTokenData?.refreshToken ?? '');
+    // await _prefs.setString(
+    //     AppConstants.accessTokenKey, refreshTokenData?.accessToken ?? '');
+    // await _prefs.setString(
+    //     AppConstants.refreshTokenKey, refreshTokenData?.refreshToken ?? '');
     await _prefs.setString(AppConstants.accessTokenExpiredKey,
         refreshTokenData?.expiredAccessToken ?? '');
   }

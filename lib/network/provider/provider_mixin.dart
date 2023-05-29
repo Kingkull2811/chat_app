@@ -1,11 +1,11 @@
 import 'dart:developer';
 
 import 'package:chat_app/network/response/base_get_response.dart';
-import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../utilities/app_constants.dart';
+import '../../utilities/secure_storage.dart';
 import '../../utilities/utils.dart';
 import '../response/base_response.dart';
 import 'auth_provider.dart';
@@ -57,13 +57,17 @@ mixin ProviderMixin {
   }
 
   Future<Options> defaultOptions({required String url}) async {
-    String? token = SharedPreferencesStorage().getAccessToken();
-    // await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+    String? token = //SharedPreferencesStorage().getAccessToken();
+        await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+
+    String refreshToken =
+        await SecureStorage().readSecureData(AppConstants.refreshTokenKey);
     if (kDebugMode) {
       if (isNotNullOrEmpty(url)) {
         print('URL: $url');
       }
       log('TOKEN: $token');
+      log('REF: $refreshToken');
     }
     if (isNullOrEmpty(token)) {
       log('TOKEN NULL');
