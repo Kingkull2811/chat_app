@@ -90,20 +90,23 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
           showMessageNoInternetDialog(context);
         }
         if (curState.isAddSuccess) {
-          showCupertinoMessageDialog(context, 'Add new class successfully',
-              onClose: () {
-            _codeController.clear();
-            _nameController.clear();
-            _yearController.clear();
-            listSubjectSelected = [];
-          });
+          showCupertinoMessageDialog(
+            context,
+            'Add new class successfully',
+            onClose: () {
+              _codeController.clear();
+              _nameController.clear();
+              _yearController.clear();
+              listSubjectSelected = [];
+            },
+          );
         }
         if (curState.isUpdateSuccess) {
           showCupertinoMessageDialog(
             context,
             'Update class successfully',
             onClose: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop(true);
             },
           );
         }
@@ -117,7 +120,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
               backgroundColor: Theme.of(context).primaryColor,
               centerTitle: true,
               leading: IconButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => Navigator.of(context).pop(true),
                 icon: const Icon(
                   Icons.arrow_back_ios,
                   size: 24,

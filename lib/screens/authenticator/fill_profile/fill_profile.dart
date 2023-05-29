@@ -262,7 +262,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
       if (isNullOrEmpty(_image)) {
         showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
       } else {
-        // showLoading(context);
+        showLoading(context);
         List<int?> listStudentIdSelected = listStudent
             .map(
               (e) => e.id,

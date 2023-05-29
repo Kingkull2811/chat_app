@@ -1,9 +1,11 @@
+import 'dart:developer';
+
 import 'package:chat_app/network/response/base_get_response.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../utilities/app_constants.dart';
-import '../../utilities/secure_storage.dart';
 import '../../utilities/utils.dart';
 import '../response/base_response.dart';
 import 'auth_provider.dart';
@@ -54,22 +56,25 @@ mixin ProviderMixin {
     );
   }
 
-  Future<Options> defaultOptions({
-    required String url,
-  }) async {
-    String token =
-        await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+  Future<Options> defaultOptions({required String url}) async {
+    String? token = SharedPreferencesStorage().getAccessToken();
+    // await SecureStorage().readSecureData(AppConstants.accessTokenKey);
     if (kDebugMode) {
       if (isNotNullOrEmpty(url)) {
         print('URL: $url');
       }
-      // log('TOKEN - ${AppConstants.buildRegion.toUpperCase()}: $token');
+      log('TOKEN: $token');
     }
-    return Options(
-      headers: {
-        'Authorization': token,
-      },
-    );
+    if (isNullOrEmpty(token)) {
+      log('TOKEN NULL');
+      return Options();
+    } else {
+      return Options(
+        headers: {
+          'Authorization': token!,
+        },
+      );
+    }
   }
 
   Options optionsToFCMServer() => Options(

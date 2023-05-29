@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/class_model.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/network/response/subject_response.dart';
@@ -29,11 +27,8 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
             apiError: ApiError.noInternetConnection,
           ));
         } else {
-          // final response = await _classRepository.getListClass();
           final response = await _classRepository.getListSubject();
 
-          // log('class: $response');
-          log('subject: $response');
           if (response is SubjectResponse) {
             emit(state.copyWith(
               isLoading: false,

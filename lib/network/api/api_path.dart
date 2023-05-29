@@ -8,7 +8,8 @@ class ApiPath {
   //                - true: ip mac
   static const bool useMac = false;
 
-  static const String domain = useMac ? apiDomainMac : apiDomain;
+  // static const String domain = useMac ? apiDomainMac : apiDomain;
+  static const String domain = 'http://167.99.65.226:8080';
 
   static const String signup = '$domain/api/auth/sign-up';
 
