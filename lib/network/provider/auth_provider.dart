@@ -9,7 +9,6 @@ import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
-import '../../utilities/app_constants.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../response/base_get_response.dart';
 import '../response/login_response.dart';
@@ -24,15 +23,13 @@ class AuthProvider with ProviderMixin {
       String refreshTokenExpired = _pref.getRefreshTokenExpired();
 
       if (DateTime.parse(refreshTokenExpired).isAfter(DateTime.now())) {
-        String? refreshToken = //_pref.getRefreshToken();
-            await SecureStorage().readSecureData(AppConstants.refreshTokenKey);
+        String refreshToken = await SecureStorage().getRefreshToken();
+        print('ref: $refreshToken');
 
         final response = await AuthProvider().refreshToken(
-          refreshToken: refreshToken!,
+          refreshToken: refreshToken,
         );
-        await _pref.saveInfoWhenRefreshToken(
-          refreshTokenData: response.data,
-        );
+        await _pref.saveInfoWhenRefreshToken(data: response.data);
         return true;
       }
       return false;
@@ -68,7 +65,6 @@ class AuthProvider with ProviderMixin {
         ApiPath.login,
         data: {"password": password, "username": username},
       );
-      log('responseLogin: ${response.data}');
 
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
@@ -89,7 +85,6 @@ class AuthProvider with ProviderMixin {
         data: data,
         options: baseOption(),
       );
-      log('signUp: $response');
 
       return BaseResponse.fromJson(response.data);
     } catch (error) {
@@ -114,7 +109,6 @@ class AuthProvider with ProviderMixin {
         apiGetProfile,
         options: await defaultOptions(url: apiGetProfile),
       );
-      log('getUser: $response');
 
       return UserInfoModel.fromJson(response.data);
     } catch (error, stacktrace) {

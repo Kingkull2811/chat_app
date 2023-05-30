@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -57,28 +55,22 @@ mixin ProviderMixin {
   }
 
   Future<Options> defaultOptions({required String url}) async {
-    String? token = //SharedPreferencesStorage().getAccessToken();
-        await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+    String token = await SecureStorage().getAccessToken();
+    // String refreshToken = await SecureStorage().getRefreshToken();
 
-    String refreshToken =
-        await SecureStorage().readSecureData(AppConstants.refreshTokenKey);
     if (kDebugMode) {
       if (isNotNullOrEmpty(url)) {
         print('URL: $url');
       }
-      log('TOKEN: $token');
-      log('REF: $refreshToken');
+      // log('TOKEN: $token');
+      // log('REF: $refreshToken');
     }
-    if (isNullOrEmpty(token)) {
-      log('TOKEN NULL');
-      return Options();
-    } else {
-      return Options(
-        headers: {
-          'Authorization': token!,
-        },
-      );
-    }
+
+    return Options(
+      headers: {
+        'Authorization': token,
+      },
+    );
   }
 
   Options optionsToFCMServer() => Options(

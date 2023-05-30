@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
@@ -22,6 +20,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../network/response/base_get_response.dart';
 import '../../../../widgets/animation_loading.dart';
 import '../../../../widgets/custom_check_box.dart';
 import '../../fill_profile/fill_profile.dart';
@@ -81,7 +80,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
         return currState.isSuccessAuthenticateBiometric;
       },
       listener: (context, state) {
-        _goToTermPolicy();
+        _goToTermPolicy(context);
       },
       builder: (context, state) {
         if (state.isLoading) {
@@ -221,7 +220,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
     );
   }
 
-  Future<void> _goToTermPolicy() async {
+  Future<void> _goToTermPolicy(BuildContext context) async {
     SharedPreferencesStorage().setLoggedOutStatus(false);
     bool agreedWithTerms = SharedPreferencesStorage().getAgreedWithTerms();
     if (mounted) {
@@ -241,6 +240,15 @@ class _LoginFormPageState extends State<LoginFormPage> {
           userInfo.isFillProfileKey
               ? _navigateToMainPage()
               : _navigateToFillProfilePage(userInfo);
+        } else if (userInfo is ExpiredTokenGetResponse) {
+          logoutIfNeed(this.context);
+        } else {
+          //show log
+          showCupertinoMessageDialog(
+            this.context,
+            'ERROR!',
+            content: 'Can\'t get user info',
+          );
         }
       }
     }
@@ -324,13 +332,9 @@ class _LoginFormPageState extends State<LoginFormPage> {
       if (response.httpStatus == 200) {
         await SharedPreferencesStorage().setRememberInfo(true);
         await SharedPreferencesStorage().setSaveUserInfo(response.data);
-
-        //todo:
-        log('tokenLogin: ${response.data?.accessToken}');
-
         Future.delayed(
           const Duration(seconds: 2),
-          () async => await _goToTermPolicy(),
+          () async => await _goToTermPolicy(context),
         );
       } else {
         showCupertinoMessageDialog(

@@ -56,26 +56,18 @@ class SharedPreferencesStorage {
 
   Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
     if (signInData != null) {
-      await _secureStorage.writeSecureData(
-          AppConstants.accessTokenKey, signInData.accessToken);
-      await _secureStorage.writeSecureData(
-          AppConstants.refreshTokenKey, signInData.refreshToken);
-      // await _secureStorage.writeSecureData(
-      //     AppConstants.emailKey, signInData.email.toString());
+      await _secureStorage.setAccessToken(accessToken: signInData.accessToken);
+      await _secureStorage.setRefreshToken(refreshT: signInData.refreshToken);
 
-      // await _prefs.setString(
-      //     AppConstants.accessTokenKey, signInData.accessToken ?? '');
-      // await _prefs.setString(
-      //     AppConstants.refreshTokenKey, signInData.refreshToken ?? '');
-
-      await _prefs.setString(AppConstants.accessTokenExpiredKey,
-          signInData.expiredAccessToken ?? '');
-      await _prefs.setString(AppConstants.refreshTokenExpiredKey,
-          signInData.expiredRefreshToken ?? '');
       await _prefs.setString(
-          AppConstants.usernameKey, signInData.username ?? '');
+          AppConstants.accessTokenExpiredKey, signInData.expiredAccessToken);
+
+      await _prefs.setString(
+          AppConstants.refreshTokenExpiredKey, signInData.expiredRefreshToken);
+
+      await _prefs.setString(AppConstants.usernameKey, signInData.username);
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
-      await _prefs.setString(AppConstants.emailKey, signInData.email ?? '');
+      await _prefs.setString(AppConstants.emailKey, signInData.email);
 
       await _prefs.setStringList(
           AppConstants.rolesKey, signInData.roles ?? ['ROLE_USER']);
@@ -84,19 +76,15 @@ class SharedPreferencesStorage {
     }
   }
 
-  Future<void> saveInfoWhenRefreshToken(
-      {required TokenDataResponse? refreshTokenData}) async {
-    await _secureStorage.writeSecureData(
-        AppConstants.accessTokenKey, refreshTokenData?.accessToken);
-    await _secureStorage.writeSecureData(
-        AppConstants.refreshTokenKey, refreshTokenData?.refreshToken);
-
-    // await _prefs.setString(
-    //     AppConstants.accessTokenKey, refreshTokenData?.accessToken ?? '');
-    // await _prefs.setString(
-    //     AppConstants.refreshTokenKey, refreshTokenData?.refreshToken ?? '');
-    await _prefs.setString(AppConstants.accessTokenExpiredKey,
-        refreshTokenData?.expiredAccessToken ?? '');
+  Future<void> saveInfoWhenRefreshToken({
+    required TokenDataResponse? data,
+  }) async {
+    if (data != null) {
+      await _secureStorage.setAccessToken(accessToken: data.accessToken!);
+      await _secureStorage.setRefreshToken(refreshT: data.refreshToken!);
+      await _prefs.setString(
+          AppConstants.accessTokenExpiredKey, data.expiredAccessToken ?? '');
+    }
   }
 
   Future<void> checkRoles(List<String> listRoles) async {
@@ -164,16 +152,8 @@ class SharedPreferencesStorage {
   }
 
   void resetDataWhenLogout() {
-    _prefs.remove(AppConstants.emailKey);
-    _prefs.remove(AppConstants.accessTokenKey);
-    _prefs.remove(AppConstants.refreshTokenKey);
-    _prefs.remove(AppConstants.userIdKey);
     _prefs.setBool(AppConstants.isLoggedOut, true);
     _prefs.setBool(AppConstants.isFillProfileKey, false);
-
-    // _secureStorage.deleteSecureData(AppConstants.emailKey);
-    // _secureStorage.deleteSecureData(AppConstants.accessTokenKey);
-    // _secureStorage.deleteSecureData(AppConstants.refreshTokenKey);
   }
 
   /// ---setting---
