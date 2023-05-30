@@ -26,6 +26,15 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
   final _subjectCodeController = TextEditingController();
   final _subjectNameController = TextEditingController();
 
+  Future<void> _reloadPage() async {
+    await Future.delayed(const Duration(seconds: 1), () {
+      _subjectBloc.add(InitSubjectEvent());
+      Navigator.pop(context);
+      setState(() {});
+    });
+
+  }
+
   @override
   void initState() {
     _subjectBloc = BlocProvider.of<SubjectManagementBloc>(context)
@@ -111,12 +120,12 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                             isScrollControlled: true,
                             backgroundColor: Colors.transparent,
                             builder: (context) => _formSubjectInfo(context),
-                          ).whenComplete(() {
-                            _subjectBloc.add(InitSubjectEvent());
+                          ).whenComplete(() async {
+                            showLoading(context);
                             setState(() {
-                              _subjectCodeController.clear();
                               _subjectNameController.clear();
                             });
+                            await _reloadPage();
                           });
                         },
                         child: Text(
@@ -222,12 +231,12 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                                   isEdit: true,
                                   subjectData: listSubject[index - 1],
                                 ),
-                              ).whenComplete(() {
-                                _subjectBloc.add(InitSubjectEvent());
+                              ).whenComplete(() async {
+                                showLoading(context);
                                 setState(() {
-                                  _subjectCodeController.clear();
                                   _subjectNameController.clear();
                                 });
+                                await _reloadPage();
                               });
                             },
                             child: Container(
@@ -262,9 +271,8 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                                   );
                                   Navigator.pop(context);
                                 },
-                              ).whenComplete(() {
-                                _subjectBloc.add(InitSubjectEvent());
-                                setState(() {});
+                              ).whenComplete(() async {
+                                await _reloadPage();
                               });
                             },
                             child: Container(
@@ -332,6 +340,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                   padding: const EdgeInsets.only(top: 0),
                   child: _inputText(
                     context,
+                    readOnly: true,
                     controller: _subjectCodeController,
                     inputAction: TextInputAction.done,
                     labelText: 'Subject Code',

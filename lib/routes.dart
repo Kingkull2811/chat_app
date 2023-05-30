@@ -21,6 +21,36 @@ class AppRoutes {
   static const login = '/login';
   static const terms = '/settings/term_policy';
 
+  bool _isLoggedIn = false;
+  final SharedPreferencesStorage _pref = SharedPreferencesStorage();
+
+  Future<bool> getUserLoggedInStatus() async {
+    bool isLoggedOut = _pref.getLoggedOutStatus();
+    bool isExpired = true;
+    String passwordExpiredTime = _pref.getAccessTokenExpired();
+    if (passwordExpiredTime.isNotEmpty) {
+      try {
+        if (DateTime.parse(passwordExpiredTime).isAfter(DateTime.now())) {
+          isExpired = false;
+        }
+      } catch (_) {
+        return false;
+      }
+
+      if (!isExpired) {
+        if (isLoggedOut) {
+          return _isLoggedIn = false;
+        } else {
+          return _isLoggedIn = true;
+        }
+      } else {
+        return _isLoggedIn = false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   Map<String, Widget Function(BuildContext)> routes(context,
       {required bool isLoggedIn}) {
     return {
@@ -50,7 +80,7 @@ class AppRoutes {
       AppRoutes.profile: (context) {
         return BlocProvider<ProfileBloc>(
           create: (context) => ProfileBloc(context),
-          child: ProfilePage(userID: SharedPreferencesStorage().getUserId()),
+          child: ProfilePage(userID: _pref.getUserId()),
         );
       },
       AppRoutes.login: (context) {

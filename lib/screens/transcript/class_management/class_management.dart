@@ -28,6 +28,15 @@ class _ClassManagementState extends State<ClassManagement> {
 
   late ClassManagementBloc _classManagementBloc;
 
+  Future<void> _reloadPage() async {
+    showLoading(context);
+    await Future.delayed(const Duration(seconds: 1), () {
+      _classManagementBloc.add(InitClassEvent());
+      Navigator.pop(context);
+      setState(() {});
+    });
+  }
+
   @override
   void initState() {
     _classManagementBloc = BlocProvider.of<ClassManagementBloc>(context)
@@ -74,25 +83,28 @@ class _ClassManagementState extends State<ClassManagement> {
     if (isNullOrEmpty(listClass)) {
       return const DataNotFoundPage(title: 'Class data not found');
     }
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      physics: const BouncingScrollPhysics(),
-      itemCount: listClass!.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-            child: Text(
-              'List class:',
-              style: TextStyle(
-                fontSize: 20,
-                color: Theme.of(context).primaryColor,
+    return RefreshIndicator(
+      onRefresh: () async => await _reloadPage(),
+      child: ListView.builder(
+        scrollDirection: Axis.vertical,
+        physics: const BouncingScrollPhysics(),
+        itemCount: listClass!.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+              child: Text(
+                'List class:',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
-            ),
-          );
-        }
-        return _createItemClass(index, listClass[index - 1]);
-      },
+            );
+          }
+          return _createItemClass(index, listClass[index - 1]);
+        },
+      ),
     );
   }
 
@@ -128,8 +140,8 @@ class _ClassManagementState extends State<ClassManagement> {
                       return CupertinoActionSheet(
                         actions: <Widget>[
                           CupertinoActionSheetAction(
-                            onPressed: () {
-                              _navToEditClass(classInfo);
+                            onPressed: () async {
+                              await _navToEditClass(classInfo);
                             },
                             child: Text(
                               'Edit class',
@@ -236,18 +248,23 @@ class _ClassManagementState extends State<ClassManagement> {
     );
   }
 
-  void _navToEditClass(ClassModel classInfo) => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider<ClassInfoBloc>(
-            create: (context) => ClassInfoBloc(context)..add(ClassInfoInit()),
-            child: ClassInfoPage(
-              isEdit: true,
-              classInfoEdit: classInfo,
-            ),
+  Future<void> _navToEditClass(ClassModel classInfo) async {
+    final bool result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider<ClassInfoBloc>(
+          create: (context) => ClassInfoBloc(context)..add(ClassInfoInit()),
+          child: ClassInfoPage(
+            isEdit: true,
+            classInfoEdit: classInfo,
           ),
         ),
-      );
+      ),
+    );
+    if (result) {
+      await _reloadPage();
+    }
+  }
 
   Widget _createItemSubject(List<SubjectModel>? listSubject) {
     if (isNullOrEmpty(listSubject)) {
@@ -274,7 +291,7 @@ class _ClassManagementState extends State<ClassManagement> {
               return _createItem('Serial', 'Subject code', 'Subject name');
             }
             return _createItem(
-              (index - 1).toString(),
+              (index).toString(),
               listSubject[index - 1].code ?? '',
               listSubject[index - 1].subjectName ?? '',
             );

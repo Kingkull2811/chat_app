@@ -5,36 +5,31 @@ import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/refresh_token_response.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:dio/dio.dart';
+import 'package:path/path.dart';
 
 import '../../utilities/shared_preferences_storage.dart';
 import '../response/base_get_response.dart';
 import '../response/login_response.dart';
 
 class AuthProvider with ProviderMixin {
-  final SecureStorage _secureStorage = SecureStorage();
+  final SharedPreferencesStorage _pref = SharedPreferencesStorage();
 
   Future<bool> checkAuthenticationStatus() async {
-    String accessTokenExpired =
-        SharedPreferencesStorage().getAccessTokenExpired();
+    String accessTokenExpired = _pref.getAccessTokenExpired();
 
     if (DateTime.parse(accessTokenExpired).isBefore(DateTime.now())) {
-      String refreshTokenExpired =
-          SharedPreferencesStorage().getRefreshTokenExpired();
+      String refreshTokenExpired = _pref.getRefreshTokenExpired();
 
       if (DateTime.parse(refreshTokenExpired).isAfter(DateTime.now())) {
-        String refreshToken = await _secureStorage.readSecureData(
-          AppConstants.refreshTokenKey,
-        );
+        String refreshToken = await SecureStorage().getRefreshToken();
+        print('ref: $refreshToken');
 
         final response = await AuthProvider().refreshToken(
           refreshToken: refreshToken,
         );
-        await SharedPreferencesStorage().saveInfoWhenRefreshToken(
-          refreshTokenData: response.data,
-        );
+        await _pref.saveInfoWhenRefreshToken(data: response.data);
         return true;
       }
       return false;
@@ -49,10 +44,7 @@ class AuthProvider with ProviderMixin {
       Response response = await dio.post(
         ApiPath.refreshToken,
         data: {"refreshToken": refreshToken},
-        // options: AppConstants.options,
       );
-      // log("new token data: ${response.data.toString()}");
-
       return RefreshTokenResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.refreshToken);
@@ -72,8 +64,8 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.login,
         data: {"password": password, "username": username},
-        // options: AppConstants.options,
       );
+
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);
@@ -93,7 +85,6 @@ class AuthProvider with ProviderMixin {
         data: data,
         options: baseOption(),
       );
-      log('signUp: $response');
 
       return BaseResponse.fromJson(response.data);
     } catch (error) {
@@ -111,14 +102,13 @@ class AuthProvider with ProviderMixin {
     if (await isExpiredToken()) {
       return ExpiredTokenGetResponse();
     }
-    final String apiGetProfile = ApiPath.fillProfile + userId.toString();
+    final String apiGetProfile = join(ApiPath.fillProfile, userId.toString());
 
     try {
       final response = await dio.get(
         apiGetProfile,
         options: await defaultOptions(url: apiGetProfile),
       );
-      // log(response.toString());
 
       return UserInfoModel.fromJson(response.data);
     } catch (error, stacktrace) {

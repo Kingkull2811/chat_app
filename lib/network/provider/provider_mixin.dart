@@ -54,17 +54,18 @@ mixin ProviderMixin {
     );
   }
 
-  Future<Options> defaultOptions({
-    required String url,
-  }) async {
-    String token =
-        await SecureStorage().readSecureData(AppConstants.accessTokenKey);
+  Future<Options> defaultOptions({required String url}) async {
+    String token = await SecureStorage().getAccessToken();
+    // String refreshToken = await SecureStorage().getRefreshToken();
+
     if (kDebugMode) {
       if (isNotNullOrEmpty(url)) {
         print('URL: $url');
       }
-      // log('TOKEN - ${AppConstants.buildRegion.toUpperCase()}: $token');
+      // log('TOKEN: $token');
+      // log('REF: $refreshToken');
     }
+
     return Options(
       headers: {
         'Authorization': token,
