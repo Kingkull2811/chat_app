@@ -44,6 +44,15 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
     super.dispose();
   }
 
+  Future<void> _reloadPage() async {
+    showLoading(context);
+    await Future.delayed(const Duration(seconds: 1), () {
+      _subjectBloc.add(InitStudentsEvent());
+      Navigator.pop(context);
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<StudentsManagementBloc, StudentManagementState>(
@@ -108,7 +117,8 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                     actions: <Widget>[
                       CupertinoActionSheetAction(
                         onPressed: () async {
-                          _navToAddStudent(isEdit: false);
+                          Navigator.pop(context);
+                          await _navToAddStudent(isEdit: false);
                         },
                         child: Text(
                           'Add new student',
@@ -146,17 +156,14 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
       body: isNullOrEmpty(listStudent)
           ? const DataNotFoundPage(title: 'Students data not found')
           : RefreshIndicator(
-              onRefresh: () async {
-                _subjectBloc.add(InitStudentsEvent());
-                // setState(() {});
-              },
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
+              onRefresh: () async => await _reloadPage(),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.zero,
                 physics: const BouncingScrollPhysics(),
-                itemCount: listStudent!.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Padding(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
                       child: Text(
                         'List student:',
@@ -165,10 +172,24 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
-                    );
-                  }
-                  return _createItemStudent(context, listStudent[index - 1]);
-                },
+                    ),
+                    SizedBox(
+                      height: 206 * (listStudent!.length + 1).toDouble(),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.vertical,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: listStudent.length,
+                        itemBuilder: (context, index) {
+                          return _createItemStudent(
+                            context,
+                            listStudent[index],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
     );
@@ -179,8 +200,8 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
-        onTap: () {
-          _navToAddStudent(isEdit: true, student: student);
+        onTap: () async {
+          await _navToAddStudent(isEdit: true, student: student);
         },
         child: Container(
           height: 190,
@@ -286,7 +307,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
-                            student.classResponse?.className ?? '',
+                            student.className ?? '',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
@@ -297,11 +318,6 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                     ),
                   ),
                 ),
-                // Icon(
-                //   Icons.navigate_next,
-                //   size: 24,
-                //   color: Theme.of(context).primaryColor,
-                // )
               ],
             ),
           ),
@@ -310,13 +326,20 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
     );
   }
 
-  _navToAddStudent({bool isEdit = false, Student? student}) => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (context) => AddStudentBloc(context)..add(InitialEvent()),
-            child: AddStudent(isEdit: isEdit, student: student),
-          ),
+  _navToAddStudent({bool isEdit = false, Student? student}) async {
+    final bool result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => AddStudentBloc(context)..add(InitialEvent()),
+          child: AddStudent(isEdit: isEdit, student: student),
         ),
-      );
+      ),
+    );
+    if (result) {
+      await _reloadPage();
+    } else {
+      return;
+    }
+  }
 }

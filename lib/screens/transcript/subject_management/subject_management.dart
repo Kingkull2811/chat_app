@@ -1,3 +1,4 @@
+import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/screens/transcript/subject_management/subject_management_state.dart';
 import 'package:chat_app/widgets/data_not_found.dart';
 import 'package:flutter/cupertino.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../network/model/subject_model.dart';
+import '../../../network/repository/class_repository.dart';
 import '../../../utilities/enum/api_error_result.dart';
 import '../../../utilities/screen_utilities.dart';
 import '../../../utilities/utils.dart';
@@ -26,13 +28,15 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
   final _subjectCodeController = TextEditingController();
   final _subjectNameController = TextEditingController();
 
+  final _classRepository = ClassRepository();
+
   Future<void> _reloadPage() async {
+    showLoading(context);
     await Future.delayed(const Duration(seconds: 1), () {
       _subjectBloc.add(InitSubjectEvent());
       Navigator.pop(context);
       setState(() {});
     });
-
   }
 
   @override
@@ -121,7 +125,6 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                             backgroundColor: Colors.transparent,
                             builder: (context) => _formSubjectInfo(context),
                           ).whenComplete(() async {
-                            showLoading(context);
                             setState(() {
                               _subjectNameController.clear();
                             });
@@ -163,139 +166,146 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
       ),
       body: isNullOrEmpty(listSubject)
           ? const DataNotFoundPage(title: 'Subject data not found')
-          : ListView.builder(
-              itemCount: listSubject!.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-                    child: Text(
-                      'List subject:',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).primaryColor,
+          : RefreshIndicator(
+              onRefresh: () async => await _reloadPage(),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+                      child: Text(
+                        'List subject:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
+                    ),
+                    SizedBox(
+                      height: 150 + 80 * (listSubject!.length + 1).toDouble(),
+                      child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        itemCount: listSubject.length,
+                        itemBuilder: (context, index) =>
+                            itemSubject(listSubject[index]),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget itemSubject(SubjectModel data) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.grey.withOpacity(0.1),
+          border: Border.all(
+            width: 0.5,
+            color: Colors.grey.withOpacity(0.4),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Subject code: ${data.code}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      'Subject Name: ${data.subjectName}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: InkWell(
+                onTap: () async {
+                  await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => _formSubjectInfo(
+                      context,
+                      isEdit: true,
+                      subjectData: data,
                     ),
                   );
-                }
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: Container(
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.grey.withOpacity(0.1),
-                      border: Border.all(
-                        width: 0.5,
-                        color: Colors.grey.withOpacity(0.4),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  'Subject code: ${listSubject[index - 1].code}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Text(
-                                  'Subject Name: ${listSubject[index - 1].subjectName}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: InkWell(
-                            onTap: () async {
-                              await showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => _formSubjectInfo(
-                                  context,
-                                  isEdit: true,
-                                  subjectData: listSubject[index - 1],
-                                ),
-                              ).whenComplete(() async {
-                                showLoading(context);
-                                setState(() {
-                                  _subjectNameController.clear();
-                                });
-                                await _reloadPage();
-                              });
-                            },
-                            child: Container(
-                              height: 34,
-                              width: 34,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(17),
-                                color: Colors.grey.withOpacity(0.3),
-                              ),
-                              child: Icon(
-                                Icons.edit_note,
-                                size: 24,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 10),
-                          child: InkWell(
-                            onTap: () {
-                              showMessageTwoOption(
-                                context,
-                                'Do you want to delete this subject?',
-                                okLabel: 'Delete',
-                                onOk: () {
-                                  showLoading(context);
-                                  _subjectBloc.add(
-                                    DeleteSubjectEvent(
-                                      (listSubject[index - 1].subjectId)!,
-                                    ),
-                                  );
-                                  Navigator.pop(context);
-                                },
-                              ).whenComplete(() async {
-                                await _reloadPage();
-                              });
-                            },
-                            child: Container(
-                              height: 34,
-                              width: 34,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(17),
-                                color: Colors.grey.withOpacity(0.3),
-                              ),
-                              child: const Icon(
-                                Icons.delete_outline,
-                                size: 24,
-                                color: Colors.red,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                },
+                child: Container(
+                  height: 34,
+                  width: 34,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(17),
+                    color: Colors.grey.withOpacity(0.3),
                   ),
-                );
-              },
+                  child: Icon(
+                    Icons.edit_note,
+                    size: 24,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: InkWell(
+                onTap: () {
+                  showMessageTwoOption(
+                    context,
+                    'Do you want to delete this subject?',
+                    okLabel: 'Delete',
+                    onOk: () async {
+                      showLoading(context);
+                      _subjectBloc.add(DeleteSubjectEvent((data.subjectId)!));
+                      Navigator.pop(context);
+                      await _reloadPage();
+                    },
+                  );
+                },
+                child: Container(
+                  height: 34,
+                  width: 34,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(17),
+                    color: Colors.grey.withOpacity(0.3),
+                  ),
+                  child: const Icon(
+                    Icons.delete_outline,
+                    size: 24,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -370,18 +380,25 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                           context, 'Subject Name can\'t be empty');
                     } else {
                       final Map<String, dynamic> data = {
-                        "code": _subjectCodeController.text.trim(),
+                        if (isEdit) "code": _subjectCodeController.text.trim(),
                         "name": _subjectNameController.text.trim()
                       };
                       isEdit
-                          ? _subjectBloc.add(
-                              EditSubjectEvent(
-                                subjectId: (subjectData?.subjectId)!,
-                                data: data,
-                              ),
+                          ? _updateSubject(
+                              context,
+                              (subjectData?.subjectId)!,
+                              data,
                             )
-                          : _subjectBloc.add(AddSubjectEvent(data: data));
-                      Navigator.pop(context);
+                          : _addSubject(context, data);
+                      // isEdit
+                      //     ? _subjectBloc.add(
+                      //         EditSubjectEvent(
+                      //           subjectId: (subjectData?.subjectId)!,
+                      //           data: data,
+                      //         ),
+                      //       )
+                      //     : _subjectBloc.add(AddSubjectEvent(data: data));
+                      // Navigator.pop(context);
                     }
                   },
                 ),
@@ -391,6 +408,56 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
         ),
       ),
     );
+  }
+
+  _addSubject(BuildContext context, Map<String, dynamic> data) async {
+    final response = await _classRepository.addSubject(data: data);
+    if (response is SubjectModel) {
+      showCupertinoMessageDialog(
+        this.context,
+        'Add new subject successfully!',
+        onClose: () async {
+          Navigator.pop(context);
+
+          await _reloadPage();
+        },
+      );
+    } else if (response is ExpiredTokenGetResponse) {
+      logoutIfNeed(this.context);
+    } else {
+      showCupertinoMessageDialog(
+        this.context,
+        'Add new subject failure!',
+      );
+    }
+  }
+
+  _updateSubject(
+    BuildContext context,
+    int subjectId,
+    Map<String, dynamic> data,
+  ) async {
+    final response = await _classRepository.editSubject(
+      subjectId: subjectId,
+      data: data,
+    );
+    if (response is SubjectModel) {
+      showCupertinoMessageDialog(
+        this.context,
+        'Update subject successfully!',
+        onClose: () async {
+          Navigator.pop(context);
+          await _reloadPage();
+        },
+      );
+    } else if (response is ExpiredTokenGetResponse) {
+      logoutIfNeed(this.context);
+    } else {
+      showCupertinoMessageDialog(
+        this.context,
+        'Update subject failure!',
+      );
+    }
   }
 
   Widget _inputText(

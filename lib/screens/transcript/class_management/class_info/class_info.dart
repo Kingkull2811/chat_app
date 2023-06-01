@@ -1,4 +1,5 @@
 import 'package:chat_app/network/model/class_model.dart';
+import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/screens/transcript/class_management/class_info/class_info_bloc.dart';
 import 'package:chat_app/screens/transcript/class_management/class_info/class_info_event.dart';
 import 'package:chat_app/screens/transcript/class_management/class_info/class_info_state.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../network/model/subject_model.dart';
+import '../../../../network/repository/class_repository.dart';
 import '../../../../theme.dart';
 import '../../../../utilities/app_constants.dart';
 import '../../../../utilities/enum/api_error_result.dart';
@@ -40,6 +42,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
   bool _showListYear = false;
 
   late ClassInfoBloc _cLassInfoBloc;
+  final _classRepository = ClassRepository();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -88,27 +91,6 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
-        }
-        if (curState.isAddSuccess) {
-          showCupertinoMessageDialog(
-            context,
-            'Add new class successfully',
-            onClose: () {
-              _codeController.clear();
-              _nameController.clear();
-              _yearController.clear();
-              listSubjectSelected = [];
-            },
-          );
-        }
-        if (curState.isUpdateSuccess) {
-          showCupertinoMessageDialog(
-            context,
-            'Update class successfully',
-            onClose: () {
-              Navigator.of(context).pop(true);
-            },
-          );
         }
       },
       builder: (context, state) {
@@ -217,7 +199,9 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
               _listSubject(listSubject),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-                child: widget.isEdit ? _buttonUpdate() : _buttonSave(),
+                child: widget.isEdit
+                    ? _buttonUpdate(context)
+                    : _buttonSave(context),
               ),
             ],
           ),
@@ -226,7 +210,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
     );
   }
 
-  Widget _buttonUpdate() {
+  Widget _buttonUpdate(BuildContext context) {
     return PrimaryButton(
       text: 'Update',
       onTap: () async {
@@ -245,24 +229,47 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
             if (widget.classInfoEdit?.classId == null) {
               showCupertinoMessageDialog(context, 'Class not found');
             }
+            showLoading(context);
+
             final Map<String, dynamic> data = {
               "code": _codeController.text.trim(),
               "name": _nameController.text.trim(),
               "subjectIds": listSubjectSelected,
               "year": _yearController.text.trim()
             };
-            _cLassInfoBloc.add(EditClassEvent(
-              classId: (widget.classInfoEdit?.classId)!,
-              data: data,
-            ));
-            // setState(() {});
+            // _cLassInfoBloc.add(EditClassEvent(
+            //   classId: (widget.classInfoEdit?.classId)!,
+            //   data: data,
+            // ));
+            final response = await _classRepository.addClass(data: data);
+            if (response is ClassModel) {
+              showCupertinoMessageDialog(
+                this.context,
+                'Update class successfully',
+                onClose: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).pop(true);
+                },
+              );
+            } else if (response is ExpiredTokenGetResponse) {
+              logoutIfNeed(this.context);
+            } else {
+              showCupertinoMessageDialog(
+                this.context,
+                'Update class failure',
+                onClose: () {
+                  Navigator.pop(context);
+                  Navigator.of(context).pop(true);
+                },
+              );
+            }
           }
         }
       },
     );
   }
 
-  Widget _buttonSave() {
+  Widget _buttonSave(BuildContext context) {
     return PrimaryButton(
       text: 'Save',
       onTap: () async {
@@ -274,13 +281,36 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
         } else {
           if (_formKey.currentState!.validate()) {
             final Map<String, dynamic> data = {
-              // "code": _codeController.text.trim(),
               "name": _nameController.text.trim(),
               "subjectIds": listSubjectSelected,
               "year": _yearController.text.trim()
             };
-            _cLassInfoBloc.add(AddClassEvent(data: data));
-            // setState(() {});
+            // _cLassInfoBloc.add(AddClassEvent(data: data));
+
+            final response = await _classRepository.addClass(data: data);
+            if (response is ClassModel) {
+              showCupertinoMessageDialog(
+                this.context,
+                'Add new class successfully',
+                onClose: () {
+                  // Navigator.of(context).pop(true);
+                  setState(() {
+                    _codeController.clear();
+                    _nameController.clear();
+                    _yearController.clear();
+                    listSubjectSelected = [];
+                  });
+                },
+              );
+            } else if (response is ExpiredTokenGetResponse) {
+              logoutIfNeed(this.context);
+            } else {
+              showCupertinoMessageDialog(
+                this.context,
+                'Add new class failure',
+                onClose: () => Navigator.pop(context),
+              );
+            }
           }
         }
       },

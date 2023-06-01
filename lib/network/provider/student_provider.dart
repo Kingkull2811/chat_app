@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/network/response/base_response.dart';
@@ -78,7 +76,6 @@ class StudentProvider with ProviderMixin {
         data: data,
         options: await defaultOptions(url: apiEditStudent),
       );
-      log(response.toString());
 
       return Student.fromJson(response.data);
     } catch (error, stacktrace) {

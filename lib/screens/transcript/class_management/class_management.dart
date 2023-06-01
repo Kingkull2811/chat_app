@@ -85,25 +85,39 @@ class _ClassManagementState extends State<ClassManagement> {
     }
     return RefreshIndicator(
       onRefresh: () async => await _reloadPage(),
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.zero,
         physics: const BouncingScrollPhysics(),
-        itemCount: listClass!.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
-              child: Text(
-                'List class:',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).primaryColor,
+        child: Padding(
+          padding: const EdgeInsets.all(0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+                child: Text(
+                  'List class:',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
-            );
-          }
-          return _createItemClass(index, listClass[index - 1]);
-        },
+              SizedBox(
+                height: 86 + 86 * (listClass!.length).toDouble(),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  scrollDirection: Axis.vertical,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: listClass.length,
+                  itemBuilder: (context, index) {
+                    return _createItemClass(index, listClass[index]);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -141,6 +155,7 @@ class _ClassManagementState extends State<ClassManagement> {
                         actions: <Widget>[
                           CupertinoActionSheetAction(
                             onPressed: () async {
+                              Navigator.pop(context);
                               await _navToEditClass(classInfo);
                             },
                             child: Text(
@@ -166,12 +181,11 @@ class _ClassManagementState extends State<ClassManagement> {
                                       content: 'Clas not found',
                                     );
                                   }
-
                                   _classManagementBloc.add(DeleteClassEvent(
                                     classId: classInfo.classId ?? 0,
                                   ));
-                                  _classManagementBloc.add(InitClassEvent());
-                                  setState(() {});
+                                  Navigator.pop(context);
+                                  await _reloadPage();
                                 },
                               );
                             },
@@ -263,6 +277,8 @@ class _ClassManagementState extends State<ClassManagement> {
     );
     if (result) {
       await _reloadPage();
+    } else {
+      return;
     }
   }
 
@@ -284,6 +300,7 @@ class _ClassManagementState extends State<ClassManagement> {
       child: SizedBox(
         height: 36 + 30 * listSubject!.length.toDouble(),
         child: ListView.builder(
+          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: listSubject.length + 1,
           itemBuilder: (context, index) {
@@ -381,8 +398,8 @@ class _ClassManagementState extends State<ClassManagement> {
                     actions: <Widget>[
                       CupertinoActionSheetAction(
                         onPressed: () async {
-                          // Navigator.pop(context);
-                          Navigator.push(
+                          Navigator.pop(context);
+                          final bool result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => BlocProvider<ClassInfoBloc>(
@@ -391,6 +408,11 @@ class _ClassManagementState extends State<ClassManagement> {
                               ),
                             ),
                           );
+                          if (result) {
+                            await _reloadPage();
+                          } else {
+                            return;
+                          }
                         },
                         child: Text(
                           'Add new class',

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/response/class_response.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -28,18 +26,13 @@ class ClassManagementBloc
           ));
         } else {
           final response = await _classRepository.getListClass();
-          // final responseSubject = await _classRepository.getListSubject();
 
-          log('class: $response');
-          // log('subject: $responseSubject');
           if (response is ClassResponse) {
             emit(state.copyWith(
               isLoading: false,
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
-            // } else if (responseSubject is SubjectResponse) {
-            // emit(state.copyWith(listSubject: responseSubject.listSubject));
           } else {
             emit(state.copyWith(
               isLoading: false,

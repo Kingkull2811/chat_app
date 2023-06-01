@@ -52,6 +52,6 @@ class Student {
 
   @override
   String toString() {
-    return 'Student{id: $id, name: $name, code: $code, dateOfBirth: $dateOfBirth, imageUrl: $imageUrl}';
+    return '\nStudent{id: $id, name: $name, code: $code, className: $className}';
   }
 }

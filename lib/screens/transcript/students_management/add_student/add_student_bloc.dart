@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/repository/class_repository.dart';
 import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/class_response.dart';
@@ -33,7 +31,7 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
           ));
         } else {
           final response = await _classRepository.getListClass();
-          log('response News: $response ');
+          // log('response News: $response ');
 
           if (response is ClassResponse) {
             emit(state.copyWith(
