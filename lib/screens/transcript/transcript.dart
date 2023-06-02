@@ -10,7 +10,6 @@ import 'package:chat_app/screens/transcript/transcript_event.dart';
 import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_page.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management_bloc.dart';
-import 'package:chat_app/screens/transcript/transcript_management/transcript_management_event.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -595,10 +594,7 @@ class TranscriptPageState extends State<TranscriptPage> {
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider<TranscriptManagementBloc>(
-            create: (context) => TranscriptManagementBloc(context)
-              ..add(
-                InitTranscriptEvent(),
-              ),
+            create: (context) => TranscriptManagementBloc(context),
             child: const TranscriptManagementPage(),
           ),
         ),

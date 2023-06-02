@@ -44,6 +44,24 @@ class StudentProvider with ProviderMixin {
     }
   }
 
+  Future<Object> getStudentByID({required int studentId}) async {
+    if (await isExpiredToken()) {
+      return ExpiredTokenGetResponse();
+    }
+    final apiGetStudentByID =
+        join(ApiPath.getStudentInfo, studentId.toString());
+    try {
+      final response = await dio.get(
+        apiGetStudentByID,
+        options: await defaultOptions(url: apiGetStudentByID),
+      );
+
+      return Student.fromJson(response.data);
+    } catch (error, stacktrace) {
+      return errorGetResponse(error, stacktrace, apiGetStudentByID);
+    }
+  }
+
   Future<Object> addStudent({required Map<String, dynamic> data}) async {
     if (await isExpiredToken()) {
       return ExpiredTokenResponse();

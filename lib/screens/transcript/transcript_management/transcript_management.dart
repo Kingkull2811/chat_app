@@ -1,6 +1,5 @@
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_subject_bloc.dart';
-import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_subject_event.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management_event.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management_state.dart';
 import 'package:chat_app/utilities/utils.dart';
@@ -188,6 +187,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.zero,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           child: state.isLoading
@@ -214,6 +214,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
       height: 170 * listStudent!.length.toDouble(),
       child: ListView.builder(
         scrollDirection: Axis.vertical,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: listStudent.length,
         itemBuilder: (context, index) => _createItemStudent(listStudent[index]),
@@ -230,28 +231,32 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
     setState(() {});
   }
 
-  _navToEnterPointPage(Student student) => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider(
-            create: (context) => EnterPointSubjectBloc(context)
-              ..add(
-                InitEvent(),
-              ),
-            child: EnterPointPage(
-              student: student,
-              schoolYear: _schoolYearController.text.trim(),
-            ),
+  Future _navToEnterPointPage(Student student) async {
+    final bool result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => EnterPointSubjectBloc(context),
+          child: EnterPointPage(
+            student: student,
+            schoolYear: _schoolYearController.text.trim(),
           ),
         ),
-      );
+      ),
+    );
+    if (result) {
+      _reloadPage();
+    } else {
+      return;
+    }
+  }
 
   Widget _createItemStudent(Student student) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: InkWell(
-        onTap: () {
-          _navToEnterPointPage(student);
+        onTap: () async {
+          await _navToEnterPointPage(student);
         },
         child: Container(
           height: 150,
@@ -456,6 +461,11 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
               onTap: () {
                 setState(() {
                   _schoolYearController.text = schoolYear[index];
+                  _transcriptBloc.add(SearchEvent(
+                    searchQuery: _searchController.text,
+                    schoolYear: _schoolYearController.text,
+                    classId: classIdSelected,
+                  ));
                 });
                 Navigator.pop(context);
               },
@@ -535,6 +545,11 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                       setState(() {
                         _classController.text = '${listClass[index].className}';
                         classIdSelected = listClass[index].classId;
+                        _transcriptBloc.add(SearchEvent(
+                          searchQuery: _searchController.text,
+                          schoolYear: _schoolYearController.text,
+                          classId: classIdSelected,
+                        ));
                       });
                       Navigator.pop(context);
                     },
@@ -595,6 +610,12 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
               setState(() {
                 _showSearchResult = false;
               });
+            } else {
+              _transcriptBloc.add(SearchEvent(
+                searchQuery: _searchController.text,
+                schoolYear: _schoolYearController.text,
+                classId: classIdSelected,
+              ));
             }
           },
           decoration: InputDecoration(

@@ -78,6 +78,7 @@ class EnterPointSubjectBloc
             id: learn.id!,
             data: data,
           );
+          //todo: remove it
           log('dataSend: $data');
           log('update: $response');
 
@@ -103,6 +104,7 @@ class EnterPointSubjectBloc
           studentID: event.studentID,
           schoolYear: event.schoolYear,
         );
+        //todo: remove it
         log('math: $mathResponse}');
 
         if (mathResponse.isOK()) {

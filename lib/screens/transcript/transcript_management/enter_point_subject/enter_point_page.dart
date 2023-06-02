@@ -87,7 +87,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
               backgroundColor: Theme.of(context).primaryColor,
               leading: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop(true);
                 },
                 child: const Icon(
                   Icons.arrow_back_ios,
@@ -225,7 +225,9 @@ class _EnterPointPageState extends State<EnterPointPage> {
                         });
                       } else {
                         showCupertinoMessageDialog(
-                            this.context, 'No change in the transcript yet.');
+                          this.context,
+                          'No change in the transcript yet.',
+                        );
                       }
                     },
                   ),
@@ -510,10 +512,15 @@ class _EnterPointPageState extends State<EnterPointPage> {
                     okLabel: "Save",
                     cancelLabel: 'Not save',
                     onCancel: () {
-                      //push data to server
                       _onTapSelectSemester(listSemester[index]);
                     },
                     onOk: () {
+                      //push data to server
+                      _enterPointSubjectBloc.add(UpdatePointEvent(
+                        listResult: listResult,
+                        schoolYear: widget.schoolYear,
+                        studentID: widget.student.id!,
+                      ));
                       _onTapSelectSemester(listSemester[index]);
                     },
                   );

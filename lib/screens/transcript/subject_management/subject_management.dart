@@ -390,8 +390,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                               data,
                             )
                           : _addSubject(context, data);
-                      // isEdit
-                      //     ? _subjectBloc.add(
+                      // isEdit? _subjectBloc.add(
                       //         EditSubjectEvent(
                       //           subjectId: (subjectData?.subjectId)!,
                       //           data: data,

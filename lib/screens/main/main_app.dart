@@ -276,25 +276,19 @@ class MainAppState extends State<MainApp>
       case 0:
         currentTab = BlocProvider(
           create: (context) => ChatsBloc(context)..add(ChatInit()),
-          child: const ChatsPage(
-              // key: DatabaseService().chatKey,
-              ),
+          child: const ChatsPage(),
         );
         break;
       case 1:
         currentTab = BlocProvider<NewsBloc>(
           create: (context) => NewsBloc(context),
-          child: const NewsPage(
-              // key: DatabaseService().newsKey,
-              ),
+          child: const NewsPage(),
         );
         break;
       case 2:
         currentTab = BlocProvider<TranscriptBloc>(
           create: (context) => TranscriptBloc(context),
-          child: const TranscriptPage(
-              // key: DatabaseService().transcriptKey,
-              ),
+          child: const TranscriptPage(),
         );
         break;
       case 3:
@@ -303,9 +297,7 @@ class MainAppState extends State<MainApp>
       default:
         currentTab = BlocProvider(
           create: (context) => ChatsBloc(context),
-          child: const ChatsPage(
-              // key: DatabaseService().chatKey,
-              ),
+          child: const ChatsPage(),
         );
     }
     return currentTab;

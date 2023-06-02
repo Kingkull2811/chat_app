@@ -1,4 +1,5 @@
 import 'package:chat_app/network/model/student.dart';
+import 'package:chat_app/network/repository/student_repository.dart';
 import 'package:chat_app/screens/transcript/students_management/add_student/add_student.dart';
 import 'package:chat_app/screens/transcript/students_management/add_student/add_student_bloc.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management_state.dart';
@@ -201,7 +202,10 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: () async {
-          await _navToAddStudent(isEdit: true, student: student);
+          final response = await StudentRepository().getStudentByID(
+            studentID: student.id!,
+          );
+          await _navToAddStudent(isEdit: true, student: response as Student);
         },
         child: Container(
           height: 190,
