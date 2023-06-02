@@ -1,5 +1,6 @@
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
+import 'package:chat_app/services/awesome_notification.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -77,7 +78,8 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
             'phone': response.phone,
             'fileUrl': response.fileUrl,
             'parentOf': listToFirestore,
-            'fcm_token': SharedPreferencesStorage().getFCMToken(),
+            'fcm_token': await AwesomeNotification().requestFirebaseToken(),
+            // 'fcm_token': SharedPreferencesStorage().getFCMToken(),
           };
 
           await FirebaseService().uploadUserData(

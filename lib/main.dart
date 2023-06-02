@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/services/notification_services.dart';
+import 'package:chat_app/services/awesome_notification.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,6 +27,12 @@ void main() async {
   _removeBadgeWhenOpenApp();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize cho Local Notification
+  await AwesomeNotification.initializeLocalNotifications(debug: true);
+
+  // Initialize cho Push Notification
+  await AwesomeNotification.initializeRemoteNotifications(debug: true);
 
   // Init SharedPreferences storage
   await SharedPreferencesStorage.init();
@@ -54,23 +60,26 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
 
-  NotificationServices notificationServices = NotificationServices();
+  // NotificationServices notificationServices = NotificationServices();
 
   @override
   void initState() {
     getUserLoggedInStatus();
     super.initState();
-    notificationServices.requestNotificationPermission();
-    notificationServices.foregroundMessage();
-    notificationServices.firebaseInit(context);
-    notificationServices.setupInteractMessage(context);
-    notificationServices.isTokenRefresh();
+    // notificationServices.requestNotificationPermission();
+    // notificationServices.foregroundMessage();
+    // notificationServices.firebaseInit(context);
+    // notificationServices.setupInteractMessage(context);
+    // notificationServices.isTokenRefresh();
+    //
+    // notificationServices.getDeviceToken().then((value) async {
+    //   if (kDebugMode) {
+    //     // print('device FCMToken: $value');
+    //   }
+    // });
 
-    notificationServices.getDeviceToken().then((value) async {
-      if (kDebugMode) {
-        // print('device FCMToken: $value');
-      }
-    });
+    AwesomeNotification().checkPermission();
+    AwesomeNotification().requestFirebaseToken();
   }
 
   @override

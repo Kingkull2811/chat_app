@@ -27,7 +27,7 @@ class ChatModel {
       receiverId: json['receiver_id'],
       receiverAvt: json['receiver_avt'],
       receiverName: json['receiver_name'],
-      lastMessage: json['last_message'],
+      lastMessage: json['last_message']??'',
       messageType: getMessageType(json['messes_type']),
       time: json['time'],
       receiverFcmToken: json['fcm_token'],

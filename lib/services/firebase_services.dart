@@ -17,6 +17,7 @@ import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
 import '../network/repository/push_notification_repository.dart';
 import '../utilities/enum/message_type.dart';
+import 'awesome_notification.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -45,8 +46,8 @@ class FirebaseService {
       return;
     }
     channel = const AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
+      'kull_chat', // id
+      'kull_chat', // title
       description:
           'This channel is used for important notifications.', // description
       importance: Importance.high,
@@ -270,7 +271,8 @@ class FirebaseService {
                   .doc(docID)
                   .update(
                 {
-                  'fcm_token_$currentUserId': _prefs.getFCMToken(),
+                  'fcm_token_$currentUserId':
+                      await AwesomeNotification().requestFirebaseToken(),
                   'fcm_token_$receiverId': receiverFCMToken,
                 },
               );
@@ -289,7 +291,8 @@ class FirebaseService {
                     currentUserId.toString(): _prefs.getImageAvartarUrl(),
                     receiverId: receiverAvt,
                   },
-                  'fcm_token_$currentUserId': _prefs.getFCMToken(),
+                  'fcm_token_$currentUserId':
+                      await AwesomeNotification().requestFirebaseToken(),
                   'fcm_token_$receiverId': receiverFCMToken,
                   'time': Timestamp.now(),
                 },
@@ -321,6 +324,7 @@ class FirebaseService {
     required var docID,
     required String messageText,
     required int currentUserId,
+    required String receiverFCMToken,
   }) async {
     final MessageModel message = MessageModel(
       fromId: currentUserId,
@@ -350,16 +354,28 @@ class FirebaseService {
         'message_type': setMessageType(message.messageType)
       },
     );
+
+    await sendPushNotification(
+      receiverFCMToken: receiverFCMToken,
+      senderName: _prefs.getFullName(),
+      message: message.message,
+    );
   }
 
-  Future<void> sendImageMessage(var docID, String imagePath) async {
+  Future<void> sendImageMessage(
+    var docID,
+    String imagePath,
+    receiverFCMToken,
+  ) async {
+    final imageUrl = await FirebaseService().uploadImageToStorage(
+      titleName: 'image_message',
+      childFolder: AppConstants.imageMessageChild,
+      image: File(imagePath),
+    );
+
     MessageModel message = MessageModel(
       fromId: _prefs.getUserId(),
-      message: await FirebaseService().uploadImageToStorage(
-        titleName: 'image_message',
-        childFolder: AppConstants.imageMessageChild,
-        image: File(imagePath),
-      ),
+      message: imageUrl,
       messageType: MessageType.image,
       time: Timestamp.now(),
     );
@@ -385,30 +401,34 @@ class FirebaseService {
         'message_type': setMessageType(message.messageType)
       },
     );
+
+    await sendPushNotification(
+      receiverFCMToken: receiverFCMToken,
+      senderName: _prefs.getFullName(),
+      imageUrl: imageUrl,
+    );
   }
 
   Future<void> sendPushNotification({
     required String receiverFCMToken,
     required String senderName,
-    required String message,
+    String? message,
+    String? imageUrl,
   }) async {
-    final data = {
-      'to': receiverFCMToken,
+    Map<String, dynamic> data = {
+      "to": receiverFCMToken,
       "notification": {
-        "body": message,
-        "title": senderName, //our name should be send
-        // "android_channel_id": "chats"
+        if (message != null) "body": message,
+        "title": senderName,
+        "sound": true,
+        if (imageUrl != null) 'image': imageUrl,
       },
+      "data": {"content_type": "notification", "value": 1},
+      "content_available": true,
+      "priority": "high"
     };
-    //onTap:
-    // _messaging.subscribeToTopic('topic');
-    log('dataSendL $data');
 
-    await PushNotificationRepository().messagePN(
-      fcmToken: receiverFCMToken,
-      title: senderName,
-      message: message,
-    );
+    await PushNotificationRepository().messagePN(data: data);
 
     ///send to api fcmGoogle
     // final data2 = {
@@ -512,7 +532,9 @@ class FirebaseService {
       await _firestore
           .collection(AppConstants.userCollection)
           .doc('user_id_$userId')
-          .update({'fcm_token': _prefs.getFCMToken()});
+          .update({
+        'fcm_token': await AwesomeNotification().requestFirebaseToken()
+      });
     }
 
     if (isNotNullOrEmpty(docID)) {
@@ -521,12 +543,11 @@ class FirebaseService {
           .doc(docID)
           .update(
         {
-          'fcm_token_${_prefs.getUserId()}': _prefs.getFCMToken().toString(),
+          'fcm_token_${_prefs.getUserId()}':
+              await AwesomeNotification().requestFirebaseToken(),
         },
       );
     }
-    //todo
-    print('device token: ${_prefs.getFCMToken()}');
   }
 
   String constructFCMPayload(String? token) {
