@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/main/main_app.dart';
@@ -10,7 +12,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../authenticator/fill_profile/fill_profile.dart';
 import '../authenticator/fill_profile/fill_profile_bloc.dart';
-import '../authenticator/fill_profile/fill_profile_event.dart';
 
 class OnBoarding3Page extends StatefulWidget {
   const OnBoarding3Page({
@@ -78,16 +79,19 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                 final userInfo = await AuthRepository().getUserInfo(
                   userId: SharedPreferencesStorage().getUserId(),
                 );
+                log('user: $userInfo');
+
                 if (userInfo is UserInfoModel) {
+                  log('nav to Main or Fill');
                   await SharedPreferencesStorage()
                       .setFullName(userInfo.fullName ?? '');
                   await SharedPreferencesStorage()
                       .setImageAvartarUrl(userInfo.fileUrl ?? '');
-                  if (!mounted) {}
-                  const Duration(milliseconds: 500);
-                  userInfo.isFillProfileKey == true
+                  userInfo.isFillProfileKey
                       ? _navigateToMainPage()
                       : _navigateToFillProfilePage(userInfo);
+                } else {
+                  log(userInfo.toString());
                 }
               },
             ),
@@ -97,17 +101,16 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
     );
   }
 
-  _navigateToFillProfilePage(UserInfoModel userInfo) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BlocProvider<FillProfileBloc>(
-          create: (context) => FillProfileBloc(context)..add(FillInit()),
-          child: FillProfilePage(userInfo: userInfo),
+  _navigateToFillProfilePage(UserInfoModel userInfo) => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider<FillProfileBloc>(
+            create: (context) => FillProfileBloc(context),
+            child: FillProfilePage(userInfo: userInfo),
+          ),
         ),
-      ),
-    );
-  }
+        // (route) => true,
+      );
 
   _navigateToMainPage() => Navigator.pushReplacement(
         context,

@@ -230,16 +230,16 @@ class _MessageViewState extends State<MessageView> {
                 color: AppColors.primaryColor,
               ),
             ),
-            GestureDetector(
-              onTap: () {},
-              onLongPress: () async {},
-              onLongPressEnd: (_) {},
-              child: const Icon(
-                Icons.mic_none_outlined,
-                size: 30,
-                color: AppColors.primaryColor,
-              ),
-            ),
+            // GestureDetector(
+            //   onTap: () {},
+            //   onLongPress: () async {},
+            //   onLongPressEnd: (_) {},
+            //   child: const Icon(
+            //     Icons.mic_none_outlined,
+            //     size: 30,
+            //     color: AppColors.primaryColor,
+            //   ),
+            // ),
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,

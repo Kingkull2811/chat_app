@@ -25,7 +25,6 @@ import '../../../../widgets/animation_loading.dart';
 import '../../../../widgets/custom_check_box.dart';
 import '../../fill_profile/fill_profile.dart';
 import '../../fill_profile/fill_profile_bloc.dart';
-import '../../fill_profile/fill_profile_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormPage extends StatefulWidget {
@@ -53,6 +52,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
   final AuthRepository _authRepository = AuthRepository();
 
   final _formKey = GlobalKey<FormState>();
+
+  final SharedPreferencesStorage _pref = SharedPreferencesStorage();
 
   @override
   void initState() {
@@ -221,25 +222,24 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   Future<void> _goToTermPolicy(BuildContext context) async {
-    SharedPreferencesStorage().setLoggedOutStatus(false);
-    bool agreedWithTerms = SharedPreferencesStorage().getAgreedWithTerms();
+    _pref.setLoggedOutStatus(false);
+    bool agreedWithTerms = _pref.getAgreedWithTerms();
     if (mounted) {
       if (!agreedWithTerms) {
         _navigateToTerm();
       } else {
-        // showLoading(context);
-        final userInfo = await _authRepository.getUserInfo(
-            userId: SharedPreferencesStorage().getUserId());
+        final userInfo =
+            await _authRepository.getUserInfo(userId: _pref.getUserId());
         if (userInfo is UserInfoModel) {
-          await SharedPreferencesStorage().setFullName(userInfo.fullName ?? '');
-          await SharedPreferencesStorage().setImageAvartarUrl(
+          await _pref.setFullName(userInfo.fullName ?? '');
+          await _pref.setImageAvartarUrl(
             userInfo.fileUrl ?? '',
           );
 
           //navigate
           userInfo.isFillProfileKey
-              ? _navigateToMainPage()
-              : _navigateToFillProfilePage(userInfo);
+              ? await _navigateToMainPage()
+              : await _navigateToFillProfilePage(userInfo);
         } else if (userInfo is ExpiredTokenGetResponse) {
           logoutIfNeed(this.context);
         } else {
@@ -259,7 +259,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider<FillProfileBloc>(
-            create: (context) => FillProfileBloc(context)..add(FillInit()),
+            create: (context) => FillProfileBloc(context),
             child: FillProfilePage(userInfo: userInfo),
           ),
         ),
@@ -268,7 +268,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   _navigateToTerm() => Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => const TermPolicyPage()));
 
-  _navigateToMainPage() => Navigator.pushReplacement(
+  _navigateToMainPage() async => await Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)));
 
   _buildBiometricsButton(LoginFormState currentState) {
@@ -318,7 +318,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   Future<void> _handleButtonLogin(BuildContext context) async {
-    await SharedPreferencesStorage().setRememberInfo(_rememberInfo);
+    await _pref.setRememberInfo(_rememberInfo);
 
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none && mounted) {
@@ -330,8 +330,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
         password: _inputPasswordController.text,
       );
       if (response.httpStatus == 200) {
-        await SharedPreferencesStorage().setRememberInfo(true);
-        await SharedPreferencesStorage().setSaveUserInfo(response.data);
+        await _pref.setRememberInfo(true);
+        await _pref.setSaveUserInfo(response.data);
         Future.delayed(
           const Duration(seconds: 2),
           () async => await _goToTermPolicy(context),

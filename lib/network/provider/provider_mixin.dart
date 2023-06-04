@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../utilities/app_constants.dart';
 import '../../utilities/secure_storage.dart';
 import '../../utilities/utils.dart';
+import '../model/error.dart';
 import '../response/base_response.dart';
 import 'auth_provider.dart';
 
@@ -38,7 +39,7 @@ mixin ProviderMixin {
     showErrorLog(error, stacktrace, apiPath);
 
     return BaseResponse.withHttpError(
-      errors: (error is DioError) ? error.response?.data : [],
+      errors: (error is DioError) ? error.response?.data as List<Errors> : [],
       httpStatus: (error is DioError) ? error.response?.statusCode : null,
     );
   }

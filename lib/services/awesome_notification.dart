@@ -10,20 +10,21 @@ class AwesomeNotification {
   static Future<void> initializeLocalNotifications(
       {required bool debug}) async {
     await AwesomeNotifications().initialize(
-        null,
-        [
-          NotificationChannel(
-            channelKey: 'kull_chat',
-            channelName: 'kull_chat',
-            channelDescription: 'Notification tests as alerts',
-            playSound: true,
-            importance: NotificationImportance.High,
-            defaultPrivacy: NotificationPrivacy.Private,
-            defaultColor: AppColors.primaryColor,
-            ledColor: Colors.white,
-          )
-        ],
-        debug: debug);
+      null,
+      [
+        NotificationChannel(
+          channelKey: 'kull_chat',
+          channelName: 'kull_chat',
+          channelDescription: 'Notification tests as alerts',
+          playSound: true,
+          importance: NotificationImportance.High,
+          defaultPrivacy: NotificationPrivacy.Private,
+          defaultColor: AppColors.primaryColor,
+          ledColor: Colors.white,
+        )
+      ],
+      debug: debug,
+    );
   }
 
   // init Push Notification.

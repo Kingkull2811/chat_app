@@ -9,6 +9,7 @@ import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
+import '../../services/awesome_notification.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../response/base_get_response.dart';
 import '../response/login_response.dart';
@@ -63,7 +64,11 @@ class AuthProvider with ProviderMixin {
     try {
       final response = await dio.post(
         ApiPath.login,
-        data: {"password": password, "username": username},
+        data: {
+          "deviceToken": await AwesomeNotification().requestFirebaseToken(),
+          "password": password,
+          "username": username,
+        },
       );
 
       return LoginResponse.fromJson(response.data);
@@ -96,11 +101,9 @@ class AuthProvider with ProviderMixin {
     }
   }
 
-  Future<Object> getUserInfo({
-    required int userId,
-  }) async {
+  Future<Object> getUserInfo({required int userId}) async {
     if (await isExpiredToken()) {
-      return ExpiredTokenGetResponse();
+      return ExpiredTokenResponse();
     }
     final String apiGetProfile = join(ApiPath.fillProfile, userId.toString());
 
@@ -110,10 +113,10 @@ class AuthProvider with ProviderMixin {
         options: await defaultOptions(url: apiGetProfile),
       );
 
+      log('response: ${response.data}');
       return UserInfoModel.fromJson(response.data);
     } catch (error, stacktrace) {
-      log(error.toString(), stackTrace: stacktrace);
-      return UserInfoModel();
+      return errorResponse(error, stacktrace, apiGetProfile);
     }
   }
 
