@@ -224,6 +224,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   Future<void> _goToTermPolicy(BuildContext context) async {
     _pref.setLoggedOutStatus(false);
     bool agreedWithTerms = _pref.getAgreedWithTerms();
+
     if (mounted) {
       if (!agreedWithTerms) {
         _navigateToTerm();
@@ -324,7 +325,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
     if (connectivityResult == ConnectivityResult.none && mounted) {
       showMessageNoInternetDialog(context);
     } else {
-      _loginFormBloc.add(DisplayLoading());
+      // _loginFormBloc.add(DisplayLoading());
+      showLoading(context);
       final response = await _authRepository.login(
         username: _inputUsernameController.text,
         password: _inputPasswordController.text,

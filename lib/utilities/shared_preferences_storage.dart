@@ -190,5 +190,16 @@ class SharedPreferencesStorage {
     return _prefs.getBool(AppConstants.vibrateModeKey);
   }
 
-  ///
+  ///----------------notify-----------
+  void removeNotificationDestination() {
+    _prefs.remove(AppConstants.notificationDestination);
+  }
+
+  void setNotificationDestination({required String destination}) {
+    _prefs.setString(AppConstants.notificationDestination, destination);
+  }
+
+  String getNotificationDestination() {
+    return _prefs.getString(AppConstants.notificationDestination) ?? '';
+  }
 }

@@ -16,6 +16,7 @@ dependencies:
   cloud_firestore: ^4.7.1
   firebase_core: ^2.13.0
   firebase_storage: ^11.2.1
+  firebase_crashlytics: ^3.3.0
   firebase_messaging: ^14.6.1
   firebase_in_app_messaging: ^0.7.3+1
 
@@ -35,6 +36,9 @@ dependencies:
   shared_preferences: ^2.1.1
 
   google_fonts: ^4.0.4
+
+  # Flutter library to extend the capabilities of Dart Streams and StreamController
+  rxdart: ^0.27.7
 
   # A string-based path manipulation library.
   path: ^1.8.2
@@ -148,8 +152,9 @@ flutter_icons:
 flutter:
 
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/images/
     - assets/sound/
-    #- i18n/
+    - l18n/

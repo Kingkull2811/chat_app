@@ -1,5 +1,6 @@
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../utilities/app_constants.dart';
@@ -31,7 +32,17 @@ mixin ProviderMixin {
       }
       print("\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace");
     } else {
-      //record log to firebase crashlytics here}
+      //record log to firebase crashlytics here
+      FirebaseCrashlytics.instance.setCustomKey("$error", "ERROR in $apiPath");
+
+      FirebaseCrashlytics.instance.recordError(
+        "$error",
+        stacktrace,
+        reason: 'fatal',
+      );
+
+      FirebaseCrashlytics.instance.log(
+          "EXCEPTION OCCURRED: $apiPath\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace");
     }
   }
 

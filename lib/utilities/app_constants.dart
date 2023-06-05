@@ -22,6 +22,8 @@ class AppConstants {
 
   static const int maxConnectionPerHost = 16;
 
+  static const String notificationDestination = 'NOTIFICATION_DESTINATION';
+
   static const String rememberInfo = 'REMEMBER_INFO';
   static const String isLoggedOut = 'IS_LOGGED_OUT';
   static const String refreshTokenKey = 'REFRESH_TOKEN';

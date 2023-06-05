@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/api/api_path.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
@@ -113,7 +111,6 @@ class AuthProvider with ProviderMixin {
         options: await defaultOptions(url: apiGetProfile),
       );
 
-      log('response: ${response.data}');
       return UserInfoModel.fromJson(response.data);
     } catch (error, stacktrace) {
       return errorResponse(error, stacktrace, apiGetProfile);

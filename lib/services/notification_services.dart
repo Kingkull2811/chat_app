@@ -182,4 +182,16 @@ class NotificationServices {
       sound: true,
     );
   }
+
+  static Future<void> subscribeTopicForCurrentUser() async {
+    await FirebaseMessaging.instance.subscribeToTopic(
+      'KULL_CHAT_APP',
+    );
+  }
+
+  static Future<void> unsubscribeTopicForCurrentUser() async {
+    await FirebaseMessaging.instance.unsubscribeFromTopic(
+      'KULL_CHAT_APP',
+    );
+  }
 }
