@@ -9,6 +9,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -29,15 +30,20 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // Initialize cho Local Notification
-  await AwesomeNotification.initializeLocalNotifications(debug: true);
+  await AwesomeNotification.initializeLocalNotifications();
 
   // Initialize cho Push Notification
-  await AwesomeNotification.initializeRemoteNotifications(debug: true);
+  await AwesomeNotification.initializeRemoteNotifications();
+  // await AwesomeNotification.interceptInitialCallActionRequest();
 
   // Init SharedPreferences storage
   await SharedPreferencesStorage.init();
 
-  runApp(MyApp(/*appTheme: AppTheme(),*/));
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  runApp(const MyApp(/*appTheme: AppTheme(),*/));
 }
 
 _removeBadgeWhenOpenApp() async {
@@ -49,9 +55,9 @@ _removeBadgeWhenOpenApp() async {
 
 class MyApp extends StatefulWidget {
   //final AppTheme appTheme;
-  final navigatorKey = GlobalKey<NavigatorState>();
+  static final navigatorKey = GlobalKey<NavigatorState>();
 
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   State<StatefulWidget> createState() => _MyAppState();
@@ -60,26 +66,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
 
-  // NotificationServices notificationServices = NotificationServices();
-
   @override
   void initState() {
     getUserLoggedInStatus();
     super.initState();
-    // notificationServices.requestNotificationPermission();
-    // notificationServices.foregroundMessage();
-    // notificationServices.firebaseInit(context);
-    // notificationServices.setupInteractMessage(context);
-    // notificationServices.isTokenRefresh();
-    //
-    // notificationServices.getDeviceToken().then((value) async {
-    //   if (kDebugMode) {
-    //     // print('device FCMToken: $value');
-    //   }
-    // });
-
     AwesomeNotification().checkPermission();
     AwesomeNotification().requestFirebaseToken();
+    // AwesomeNotification.initializeNotificationsEventListeners();
   }
 
   @override
@@ -130,6 +123,10 @@ class _MyAppState extends State<MyApp> {
           ),
     );
 
+    String initialRoute = AwesomeNotification.initialCallAction == null
+        ? AppRoutes.main
+        : AppRoutes.callPage;
+
     return MaterialApp(
       //theme: AppTheme().light,
       theme: theme,
@@ -137,7 +134,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       //debugShowCheckedModeBanner: false,
-      navigatorKey: widget.navigatorKey,
+      navigatorKey: MyApp.navigatorKey,
       localizationsDelegates: const [
         //AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -147,6 +144,7 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
       routes: AppRoutes().routes(context, isLoggedIn: _isLoggedIn),
+      initialRoute: initialRoute,
     );
   }
 }
