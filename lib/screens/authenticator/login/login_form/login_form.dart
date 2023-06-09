@@ -228,8 +228,10 @@ class _LoginFormPageState extends State<LoginFormPage> {
       if (!agreedWithTerms) {
         _navigateToTerm();
       } else {
-        final userInfo =
-            await _authRepository.getUserInfo(userId: _pref.getUserId());
+        final userInfo = await _authRepository.getUserInfo(
+          userId: _pref.getUserId(),
+        );
+
         if (userInfo is UserInfoModel) {
           await _pref.setFullName(userInfo.fullName ?? '');
           await _pref.setImageAvartarUrl(
@@ -329,13 +331,21 @@ class _LoginFormPageState extends State<LoginFormPage> {
         username: _inputUsernameController.text,
         password: _inputPasswordController.text,
       );
+
       if (response.httpStatus == 200) {
+        if (response.data == null) {
+          showCupertinoMessageDialog(
+            this.context,
+            'Error',
+            content: 'Something is wrong, please try again later!',
+            onClose: () {
+              _loginFormBloc.add(ValidateForm());
+            },
+          );
+        }
         await _pref.setRememberInfo(true);
         await _pref.setSaveUserInfo(response.data);
-        Future.delayed(
-          const Duration(seconds: 2),
-          () async => await _goToTermPolicy(context),
-        );
+        await _goToTermPolicy(this.context);
       } else {
         showCupertinoMessageDialog(
           this.context,

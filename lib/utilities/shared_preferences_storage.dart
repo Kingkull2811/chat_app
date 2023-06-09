@@ -3,7 +3,7 @@ import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../network/response/token_data_response.dart';
+import '../network/model/refresh_token_model.dart';
 import 'app_constants.dart';
 
 class SharedPreferencesStorage {
@@ -42,13 +42,6 @@ class SharedPreferencesStorage {
   bool getAgreedWithTerms() =>
       _prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
 
-  ///----------------FCM token---------------
-
-  Future<void> setFCMToken(String token) async =>
-      await _prefs.setString(AppConstants.fcmTokenKey, token);
-
-  String getFCMToken() => _prefs.getString(AppConstants.fcmTokenKey) ?? '';
-
   ///-----------------SET USER INFO--------------------
 
   Future<void> setFullName(String fullName) async =>
@@ -60,10 +53,15 @@ class SharedPreferencesStorage {
       await _secureStorage.setRefreshToken(refreshT: signInData.refreshToken);
 
       await _prefs.setString(
-          AppConstants.accessTokenExpiredKey, signInData.expiredAccessToken);
-
+        AppConstants.accessTokenExpiredKey,
+        signInData.expiredAccessToken,
+        // '2023-06-08T18:24:00.000',
+      );
       await _prefs.setString(
-          AppConstants.refreshTokenExpiredKey, signInData.expiredRefreshToken);
+        AppConstants.refreshTokenExpiredKey,
+        signInData.expiredRefreshToken,
+        // '2023-06-08T18:25:00.000',
+      );
 
       await _prefs.setString(AppConstants.usernameKey, signInData.username);
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
@@ -77,13 +75,22 @@ class SharedPreferencesStorage {
   }
 
   Future<void> saveInfoWhenRefreshToken({
-    required TokenDataResponse? data,
+    required RefreshTokenModel? data,
   }) async {
     if (data != null) {
-      await _secureStorage.setAccessToken(accessToken: data.accessToken!);
-      await _secureStorage.setRefreshToken(refreshT: data.refreshToken!);
-      await _prefs.setString(
-          AppConstants.accessTokenExpiredKey, data.expiredAccessToken ?? '');
+      if (data.accessToken != null) {
+        await _secureStorage.setAccessToken(accessToken: data.accessToken!);
+      }
+      if (data.refreshToken != null) {
+        await _secureStorage.setRefreshToken(refreshT: data.refreshToken!);
+      }
+      if (data.expiredAccessToken != null) {
+        await _prefs.setString(
+          AppConstants.accessTokenExpiredKey,
+          data.expiredAccessToken!,
+          // '2023-06-08T18:26:00.000',
+        );
+      }
     }
   }
 
@@ -189,6 +196,4 @@ class SharedPreferencesStorage {
   bool? getVibrateMode() {
     return _prefs.getBool(AppConstants.vibrateModeKey);
   }
-
-  ///
 }

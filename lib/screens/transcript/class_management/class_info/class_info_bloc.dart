@@ -36,7 +36,6 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
               listSubject: response.listSubject,
             ));
           } else if (response is ExpiredTokenGetResponse) {
-            Navigator.pop(this.context);
             logoutIfNeed(this.context);
             return;
           } else {
@@ -57,7 +56,6 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
             isAddSuccess: true,
           ));
         } else if (response is ExpiredTokenGetResponse) {
-          Navigator.pop(this.context);
           logoutIfNeed(this.context);
           return;
         } else {
@@ -80,7 +78,6 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
             isUpdateSuccess: true,
           ));
         } else if (response is ExpiredTokenGetResponse) {
-          Navigator.pop(this.context);
           logoutIfNeed(this.context);
           return;
         } else {

@@ -161,6 +161,7 @@ String formatDateTime(DateTime? time) {
 
 MediaType getMediaType(int type) {
   switch (type) {
+    case 0:
     case 1:
       return MediaType.image;
     case 2:

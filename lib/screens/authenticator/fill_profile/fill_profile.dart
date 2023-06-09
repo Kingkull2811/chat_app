@@ -259,11 +259,16 @@ class _FillProfilePageState extends State<FillProfilePage> {
         List<int?> listStudentIdSelected =
             listStudent.map((e) => e.id).toList();
 
-        final String image = await FirebaseService().uploadImageToStorage(
-          titleName: 'image_profile_${SharedPreferencesStorage().getUserId()}',
-          childFolder: AppConstants.imageProfilesChild,
-          image: File(_image!),
-        );
+        String image = '';
+
+        if (!_isOnline) {
+          image = await FirebaseService().uploadImageToStorage(
+            titleName:
+                'image_profile_${SharedPreferencesStorage().getUserId()}',
+            childFolder: AppConstants.imageProfilesChild,
+            image: File(_image!),
+          );
+        }
 
         final Map<String, dynamic> userMap = {
           "fileUrl": _isOnline ? info?.fileUrl : image,

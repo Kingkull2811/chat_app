@@ -13,9 +13,14 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../services/notification_controller.dart';
+import '../../../services/permission.dart';
 import '../../../theme.dart';
+import '../../../utilities/call_utils.dart';
+import '../../../utilities/enum/call_type.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/app_image.dart';
+import '../call/call_incoming/call_incoming.dart';
 import '../chat_info/chat_info.dart';
 
 class MessageView extends StatefulWidget {
@@ -39,6 +44,8 @@ class _MessageViewState extends State<MessageView> {
   final _inputTextController = TextEditingController();
 
   var docID;
+
+  final _pref = SharedPreferencesStorage();
 
   final int currentUserId = SharedPreferencesStorage().getUserId();
 
@@ -85,17 +92,19 @@ class _MessageViewState extends State<MessageView> {
             return Future.value(true);
           }
         },
-        child: Scaffold(
-          appBar: _appBar(),
-          resizeToAvoidBottomInset: true,
-          body: Column(
-            children: <Widget>[
-              Expanded(
-                child: _bodyChat(),
-              ),
-              _chatInput(),
-              _emojiPick(),
-            ],
+        child: CallIncomingPage(
+          scaffold: Scaffold(
+            appBar: _appBar(),
+            resizeToAvoidBottomInset: true,
+            body: Column(
+              children: <Widget>[
+                Expanded(
+                  child: _bodyChat(),
+                ),
+                _chatInput(),
+                _emojiPick(),
+              ],
+            ),
           ),
         ),
       ),
@@ -368,7 +377,7 @@ class _MessageViewState extends State<MessageView> {
     BuildContext context,
     MessageModel message,
   ) {
-    final isMe = message.fromId == SharedPreferencesStorage().getUserId();
+    final isMe = message.fromId == _pref.getUserId();
     Widget messageContain(MessageModel itemMessage) {
       switch (itemMessage.messageType) {
         case MessageType.text:
@@ -707,6 +716,50 @@ class _MessageViewState extends State<MessageView> {
         ],
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.phone, size: 24, color: Colors.white),
+          onPressed: () async =>
+              await PermissionsServices.microphonePermissionsGranted()
+                  ? CallUtils.dialVoice(
+                      context: context,
+                      isFromChat: true,
+                      callerId: _pref.getUserId().toString(),
+                      callerName: _pref.getFullName(),
+                      callerPic: _pref.getImageAvartarUrl(),
+                      callerFCMToken:
+                          await NotificationController.requestFirebaseToken(),
+                      receiverId: widget.receiverId,
+                      receiverName: widget.receiverName,
+                      receiverPic: widget.receiverAvt,
+                      receiverFCMToken: widget.receiverFCMToken,
+                      callType: CallType.call_audio,
+                    )
+                  : {},
+        ),
+        IconButton(
+          icon: const Icon(
+            CupertinoIcons.video_camera_solid,
+            size: 24,
+            color: Colors.white,
+          ),
+          onPressed: () async =>
+              await PermissionsServices.cameraAndMicrophonePermissionsGranted()
+                  ? CallUtils.dialVideo(
+                      context: context,
+                      isFromChat: true,
+                      callerId: _pref.getUserId().toString(),
+                      callerName: _pref.getFullName(),
+                      callerPic: _pref.getImageAvartarUrl(),
+                      callerFCMToken:
+                          await NotificationController.requestFirebaseToken(),
+                      receiverId: widget.receiverId,
+                      receiverName: widget.receiverName,
+                      receiverPic: widget.receiverAvt,
+                      receiverFCMToken: widget.receiverFCMToken,
+                      callType: CallType.call_video,
+                    )
+                  : {},
+        ),
         IconButton(
           icon: const Icon(
             Icons.info_outline,

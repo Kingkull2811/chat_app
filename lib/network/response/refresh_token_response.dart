@@ -1,9 +1,9 @@
 import 'package:chat_app/network/model/error.dart';
+import 'package:chat_app/network/model/refresh_token_model.dart';
 import 'package:chat_app/network/response/base_response.dart';
-import 'package:chat_app/network/response/token_data_response.dart';
 
 class RefreshTokenResponse extends BaseResponse {
-  final TokenDataResponse? data;
+  final RefreshTokenModel? data;
 
   RefreshTokenResponse({
     int? httpStatus,
@@ -20,7 +20,7 @@ class RefreshTokenResponse extends BaseResponse {
       httpStatus: json["httpStatus"],
       message: json["message"],
       errors: errors,
-      data: TokenDataResponse.fromJson(json["data"]),
+      data: RefreshTokenModel.fromJson(json["data"]),
     );
   }
 

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/main/main_app.dart';
@@ -79,10 +77,10 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                 final userInfo = await AuthRepository().getUserInfo(
                   userId: SharedPreferencesStorage().getUserId(),
                 );
-                log('user: $userInfo');
+                // log('user: $userInfo');
 
                 if (userInfo is UserInfoModel) {
-                  log('nav to Main or Fill');
+                  // log('nav to Main or Fill');
                   await SharedPreferencesStorage()
                       .setFullName(userInfo.fullName ?? '');
                   await SharedPreferencesStorage()
@@ -91,7 +89,7 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                       ? _navigateToMainPage()
                       : _navigateToFillProfilePage(userInfo);
                 } else {
-                  log(userInfo.toString());
+                  // log(userInfo.toString());
                 }
               },
             ),

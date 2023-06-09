@@ -16,7 +16,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utilities/screen_utilities.dart';
 
 class ChatsPage extends StatefulWidget {
-  const ChatsPage({Key? key}) : super(key: key);
+  final bool toContact;
+
+  const ChatsPage({Key? key, this.toContact = false}) : super(key: key);
 
   @override
   State<ChatsPage> createState() => ChatsPageState();
@@ -35,7 +37,11 @@ class ChatsPageState extends State<ChatsPage>
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.toContact ? 1 : 0,
+    );
     _chatsBloc = BlocProvider.of<ChatsBloc>(context)..add(ChatInit());
     super.initState();
   }

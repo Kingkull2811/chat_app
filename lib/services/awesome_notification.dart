@@ -82,11 +82,7 @@ class AwesomeNotification {
     if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
       try {
         final token = await AwesomeNotificationsFcm().requestFirebaseAppToken();
-        if (kDebugMode) {
-          print('==================FCM Token==================');
-          print(token);
-          print('======================================');
-        }
+        debugPrint('FCM Token: $token');
 
         return token;
       } catch (exception) {
@@ -106,11 +102,10 @@ class AwesomeNotification {
   }
 
   Future<void> localNotification() async {
-    // String timezone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 1,
-        channelKey: 'kull_chat',
+        channelKey: 'kull_chat_app',
         title: 'Title Notification',
         body: 'Content Notification',
         notificationLayout: NotificationLayout.Messaging,

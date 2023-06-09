@@ -1,11 +1,13 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/services/awesome_notification.dart';
+import 'package:chat_app/services/notification_controller.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,38 +15,75 @@ import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  if (kDebugMode) {
-    print('Handling a background message ${message.messageId}');
-  }
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _removeBadgeWhenOpenApp();
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-  // Initialize cho Local Notification
-  await AwesomeNotification.initializeLocalNotifications();
-
-  // Initialize cho Push Notification
-  await AwesomeNotification.initializeRemoteNotifications();
-  // await AwesomeNotification.interceptInitialCallActionRequest();
-
-  // Init SharedPreferences storage
   await SharedPreferencesStorage.init();
 
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
+  // Always initialize Awesome Notifications
+  await NotificationController.initializeLocalNotifications();
+  await NotificationController.interceptInitialCallActionRequest();
 
-  runApp(const MyApp(/*appTheme: AppTheme(),*/));
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarBrightness: Platform.isIOS ? Brightness.light : Brightness.dark,
+      statusBarIconBrightness: Brightness.dark, // status bar color
+    ),
+  );
+
+  // final navigatorKey = GlobalKey<NavigatorState>();
+
+  runZonedGuarded<Future<void>>(() async {
+    // Wait for Firebase to initialize
+    await Firebase.initializeApp();
+
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
+
+    if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+      // Pass all uncaught errors from the framework to Crashlytics.
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+      //To catch errors that happen outside of the Flutter context, install an error listener on the current Isolate
+      Isolate.current.addErrorListener(RawReceivePort((pair) async {
+        final List<dynamic> errorAndStacktrace = pair;
+        await FirebaseCrashlytics.instance.recordError(
+          errorAndStacktrace.first,
+          errorAndStacktrace.last,
+        );
+      }).sendPort);
+    }
+
+    // ZegoUIKitPrebuiltCallInvitationService().setNavigatorKey(navigatorKey);
+
+    //run APP
+    runApp(const MyApp());
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack));
 }
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   _removeBadgeWhenOpenApp();
+//   await Firebase.initializeApp();
+//   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+//
+//   // Initialize cho Local Notification
+//   await AwesomeNotification.initializeLocalNotifications();
+//
+//   // Initialize cho Push Notification
+//   await AwesomeNotification.initializeRemoteNotifications();
+//   // await AwesomeNotification.interceptInitialCallActionRequest();
+//
+//   // Init SharedPreferences storage
+//   await SharedPreferencesStorage.init();
+//
+//   await SystemChrome.setPreferredOrientations([
+//     DeviceOrientation.portraitUp,
+//   ]);
+//
+//   runApp(const MyApp(/*appTheme: AppTheme(),*/));
+// }
 
 _removeBadgeWhenOpenApp() async {
   bool osSupportBadge = await FlutterAppBadger.isAppBadgeSupported();
@@ -70,9 +109,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     getUserLoggedInStatus();
     super.initState();
-    AwesomeNotification().checkPermission();
-    AwesomeNotification().requestFirebaseToken();
-    // AwesomeNotification.initializeNotificationsEventListeners();
+    NotificationController.checkPermission();
+    // NotificationController.requestFirebaseToken();
+    NotificationController.initializeNotificationsEventListeners();
   }
 
   @override
@@ -123,7 +162,7 @@ class _MyAppState extends State<MyApp> {
           ),
     );
 
-    String initialRoute = AwesomeNotification.initialCallAction == null
+    String initialRoute = NotificationController.initialAction == null
         ? AppRoutes.main
         : AppRoutes.callPage;
 

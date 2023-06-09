@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/model/learning_result_info.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/network/response/base_response.dart';
@@ -53,7 +51,6 @@ class EnterPointSubjectBloc
               listLearningInfo: response.listResult,
             ));
           } else if (response is ExpiredTokenGetResponse) {
-            Navigator.pop(this.context);
             logoutIfNeed(this.context);
           } else {
             emit(state.copyWith(
@@ -78,9 +75,6 @@ class EnterPointSubjectBloc
             id: learn.id!,
             data: data,
           );
-          //todo: remove it
-          log('dataSend: $data');
-          log('update: $response');
 
           if (response is LearningResultInfo) {
             emit(state.copyWith(
@@ -104,8 +98,6 @@ class EnterPointSubjectBloc
           studentID: event.studentID,
           schoolYear: event.schoolYear,
         );
-        //todo: remove it
-        log('math: $mathResponse}');
 
         if (mathResponse.isOK()) {
           emit(state.copyWith(isLoading: false));

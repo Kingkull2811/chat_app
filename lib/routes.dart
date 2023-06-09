@@ -7,7 +7,7 @@ import 'package:chat_app/screens/onboarding/onboarding_screen.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/screens/settings/terms_policies/terms_policies.dart';
-import 'package:chat_app/services/awesome_notification.dart';
+import 'package:chat_app/services/notification_controller.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,7 +73,7 @@ class AppRoutes {
       AppRoutes.callPage: (context) {
         ReceivedAction? receivedAction =
             ModalRoute.of(context)!.settings.arguments == null
-                ? AwesomeNotification.initialCallAction
+                ? NotificationController.initialAction
                 : ModalRoute.of(context)!.settings.arguments as ReceivedAction;
 
         return CallPage(receivedAction: receivedAction!);

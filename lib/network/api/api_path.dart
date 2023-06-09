@@ -1,6 +1,11 @@
 class ApiPath {
   static const String domain = 'http://167.99.65.226:8080';
 
+  static const String agoraServerDomain =
+      'https://agora-token-service-production-dabe.up.railway.app';
+
+  //https://agora-token-service-production-dabe.up.railway.app/rtc/<channel>/1/uid/<uid>/
+
   static const String signup = '$domain/api/auth/sign-up';
 
   static const String login = '$domain/api/auth/sign-in';

@@ -1,8 +1,8 @@
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../utilities/app_constants.dart';
 import '../../utilities/secure_storage.dart';
 import '../../utilities/utils.dart';
 import '../model/error.dart';
@@ -31,15 +31,28 @@ mixin ProviderMixin {
       }
       print("\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace");
     } else {
-      //record log to firebase crashlytics here}
+      //record log to firebase crashlytics here
+      FirebaseCrashlytics.instance.setCustomKey("$error", "ERROR in $apiPath");
+
+      FirebaseCrashlytics.instance
+          .recordError("$error", stacktrace, reason: 'fatal');
+
+      FirebaseCrashlytics.instance.log(
+        "EXCEPTION OCCURRED: $apiPath\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace",
+      );
     }
   }
 
   BaseResponse errorResponse(error, stacktrace, apiPath) {
     showErrorLog(error, stacktrace, apiPath);
 
+    List<dynamic> errors = error.response?.data;
+
     return BaseResponse.withHttpError(
-      errors: (error is DioError) ? error.response?.data as List<Errors> : [],
+      // errors: (error is DioError) ? error.response?.data as List<Errors> : [],
+      errors: (error is DioError)
+          ? errors.map((e) => Errors.fromJson(e)).toList()
+          : [],
       httpStatus: (error is DioError) ? error.response?.statusCode : null,
     );
   }
@@ -57,14 +70,12 @@ mixin ProviderMixin {
 
   Future<Options> defaultOptions({required String url}) async {
     String token = await SecureStorage().getAccessToken();
-    // String refreshToken = await SecureStorage().getRefreshToken();
 
     if (kDebugMode) {
       if (isNotNullOrEmpty(url)) {
         print('URL: $url');
       }
       // log('TOKEN: $token');
-      // log('REF: $refreshToken');
     }
 
     return Options(
@@ -73,13 +84,6 @@ mixin ProviderMixin {
       },
     );
   }
-
-  Options optionsToFCMServer() => Options(
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': AppConstants.fcmTokenServerKey,
-        },
-      );
 
   //for set options timeOut waiting request dio connect to servers
   Options baseOption() => Options(
