@@ -396,7 +396,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
     if (result) {
       await _reloadPage();
     } else {
-      return;
+      await _reloadPage();
     }
   }
 
