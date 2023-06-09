@@ -108,9 +108,9 @@ class _AddStudentState extends State<AddStudent> {
           showCupertinoMessageDialog(
             context,
             curState.message,
-            onCloseDialog: () {
+            onClose: () {
               Navigator.pop(context);
-              _navToStudentManagement();
+              Navigator.of(context).pop(true);
             },
           );
         } else {
@@ -120,9 +120,9 @@ class _AddStudentState extends State<AddStudent> {
           showCupertinoMessageDialog(
             context,
             curState.message,
-            onCloseDialog: () {
+            onClose: () {
               Navigator.pop(context);
-              _navToStudentManagement();
+              Navigator.of(context).pop(true);
             },
           );
         } else {
@@ -139,7 +139,7 @@ class _AddStudentState extends State<AddStudent> {
               backgroundColor: Theme.of(context).primaryColor,
               leading: GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.of(context).pop(true);
                 },
                 child: const Padding(
                   padding: EdgeInsets.only(left: 16),
@@ -167,11 +167,6 @@ class _AddStudentState extends State<AddStudent> {
         );
       },
     );
-  }
-
-  _navToStudentManagement() {
-    Navigator.pop(context);
-    Navigator.of(context).pop(true);
   }
 
   Widget _body(BuildContext context, AddStudentState state) {
@@ -434,7 +429,7 @@ class _AddStudentState extends State<AddStudent> {
     final response = await _studentRepository.addStudent(data: data);
     if (response is Student) {
       await showCupertinoMessageDialog(this.context, 'Add new student success',
-          onCloseDialog: () {
+          onClose: () {
         setState(() {
           _nameController.clear();
           _calendarController.clear();
@@ -481,7 +476,7 @@ class _AddStudentState extends State<AddStudent> {
       showCupertinoMessageDialog(
         this.context,
         'Update student success',
-        onCloseDialog: () {
+        onClose: () {
           Navigator.pop(context);
           Navigator.of(context).pop(true);
         },
@@ -513,6 +508,9 @@ class _AddStudentState extends State<AddStudent> {
                   onTap: () {
                     setState(() {
                       _yearController.text = listSchoolYear[index];
+                      if (_showYear) {
+                        _showYear = false;
+                      }
                     });
                   },
                   child: Container(
@@ -578,8 +576,10 @@ class _AddStudentState extends State<AddStudent> {
                   onTap: () {
                     setState(() {
                       _classId = listClass[index].classId;
-                      // _showClass = !_showClass;
                       _classController.text = listClass[index].className ?? '';
+                      if (_showClass) {
+                        _showClass = false;
+                      }
                     });
                   },
                   child: Container(

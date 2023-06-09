@@ -34,6 +34,10 @@ class ChatsBloc extends Bloc<ChatsEvent, ChatsState> {
           listUser.removeWhere((user) => user.id == userInfo?.id);
 
           if (userInfo != null) {
+            //update device fcm token
+            await FirebaseService()
+                .sendCurrentDeviceFCMToken(userId: userInfo.id!);
+
             emit(state.copyWith(
               isLoading: false,
               apiError: ApiError.noError,

@@ -181,6 +181,7 @@ class _NewMessageState extends State<NewMessage> {
                                 receiverId: item.id.toString(),
                                 receiverName: item.fullName ?? '',
                                 receiverAvt: item.fileUrl ?? '',
+                                receiverFCMToken: item.fcmToken ?? '',
                               ),
                             ),
                           );

@@ -18,9 +18,7 @@ class TranscriptManagementState implements ApiResultState {
 
   @override
   ApiError get apiError => _apiError;
-}
 
-extension TranscriptManagementStateEx on TranscriptManagementState {
   TranscriptManagementState copyWith({
     ApiError? apiError,
     bool? isLoading,

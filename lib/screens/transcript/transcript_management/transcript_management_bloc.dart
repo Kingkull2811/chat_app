@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/repository/class_repository.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/network/response/class_response.dart';
@@ -41,6 +39,8 @@ class TranscriptManagementBloc
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
+          } else if (response is ExpiredTokenGetResponse) {
+            logoutIfNeed(this.context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -49,14 +49,14 @@ class TranscriptManagementBloc
             ));
           }
           final Map<String, dynamic> queryParameters = {
-            'search': '',
+            // 'search': '',
             // 'classId': 0,
             'semesterYear': '2023-2024'
           };
           final responseStudent = await _studentRepository.getListStudent(
             queryParameters: queryParameters,
           );
-          log('listStudent: $responseStudent');
+
           if (responseStudent is ListStudentsResponse) {
             emit(state.copyWith(
               isLoading: false,
@@ -84,7 +84,7 @@ class TranscriptManagementBloc
         final response = await _studentRepository.getListStudent(
           queryParameters: queryParameters,
         );
-        log('list: $response');
+
         if (response is ListStudentsResponse) {
           emit(state.copyWith(
             isLoading: false,

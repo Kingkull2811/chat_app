@@ -1,10 +1,10 @@
 import '../../utilities/utils.dart';
 import '../model/error.dart';
-import '../model/student_model.dart';
+import '../model/student.dart';
 import 'base_response.dart';
 
 class StudentResponse extends BaseResponse {
-  final StudentModel? data;
+  final Student? data;
 
   StudentResponse({
     int? httpStatus,
@@ -27,6 +27,6 @@ class StudentResponse extends BaseResponse {
                 (index) => Errors.fromJson(json["errors"][index]),
               )
             : [],
-        data: json[""] == null ? null : StudentModel.fromJson(json[""]),
+        data: json["data"] == null ? null : Student.fromJson(json["data"]),
       );
 }

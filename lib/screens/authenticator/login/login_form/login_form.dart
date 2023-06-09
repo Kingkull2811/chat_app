@@ -20,11 +20,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../network/response/base_get_response.dart';
 import '../../../../widgets/animation_loading.dart';
 import '../../../../widgets/custom_check_box.dart';
 import '../../fill_profile/fill_profile.dart';
 import '../../fill_profile/fill_profile_bloc.dart';
-import '../../fill_profile/fill_profile_event.dart';
 import 'login_form_state.dart';
 
 class LoginFormPage extends StatefulWidget {
@@ -53,6 +53,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  final SharedPreferencesStorage _pref = SharedPreferencesStorage();
+
   @override
   void initState() {
     _loginFormBloc = BlocProvider.of<LoginFormBloc>(context);
@@ -79,7 +81,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
         return currState.isSuccessAuthenticateBiometric;
       },
       listener: (context, state) {
-        _goToTermPolicy();
+        _goToTermPolicy(context);
       },
       builder: (context, state) {
         if (state.isLoading) {
@@ -219,24 +221,36 @@ class _LoginFormPageState extends State<LoginFormPage> {
     );
   }
 
-  Future<void> _goToTermPolicy() async {
-    SharedPreferencesStorage().setLoggedOutStatus(false);
-    bool agreedWithTerms = SharedPreferencesStorage().getAgreedWithTerms();
+  Future<void> _goToTermPolicy(BuildContext context) async {
+    _pref.setLoggedOutStatus(false);
+    bool agreedWithTerms = _pref.getAgreedWithTerms();
     if (mounted) {
       if (!agreedWithTerms) {
         _navigateToTerm();
       } else {
-        // showLoading(context);
         final userInfo = await _authRepository.getUserInfo(
-            userId: SharedPreferencesStorage().getUserId());
+          userId: _pref.getUserId(),
+        );
+
         if (userInfo is UserInfoModel) {
-          // print(userInfo.fullName);
-          await SharedPreferencesStorage().setFullName(userInfo.fullName ?? '');
-          await SharedPreferencesStorage()
-              .setImageAvartarUrl(userInfo.fileUrl ?? '');
+          await _pref.setFullName(userInfo.fullName ?? '');
+          await _pref.setImageAvartarUrl(
+            userInfo.fileUrl ?? '',
+          );
+
+          //navigate
           userInfo.isFillProfileKey
-              ? _navigateToMainPage()
-              : _navigateToFillProfilePage(userInfo);
+              ? await _navigateToMainPage()
+              : await _navigateToFillProfilePage(userInfo);
+        } else if (userInfo is ExpiredTokenGetResponse) {
+          logoutIfNeed(this.context);
+        } else {
+          //show log
+          showCupertinoMessageDialog(
+            this.context,
+            'ERROR!',
+            content: 'Can\'t get user info',
+          );
         }
       }
     }
@@ -247,7 +261,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider<FillProfileBloc>(
-            create: (context) => FillProfileBloc(context)..add(FillInit()),
+            create: (context) => FillProfileBloc(context),
             child: FillProfilePage(userInfo: userInfo),
           ),
         ),
@@ -256,7 +270,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   _navigateToTerm() => Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => const TermPolicyPage()));
 
-  _navigateToMainPage() => Navigator.pushReplacement(
+  _navigateToMainPage() async => await Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)));
 
   _buildBiometricsButton(LoginFormState currentState) {
@@ -306,7 +320,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
   }
 
   Future<void> _handleButtonLogin(BuildContext context) async {
-    await SharedPreferencesStorage().setRememberInfo(_rememberInfo);
+    await _pref.setRememberInfo(_rememberInfo);
 
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none && mounted) {
@@ -317,17 +331,27 @@ class _LoginFormPageState extends State<LoginFormPage> {
         username: _inputUsernameController.text,
         password: _inputPasswordController.text,
       );
+
       if (response.httpStatus == 200) {
-        await SharedPreferencesStorage().setRememberInfo(true);
-        await SharedPreferencesStorage().setSaveUserInfo(response.data);
-        const Duration(milliseconds: 300);
-        await _goToTermPolicy();
+        if (response.data == null) {
+          showCupertinoMessageDialog(
+            this.context,
+            'Error',
+            content: 'Something is wrong, please try again later!',
+            onClose: () {
+              _loginFormBloc.add(ValidateForm());
+            },
+          );
+        }
+        await _pref.setRememberInfo(true);
+        await _pref.setSaveUserInfo(response.data);
+        await _goToTermPolicy(this.context);
       } else {
         showCupertinoMessageDialog(
-          this.context, 'Error',
-          // content: response.errors?.first.errorMessage,
+          this.context,
+          'Error',
           content: 'Wrong username or password',
-          onCloseDialog: () {
+          onClose: () {
             _loginFormBloc.add(ValidateForm());
           },
         );

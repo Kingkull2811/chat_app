@@ -1,9 +1,7 @@
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
-import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
-import 'package:chat_app/screens/chats/group_participants/group_participants.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
+import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,17 +11,17 @@ import '../../../utilities/screen_utilities.dart';
 import '../../../widgets/app_image.dart';
 
 class ChatInfoPage extends StatelessWidget {
-  final bool isGroup;
   final String receiverID;
   final String name;
   final String? imageUrl;
+  final String docID;
 
   const ChatInfoPage({
     Key? key,
-    this.isGroup = false,
     required this.receiverID,
     required this.name,
     this.imageUrl,
+    required this.docID,
   }) : super(key: key);
 
   @override
@@ -96,15 +94,16 @@ class ChatInfoPage extends StatelessWidget {
                     icon: Icons.call_outlined,
                     itemTitle: 'Audio',
                     onTapItemControl: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AudioCallPage(
-                            imageUrl: imageUrl ?? '',
-                            name: name,
-                          ),
-                        ),
-                      );
+                      //todo
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => AudioCallPage(
+                      //       imageUrl: imageUrl ?? '',
+                      //       name: name,
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                   _itemControl(
@@ -112,34 +111,34 @@ class ChatInfoPage extends StatelessWidget {
                     icon: Icons.videocam_outlined,
                     itemTitle: 'Video',
                     onTapItemControl: () {
+                      //todo
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => VideoCallPage(
+                      //       imageUrl: imageUrl ?? '',
+                      //       name: name,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                  ),
+                  _itemControl(
+                    context,
+                    icon: Icons.person_outline,
+                    itemTitle: 'Profile',
+                    onTapItemControl: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => VideoCallPage(
-                            imageUrl: imageUrl ?? '',
-                            name: name,
+                          builder: (context) => BlocProvider<ProfileBloc>(
+                            create: (context) => ProfileBloc(context),
+                            child: ProfilePage(userID: int.parse(receiverID)),
                           ),
                         ),
                       );
                     },
                   ),
-                  if (!isGroup)
-                    _itemControl(
-                      context,
-                      icon: Icons.person_outline,
-                      itemTitle: 'Profile',
-                      onTapItemControl: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider<ProfileBloc>(
-                              create: (context) => ProfileBloc(context),
-                              child: ProfilePage(userID: int.parse(receiverID)),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
                 ],
               ),
             ),
@@ -148,39 +147,24 @@ class ChatInfoPage extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 32),
                 child: Column(
                   children: [
-                    if (isGroup)
-                      _itemInfo(
-                        itemTitle: 'Group participants',
-                        icon: Icons.groups,
-                        onTapItem: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const GroupParticipantPage(),
-                            ),
-                          );
-                        },
-                      ),
-                    if (!isGroup)
-                      _itemInfo(
-                        itemTitle: 'Block',
-                        icon: Icons.speaker_notes_off_outlined,
-                        onTapItem: () async {
-                          showMessageTwoOption(
-                            context,
-                            'Block $name?',
-                            content:
-                                'Do you want block $name.\nAfter block, you can send message to $name and vice versa.',
-                            okLabel: 'Block',
-                            onOk: () {
-                              //todo:::
-                              //bloc user and back to chat
-                              Navigator.of(context).pop(true);
-                            },
-                          );
-                        },
-                      ),
+                    _itemInfo(
+                      itemTitle: 'Block',
+                      icon: Icons.speaker_notes_off_outlined,
+                      onTapItem: () async {
+                        showMessageTwoOption(
+                          context,
+                          'Block $name?',
+                          content:
+                              'Do you want block $name.\nAfter block, you can send message to $name and vice versa.',
+                          okLabel: 'Block',
+                          onOk: () {
+                            //todo:::
+                            //bloc user and back to chat
+                            Navigator.of(context).pop(true);
+                          },
+                        );
+                      },
+                    ),
                     _itemInfo(
                       itemTitle: 'Delete chat',
                       icon: CupertinoIcons.delete,
@@ -190,43 +174,48 @@ class ChatInfoPage extends StatelessWidget {
                           context,
                           'Delete chat',
                           content:
-                              'Do you want delete this chat.\nAfter delete, you can\'t restore this chat.',
+                              'Do you want to delete this chat? Once deleted, you cannot restore this chat.'
+                              'At the same time, this conversation will also be deleted for the remaining person in this chat.',
                           okLabel: 'Delete',
-                          onOk: () {
-                            //todo:::
+                          onOk: () async {
                             //delete this chat and go to main app
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              AppRoutes.chat,
-                              (route) => false,
+                            showLoading(context);
+                            FirebaseService().deleteChat(docID);
+                            Future.delayed(
+                              const Duration(seconds: 2),
+                              () {
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  AppRoutes.chat,
+                                  (route) => false,
+                                );
+                              },
                             );
                           },
                         );
                       },
                     ),
-                    if (isGroup)
-                      _itemInfo(
-                        itemTitle: 'Leave group',
-                        icon: Icons.output_outlined,
-                        isRed: true,
-                        onTapItem: () async {
-                          showMessageTwoOption(
-                            context,
-                            'Leave group chat',
-                            content: 'Do you want leave group chat?',
-                            okLabel: 'Leave',
-                            onOk: () {
-                              //todo:::
-                              //leave user out group chat
-                              Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                AppRoutes.chat,
-                                (route) => false,
-                              );
-                            },
-                          );
-                        },
-                      ),
+                    // _itemInfo(
+                    //   itemTitle: 'Leave group',
+                    //   icon: Icons.output_outlined,
+                    //   isRed: true,
+                    //   onTapItem: () async {
+                    //     showMessageTwoOption(
+                    //       context,
+                    //       'Leave group chat',
+                    //       content: 'Do you want leave group chat?',
+                    //       okLabel: 'Leave',
+                    //       onOk: () {
+                    //         //leave user out group chat
+                    //         Navigator.pushNamedAndRemoveUntil(
+                    //           context,
+                    //           AppRoutes.chat,
+                    //           (route) => false,
+                    //         );
+                    //       },
+                    //     );
+                    //   },
+                    // ),
                   ],
                 ),
               ),

@@ -1,32 +1,39 @@
+import '../../utilities/utils.dart';
+import '../model/error.dart';
 import '../model/user_info_model.dart';
-import 'base_get_response.dart';
+import 'base_response.dart';
 
-class GetUserInfoResponse extends BaseGetResponse {
+class GetUserInfoResponse extends BaseResponse {
   final UserInfoModel userData;
 
   GetUserInfoResponse({
+    int? httpStatus,
+    String? message,
+    List<Errors>? errors,
     required this.userData,
-    int? pageNumber,
-    int? pageSize,
-    int? totalRecord,
-    int? status,
-    String? error,
   }) : super(
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          totalRecord: totalRecord,
-          status: status,
-          error: error,
+          httpStatus: httpStatus,
+          message: message,
+          errors: errors,
         );
 
   factory GetUserInfoResponse.fromJson(Map<String, dynamic> json) {
+    List<Errors> errors = [];
+    if (isNotNullOrEmpty(json["errors"])) {
+      final List<dynamic> errorsJson = json["errors"];
+      errors =
+          errorsJson.map((errorJson) => Errors.fromJson(errorJson)).toList();
+    }
     return GetUserInfoResponse(
-      userData: json[''],
-      pageNumber: json['pageNumber'],
-      pageSize: json['pageSize'],
-      totalRecord: json['totalRecord'],
-      status: json['status'],
-      error: json['error'],
+      httpStatus: json["httpStatus"],
+      message: json["message"],
+      errors: errors,
+      userData: UserInfoModel.fromJson(json[""]),
     );
+  }
+
+  @override
+  String toString() {
+    return 'GetUserInfoResponse{userData: $userData}';
   }
 }

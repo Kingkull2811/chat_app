@@ -3,7 +3,7 @@ import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../network/response/token_data_response.dart';
+import '../network/model/refresh_token_model.dart';
 import 'app_constants.dart';
 
 class SharedPreferencesStorage {
@@ -39,32 +39,33 @@ class SharedPreferencesStorage {
     return await _prefs.setBool(AppConstants.agreedWithTermsKey, value);
   }
 
-  bool getAgreedWithTerms() {
-    return _prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
-  }
+  bool getAgreedWithTerms() =>
+      _prefs.getBool(AppConstants.agreedWithTermsKey) ?? false;
 
-  bool getFillProfileStatus() {
-    return _prefs.getBool(AppConstants.isFillProfileKey) ?? false;
-  }
+  ///-----------------SET USER INFO--------------------
 
-  ///save user info
+  Future<void> setFullName(String fullName) async =>
+      await _prefs.setString(AppConstants.fullNameKey, fullName);
+
   Future<void> setSaveUserInfo(UserInfoResponse? signInData) async {
     if (signInData != null) {
-      await _secureStorage.writeSecureData(
-          AppConstants.accessTokenKey, signInData.accessToken);
-      await _secureStorage.writeSecureData(
-          AppConstants.refreshTokenKey, signInData.refreshToken);
-      await _secureStorage.writeSecureData(
-          AppConstants.emailKey, signInData.email.toString());
+      await _secureStorage.setAccessToken(accessToken: signInData.accessToken);
+      await _secureStorage.setRefreshToken(refreshT: signInData.refreshToken);
 
-      await _prefs.setString(AppConstants.accessTokenExpiredKey,
-          signInData.expiredAccessToken ?? '');
-      await _prefs.setString(AppConstants.refreshTokenExpiredKey,
-          signInData.expiredRefreshToken ?? '');
       await _prefs.setString(
-          AppConstants.usernameKey, signInData.username ?? '');
+        AppConstants.accessTokenExpiredKey,
+        signInData.expiredAccessToken,
+        // '2023-06-08T18:24:00.000',
+      );
+      await _prefs.setString(
+        AppConstants.refreshTokenExpiredKey,
+        signInData.expiredRefreshToken,
+        // '2023-06-08T18:25:00.000',
+      );
+
+      await _prefs.setString(AppConstants.usernameKey, signInData.username);
       await _prefs.setString(AppConstants.userIdKey, signInData.id.toString());
-      await _prefs.setString(AppConstants.emailKey, signInData.email ?? '');
+      await _prefs.setString(AppConstants.emailKey, signInData.email);
 
       await _prefs.setStringList(
           AppConstants.rolesKey, signInData.roles ?? ['ROLE_USER']);
@@ -73,14 +74,24 @@ class SharedPreferencesStorage {
     }
   }
 
-  Future<void> saveInfoWhenRefreshToken(
-      {required TokenDataResponse? refreshTokenData}) async {
-    await _secureStorage.writeSecureData(
-        AppConstants.accessTokenKey, refreshTokenData?.accessToken);
-    await _secureStorage.writeSecureData(
-        AppConstants.refreshTokenKey, refreshTokenData?.refreshToken);
-    await _prefs.setString(AppConstants.accessTokenExpiredKey,
-        refreshTokenData?.expiredAccessToken ?? '');
+  Future<void> saveInfoWhenRefreshToken({
+    required RefreshTokenModel? data,
+  }) async {
+    if (data != null) {
+      if (data.accessToken != null) {
+        await _secureStorage.setAccessToken(accessToken: data.accessToken!);
+      }
+      if (data.refreshToken != null) {
+        await _secureStorage.setRefreshToken(refreshT: data.refreshToken!);
+      }
+      if (data.expiredAccessToken != null) {
+        await _prefs.setString(
+          AppConstants.accessTokenExpiredKey,
+          data.expiredAccessToken!,
+          // '2023-06-08T18:26:00.000',
+        );
+      }
+    }
   }
 
   Future<void> checkRoles(List<String> listRoles) async {
@@ -101,6 +112,21 @@ class SharedPreferencesStorage {
     }
   }
 
+  ///-----------------GET USER INFO--------------------
+
+  String getUserName() => _prefs.getString(AppConstants.usernameKey) ?? '';
+
+  String getFullName() => _prefs.getString(AppConstants.fullNameKey) ?? '';
+
+  String getUserEmail() => _prefs.getString(AppConstants.emailKey) ?? '';
+
+  String getImageAvartarUrl() =>
+      _prefs.getString(AppConstants.imageAvartarUrlKey) ?? '';
+
+  bool getFillProfileStatus() {
+    return _prefs.getBool(AppConstants.isFillProfileKey) ?? false;
+  }
+
   bool getAdminRole() => _prefs.getBool(AppConstants.isAdminRoleKey) ?? false;
 
   bool getTeacherRole() =>
@@ -112,9 +138,6 @@ class SharedPreferencesStorage {
     await _prefs.setString(AppConstants.imageAvartarUrlKey, imageUrl);
   }
 
-  String getImageAvartarUrl() =>
-      _prefs.getString(AppConstants.imageAvartarUrlKey) ?? '';
-
   int getUserId() {
     final String userID = _prefs.getString(AppConstants.userIdKey) ?? '';
     if (isNullOrEmpty(userID)) {
@@ -123,41 +146,21 @@ class SharedPreferencesStorage {
     return int.parse(userID);
   }
 
-  String getUserEmail() => _prefs.getString(AppConstants.emailKey) ?? '';
-
-  Future<void> setFullName(String fullName) async =>
-      await _prefs.setString(AppConstants.fullNameKey, fullName);
-
-  String getUserName() => _prefs.getString(AppConstants.usernameKey) ?? '';
-
-  String getFullName() => _prefs.getString(AppConstants.fullNameKey) ?? '';
-
-  Future<String> getAccessToken() async {
-    final token = await _secureStorage.readSecureData(
-      AppConstants.accessTokenKey,
-    );
-    return token;
-  }
-
   String getAccessTokenExpired() {
     return _prefs.getString(AppConstants.accessTokenExpiredKey) ?? '';
   }
+
+  String? getAccessToken() => _prefs.getString(AppConstants.accessTokenKey);
+
+  String? getRefreshToken() => _prefs.getString(AppConstants.refreshTokenKey);
 
   String getRefreshTokenExpired() {
     return _prefs.getString(AppConstants.refreshTokenExpiredKey) ?? '';
   }
 
   void resetDataWhenLogout() {
-    // _prefs.remove(AppConstants.accessTokenExpiredKey);
-    // _prefs.remove(AppConstants.refreshTokenExpiredKey);
-    // _prefs.remove(AppConstants.usernameKey);
-    _prefs.remove(AppConstants.userIdKey);
     _prefs.setBool(AppConstants.isLoggedOut, true);
     _prefs.setBool(AppConstants.isFillProfileKey, false);
-
-    _secureStorage.deleteSecureData(AppConstants.emailKey);
-    _secureStorage.deleteSecureData(AppConstants.accessTokenKey);
-    _secureStorage.deleteSecureData(AppConstants.refreshTokenKey);
   }
 
   /// ---setting---
@@ -193,6 +196,4 @@ class SharedPreferencesStorage {
   bool? getVibrateMode() {
     return _prefs.getBool(AppConstants.vibrateModeKey);
   }
-
-  ///
 }

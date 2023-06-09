@@ -1,5 +1,4 @@
-import 'package:chat_app/utilities/utils.dart';
-
+import '../../utilities/utils.dart';
 import 'class_model.dart';
 
 class Student {
@@ -10,9 +9,9 @@ class Student {
   final String? imageUrl;
   final String? className;
   final ClassModel? classResponse;
-  final dynamic mediumScore;
-  final dynamic hk1SubjectMediumScore;
-  final dynamic hk2SubjectMediumScore;
+  final double? mediumScore;
+  final double? hk1SubjectMediumScore;
+  final double? hk2SubjectMediumScore;
 
   Student({
     this.id,
@@ -38,14 +37,20 @@ class Student {
       classResponse: isNotNullOrEmpty(json['classResponse'])
           ? ClassModel.fromJson(json['classResponse'])
           : null,
-      mediumScore: json['mediumScore'],
-      hk1SubjectMediumScore: json['hk1SubjectMediumScore'],
-      hk2SubjectMediumScore: json['hk2SubjectMediumScore'],
+      mediumScore: (json['mediumScore'] == null)
+          ? null
+          : double.tryParse(json['mediumScore'].toString()) ?? 0.0,
+      hk1SubjectMediumScore: (json['hk1SubjectMediumScore'] == null)
+          ? null
+          : double.tryParse(json['hk1SubjectMediumScore'].toString()) ?? 0.0,
+      hk2SubjectMediumScore: (json['hk2SubjectMediumScore'] == null)
+          ? null
+          : double.tryParse(json['hk2SubjectMediumScore'].toString()) ?? 0.0,
     );
   }
 
   @override
   String toString() {
-    return 'Student{id: $id, name: $name, code: $code, dateOfBirth: $dateOfBirth, imageUrl: $imageUrl}';
+    return '\nStudent{id: $id, name: $name, code: $code, className: $className, classResponse: $classResponse}';
   }
 }

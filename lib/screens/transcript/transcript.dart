@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/screens/transcript/class_management/class_management.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management_bloc.dart';
@@ -12,7 +10,6 @@ import 'package:chat_app/screens/transcript/transcript_event.dart';
 import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_page.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management_bloc.dart';
-import 'package:chat_app/screens/transcript/transcript_management/transcript_management_event.dart';
 import 'package:chat_app/screens/transcript/transcript_state.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -28,7 +25,6 @@ import '../../utilities/screen_utilities.dart';
 import '../../utilities/utils.dart';
 import '../../widgets/animation_loading.dart';
 import '../../widgets/input_field_with_ontap.dart';
-import '../../widgets/message_dialog.dart';
 import 'class_management/class_management_bloc.dart';
 
 class TranscriptPage extends StatefulWidget {
@@ -58,7 +54,7 @@ class TranscriptPageState extends State<TranscriptPage> {
   void dispose() {
     _semesterController.dispose();
     super.dispose();
-    _transcriptBloc.close();
+    if (_isUser) _transcriptBloc.close();
   }
 
   @override
@@ -80,15 +76,7 @@ class TranscriptPageState extends State<TranscriptPage> {
         actions: [
           if (_isUser)
             IconButton(
-              onPressed: () async {
-                showDialog(
-                  context: context,
-                  builder: (context) => const MessageDialog(
-                    title: 'formula for calculating average score',
-                    content: '',
-                  ),
-                );
-              },
+              onPressed: () async {},
               icon: const Icon(
                 Icons.info_outline,
                 size: 24,
@@ -262,25 +250,20 @@ class TranscriptPageState extends State<TranscriptPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                          'GPA 1: ${student.hk1SubjectMediumScore ?? '-'}'),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        'GPA 1: ${(student.hk1SubjectMediumScore?.toStringAsFixed(3)) ?? '---'}'),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                          'GPA 2:  ${student.hk2SubjectMediumScore ?? '-'}'),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        'GPA 2:  ${(student.hk2SubjectMediumScore?.toStringAsFixed(3)) ?? '---'}'),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text('GPA year:  ${student.mediumScore ?? '-'}'),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        'GPA year:  ${(student.mediumScore?.toStringAsFixed(3)) ?? '---'}'),
                   ),
                 ],
               ),
@@ -325,8 +308,6 @@ class TranscriptPageState extends State<TranscriptPage> {
   }
 
   Widget _transcript(List<LearningResultInfo> listLearningInfo) {
-    log('learn: ${listLearningInfo}');
-
     final columns = [
       'Subject name',
       'Oral Test',
@@ -363,11 +344,8 @@ class TranscriptPageState extends State<TranscriptPage> {
           return DataRow(
             cells: modelBuilder(cells, (index, cell) {
               return DataCell(
-                Center(
-                  child: Text(cell == null ? '-' : cell.toString()),
-                ),
+                Center(child: Text(cell == null ? '-' : cell.toString())),
                 showEditIcon: false,
-                onTap: () {},
               );
             }),
           );
@@ -611,10 +589,7 @@ class TranscriptPageState extends State<TranscriptPage> {
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider<TranscriptManagementBloc>(
-            create: (context) => TranscriptManagementBloc(context)
-              ..add(
-                InitTranscriptEvent(),
-              ),
+            create: (context) => TranscriptManagementBloc(context),
             child: const TranscriptManagementPage(),
           ),
         ),

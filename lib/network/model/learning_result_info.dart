@@ -3,11 +3,11 @@ class LearningResultInfo {
   final int? subjectId;
   final String? subjectName;
   final int? learningResultId;
-  final double? oralTestScore;
-  final double? m15TestScore;
-  final double? m45TestScore;
-  final double? semesterTestScore;
-  final double? semesterSummaryScore;
+  double? oralTestScore;
+  double? m15TestScore;
+  double? m45TestScore;
+  double? semesterTestScore;
+  double? semesterSummaryScore;
 
   LearningResultInfo({
     this.id,
@@ -31,7 +31,11 @@ class LearningResultInfo {
       m15TestScore: json['m15TestScore'],
       m45TestScore: json['m45TestScore'],
       semesterTestScore: json['semesterTestScore'],
-      semesterSummaryScore: json['semesterSummaryScore'],
+      semesterSummaryScore: (json['semesterSummaryScore'] == null)
+          ? null
+          : double.parse(
+              (double.tryParse(json['semesterSummaryScore'].toString()) ?? 0.0)
+                  .toStringAsFixed(3)),
     );
   }
 
@@ -52,14 +56,28 @@ class LearningResultInfo {
         subjectName: subjectName ?? this.subjectName,
         learningResultId: learningResultId ?? this.learningResultId,
         oralTestScore: oralTestScore ?? this.oralTestScore,
-        m15TestScore: m45TestScore ?? this.m15TestScore,
+        m15TestScore: m15TestScore ?? this.m15TestScore,
         m45TestScore: m45TestScore ?? this.m45TestScore,
         semesterTestScore: semesterTestScore ?? this.semesterTestScore,
         semesterSummaryScore: semesterSummaryScore ?? this.semesterSummaryScore,
       );
 
   @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is LearningResultInfo && id == other.id;
+  }
+
+  @override
+  int get hashCode => Object.hash(learningResultId, id, subjectId);
+
+  @override
   String toString() {
-    return 'LearningResultInfo{id: $id, subjectId: $subjectId, subjectName: $subjectName, learningResultId: $learningResultId, oralTestScore: $oralTestScore, m15TestScore: $m15TestScore, m45TestScore: $m45TestScore, semesterTestScore: $semesterTestScore, semesterSummaryScore: $semesterSummaryScore}';
+    return '\nLearningResultInfo{id: $id, subjectId: $subjectId, subjectName: $subjectName, learningResultId: $learningResultId, oralTestScore: $oralTestScore, m15TestScore: $m15TestScore, m45TestScore: $m45TestScore, semesterTestScore: $semesterTestScore, semesterSummaryScore: $semesterSummaryScore}';
   }
 }

@@ -209,7 +209,7 @@ class _SecurityPageState extends State<SecurityPage> {
             showCupertinoMessageDialog(
               this.context,
               'Change password successfully',
-              onCloseDialog: () {
+              onClose: () {
                 _oldPassController.clear();
                 _newPassController.clear();
                 _confPassController.clear();

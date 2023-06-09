@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-
 class AppConstants {
   ///for flutter web
   static const apiKey = 'AIzaSyDGD4HfInR7ybpXD7sYguYP-5j-U2vDQ80';
@@ -38,13 +36,6 @@ class AppConstants {
 
   static const String firstTimeOpenKey = 'FIRST_TIME_OPEN';
   static const String agreedWithTermsKey = 'AGREED_WITH_TERMS';
-
-  //for set options timeOut waiting request dio connect to servers
-  static Options options = Options(
-    sendTimeout: const Duration(seconds: 8),
-    receiveTimeout: const Duration(seconds: 8),
-    receiveDataWhenStatusError: true,
-  );
 
   static const double defaultLoadingNetworkImageSize = 25;
 
@@ -91,6 +82,8 @@ class AppConstants {
   static const String messageCollection = 'messages';
   static const String chatsCollection = 'chats';
   static const String messageListCollection = 'message_list';
+  static const String callCollection = 'calls';
+
   static const String imageChild = 'images';
   static const String imageMessageChild = 'messages';
   static const String imageNewsChild = 'news';

@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:badges/badges.dart';
-import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import '../../services/database.dart';
+import '../chats/call/call_incoming/call_incoming.dart';
 import '../chats/chat.dart';
 import '../chats/chat_bloc.dart';
 import '../chats/chat_event.dart';
@@ -25,13 +25,16 @@ class MainApp extends StatefulWidget {
   /// 0 - chat, 1 - news, 2 - transcript, 3- settings
   final int? currentTab;
 
-  MainApp({key, this.currentTab}) : super(key: GlobalKey<MainAppState>());
+  final bool toContact;
+
+  MainApp({
+    key,
+    this.currentTab,
+    this.toContact = false,
+  }) : super(key: GlobalKey<MainAppState>());
 
   @override
-  MainAppState createState() {
-    // DatabaseService().mainKey = this.key as GlobalKey<State<StatefulWidget>>?;
-    return MainAppState();
-  }
+  MainAppState createState() => MainAppState();
 }
 
 class MainAppState extends State<MainApp>
@@ -40,13 +43,33 @@ class MainAppState extends State<MainApp>
 
   StreamSubscription<ConnectivityResult>? _networkSubscription;
 
-  int newChatBadge = 1;
-  int newsBadge = 2;
-  int newTranscriptBadge = 3;
+  DateTime timeBackPressed = DateTime.now();
+
+  int newChatBadge = 0;
+  int newsBadge = 0;
+  int newTranscriptBadge = 0;
+
+  // @override
+  // Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+  //   super.didChangeAppLifecycleState(state);
+  //   switch (state) {
+  //     case AppLifecycleState.resumed:
+  //       // ref.read(authControllerProvider).setUserState(true);
+  //       await FirebaseService().updateOnlineStatus(true);
+  //       break;
+  //     case AppLifecycleState.inactive:
+  //     case AppLifecycleState.detached:
+  //     case AppLifecycleState.paused:
+  //       // ref.read(authControllerProvider).setUserState(false);
+  //       await FirebaseService().updateOnlineStatus(false);
+  //       break;
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
+    // WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -65,9 +88,12 @@ class MainAppState extends State<MainApp>
       builder: (context, snapshot) {
         return WillPopScope(
           onWillPop: _onWillPop,
-          child: CupertinoTabScaffold(
-            tabBar: tapBar(),
-            tabBuilder: (context, index) => _handleScreenIndex(context, index),
+          child: CallIncomingPage(
+            scaffold: CupertinoTabScaffold(
+              tabBar: tapBar(),
+              tabBuilder: (context, index) =>
+                  _handleScreenIndex(context, index),
+            ),
           ),
         );
       },
@@ -277,25 +303,19 @@ class MainAppState extends State<MainApp>
       case 0:
         currentTab = BlocProvider(
           create: (context) => ChatsBloc(context)..add(ChatInit()),
-          child: ChatsPage(
-            key: DatabaseService().chatKey,
-          ),
+          child: ChatsPage(toContact: widget.toContact),
         );
         break;
       case 1:
         currentTab = BlocProvider<NewsBloc>(
           create: (context) => NewsBloc(context),
-          child: NewsPage(
-            key: DatabaseService().newsKey,
-          ),
+          child: const NewsPage(),
         );
         break;
       case 2:
         currentTab = BlocProvider<TranscriptBloc>(
           create: (context) => TranscriptBloc(context),
-          child: TranscriptPage(
-            key: DatabaseService().transcriptKey,
-          ),
+          child: const TranscriptPage(),
         );
         break;
       case 3:
@@ -304,9 +324,7 @@ class MainAppState extends State<MainApp>
       default:
         currentTab = BlocProvider(
           create: (context) => ChatsBloc(context),
-          child: ChatsPage(
-            key: DatabaseService().chatKey,
-          ),
+          child: const ChatsPage(),
         );
     }
     return currentTab;
@@ -318,45 +336,22 @@ class MainAppState extends State<MainApp>
   }
 
   Future<bool> _onWillPop() async {
-    return (await showDialog(
-          context: context,
-          builder: (context) => CupertinoAlertDialog(
-            title: const Text(
-              'Exit the app?',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: const Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Text(
-                'Are you sure you want to exit the app?',
-                //Bạn có chắc chắn muốn thoát khỏi ứng dụng?
-                style: TextStyle(fontSize: 14),
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                  Navigator.of(context).pop();
-                },
-                child: const Text(
-                  'Exits',
-                  style: TextStyle(
-                    color: AppColors.red700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        )) ??
-        false;
+    final difference = DateTime.now().difference(timeBackPressed);
+    final isExitWarning = difference >= const Duration(seconds: 2);
+    timeBackPressed = DateTime.now();
+
+    if (isExitWarning) {
+      Fluttertoast.showToast(
+        msg: 'Press back again to exit.',
+        fontSize: 14,
+        textColor: Colors.black,
+        backgroundColor: Colors.grey,
+      );
+      return false;
+    } else {
+      Fluttertoast.cancel();
+      return true;
+    }
   }
 
   Future<int?> getChatBadge() async {

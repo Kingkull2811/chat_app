@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/repository/class_repository.dart';
 import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/network/response/class_response.dart';
@@ -33,7 +31,6 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
           ));
         } else {
           final response = await _classRepository.getListClass();
-          log('response News: $response ');
 
           if (response is ClassResponse) {
             emit(state.copyWith(
@@ -41,6 +38,8 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
+          } else if (response is ExpiredTokenGetResponse) {
+            logoutIfNeed(this.context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -62,7 +61,6 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
             message: 'Add new student success',
           ));
         } else if (response is ExpiredTokenResponse) {
-          Navigator.pop(this.context);
           logoutIfNeed(this.context);
         } else {
           emit(state.copyWith(
@@ -88,7 +86,6 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
             message: 'Update student success',
           ));
         } else if (response is ExpiredTokenGetResponse) {
-          Navigator.pop(this.context);
           logoutIfNeed(this.context);
         } else {
           emit(state.copyWith(

@@ -1,12 +1,10 @@
 class ApiPath {
-  static const String apiDomain = 'http://192.168.1.26:8080';
-  static const String apiDomainMac = 'http://10.10.150.54:8080';
+  static const String domain = 'http://167.99.65.226:8080';
 
-  //change [useMac] - false: ip window
-  //                - true: ip mac
-  static const bool useMac = false;
+  static const String agoraServerDomain =
+      'https://agora-token-service-production-dabe.up.railway.app';
 
-  static const String domain = useMac ? apiDomainMac : apiDomain;
+  //https://agora-token-service-production-dabe.up.railway.app/rtc/<channel>/1/uid/<uid>/
 
   static const String signup = '$domain/api/auth/sign-up';
 
@@ -37,4 +35,9 @@ class ApiPath {
   static const String getStudentInfo = '$domain/api/v1/students/detail';
 
   static const String learningResult = '$domain/api/v1/learning-result';
+
+  static const String fcmGoogle =
+      'https://fcm.googleapis.com/v1/projects/chatapp-97dbc/messages:send';
+
+  static const String fcmServer = 'https://fcm.googleapis.com/fcm/send';
 }

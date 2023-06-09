@@ -35,8 +35,7 @@ class _ChatTabState extends State<ChatTab> {
   }
 
   List<ChatModel> convertListChat(
-    AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
-  ) {
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
     List<ChatModel> listChat = [];
     final data = snapshot.data?.docs;
     for (var doc in data!) {
@@ -49,18 +48,24 @@ class _ChatTabState extends State<ChatTab> {
         names.remove('$currentUserId');
         imageUrls.remove('$currentUserId');
 
+        // String currentToken = docData['fcm_token_$currentUserId'] ?? '';
+        String otherToken = docData['fcm_token_${userId.keys.first}'] ?? '';
+
         final Map<String, dynamic> mapDoc = {
           "receiver_id": userId.keys.first,
           "receiver_avt": imageUrls.values.first,
           "receiver_name": names.values.first,
           "last_message": docData['last_message'],
           "message_type": docData['message_type'],
-          "time": docData['time']
+          "time": docData['time'],
+          "fcm_token": otherToken,
         };
 
         listChat.add(ChatModel.fromJson(mapDoc));
       }
     }
+
+    listChat.sort((a, b) => (b.time.toDate()).compareTo(a.time.toDate()));
     return listChat;
   }
 
@@ -146,9 +151,10 @@ class _ChatTabState extends State<ChatTab> {
         context,
         MaterialPageRoute(
           builder: (context) => MessageView(
-            receiverId: chatItem.receiverId ?? '',
-            receiverName: chatItem.receiverName ?? '',
-            receiverAvt: chatItem.receiverAvt ?? '',
+            receiverId: chatItem.receiverId,
+            receiverName: chatItem.receiverName,
+            receiverAvt: chatItem.receiverAvt,
+            receiverFCMToken: chatItem.receiverFcmToken,
           ),
         ),
       );
@@ -202,14 +208,14 @@ class _ChatTabState extends State<ChatTab> {
             children: [
               Expanded(
                 child: Text(
-                  chatItem.receiverName ?? '',
+                  chatItem.receiverName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ),
               Text(
-                formatDateUtcToTime(chatItem.time),
+                convertTimestampToDateTime(chatItem.time),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.normal,
@@ -226,7 +232,7 @@ class _ChatTabState extends State<ChatTab> {
               children: [
                 Expanded(
                   child: Text(
-                    chatItem.lastMessage ?? '',
+                    chatItem.lastMessage,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

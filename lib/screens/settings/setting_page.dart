@@ -220,7 +220,7 @@ class _SettingPageState extends State<SettingPage> {
                             localPathOrUrl:
                                 SharedPreferencesStorage().getImageAvartarUrl(),
                             boxFit: BoxFit.cover,
-                            errorWidget: Container(
+                            errorWidget: SizedBox(
                               height: 80,
                               width: 80,
                               child: Image.asset(
