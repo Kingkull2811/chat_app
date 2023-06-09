@@ -44,7 +44,6 @@ class _ChatTabState extends State<ChatTab> {
         Map<String, dynamic> userId = docData['members'];
         Map<String, dynamic> names = docData['names'];
         Map<String, dynamic> imageUrls = docData['imageUrls'];
-
         userId.remove('$currentUserId');
         names.remove('$currentUserId');
         imageUrls.remove('$currentUserId');

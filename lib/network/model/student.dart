@@ -1,5 +1,4 @@
-import 'package:chat_app/utilities/utils.dart';
-
+import '../../utilities/utils.dart';
 import 'class_model.dart';
 
 class Student {
