@@ -202,7 +202,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
                             _isEditRow = !_isEditRow;
                           }
                         });
-                        showLoading(context);
+                        // showLoading(context);
                         Future.delayed(const Duration(seconds: 3), () {
                           if (state.updateDone) {
                             showCupertinoMessageDialog(

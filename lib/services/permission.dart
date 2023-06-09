@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class PermissionsHandlers {
+class PermissionsServices {
   static Future<bool> cameraAndMicrophonePermissionsGranted() async {
     PermissionStatus cameraPermissionStatus = await _getCameraPermission();
     PermissionStatus microphonePermissionStatus =

@@ -1,10 +1,13 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
+import 'package:chat_app/screens/chats/call/call_page.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/onboarding/onboarding_screen.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/screens/settings/terms_policies/terms_policies.dart';
+import 'package:chat_app/services/notification_controller.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,40 +22,15 @@ class AppRoutes {
   static const setting = '/setting';
   static const profile = '/settings/profile';
   static const login = '/login';
-  static const terms = '/settings/term_policy';
+  static const terms = '/settings/term-policy';
+  static const callPage = '/chat/call-page';
 
-  bool _isLoggedIn = false;
   final SharedPreferencesStorage _pref = SharedPreferencesStorage();
 
-  Future<bool> getUserLoggedInStatus() async {
-    bool isLoggedOut = _pref.getLoggedOutStatus();
-    bool isExpired = true;
-    String passwordExpiredTime = _pref.getAccessTokenExpired();
-    if (passwordExpiredTime.isNotEmpty) {
-      try {
-        if (DateTime.parse(passwordExpiredTime).isAfter(DateTime.now())) {
-          isExpired = false;
-        }
-      } catch (_) {
-        return false;
-      }
-
-      if (!isExpired) {
-        if (isLoggedOut) {
-          return _isLoggedIn = false;
-        } else {
-          return _isLoggedIn = true;
-        }
-      } else {
-        return _isLoggedIn = false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  Map<String, Widget Function(BuildContext)> routes(context,
-      {required bool isLoggedIn}) {
+  Map<String, Widget Function(BuildContext)> routes(
+    context, {
+    required bool isLoggedIn,
+  }) {
     return {
       AppRoutes.main: (context) {
         return isLoggedIn
@@ -91,6 +69,14 @@ class AppRoutes {
       },
       AppRoutes.terms: (context) {
         return const TermPolicyPage();
+      },
+      AppRoutes.callPage: (context) {
+        ReceivedAction? receivedAction =
+            ModalRoute.of(context)!.settings.arguments == null
+                ? NotificationController.initialAction
+                : ModalRoute.of(context)!.settings.arguments as ReceivedAction;
+
+        return CallPage(receivedAction: receivedAction!);
       }
     };
   }

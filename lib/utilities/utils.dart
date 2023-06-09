@@ -1,11 +1,17 @@
 import 'dart:io';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:chat_app/utilities/enum/media_type.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 
 String getBiometricsButtonPath({
   BiometricButtonType? buttonType,
@@ -155,6 +161,7 @@ String formatDateTime(DateTime? time) {
 
 MediaType getMediaType(int type) {
   switch (type) {
+    case 0:
     case 1:
       return MediaType.image;
     case 2:
@@ -182,4 +189,69 @@ double matchGPA(double? oral, m15, m45, finalE) {
       ((oral ?? 0.0) + (m15 ?? 0.0) + 2 * (m45 ?? 0.0) + 3 * (finalE ?? 0.0)) /
           7;
   return double.parse(gpa.toStringAsFixed(3));
+}
+
+///----------------------Awesome Notification----------------------
+
+/// nav Page
+void loadSingletonPage(
+  NavigatorState? navigatorState, {
+  required String targetPage,
+  required ReceivedAction receivedAction,
+}) {
+  // Avoid to open the notification details page over another details page already opened
+  // Navigate into pages, avoiding to open the notification details page over another details page already opened
+  navigatorState?.pushNamedAndRemoveUntil(
+    targetPage,
+    (route) {
+      return (route.settings.name != targetPage) || route.isFirst;
+    },
+    arguments: receivedAction,
+  );
+}
+
+Future<String> getPlatformVersion() async {
+  if (Platform.isAndroid) {
+    var androidInfo = await DeviceInfoPlugin().androidInfo;
+    var sdkInt = androidInfo.version.sdkInt;
+    return 'Android-$sdkInt';
+  }
+
+  if (Platform.isIOS) {
+    var iosInfo = await DeviceInfoPlugin().iosInfo;
+    var systemName = iosInfo.systemName;
+    var version = iosInfo.systemVersion;
+    return '$systemName-$version';
+  }
+
+  return 'unknown';
+}
+
+Future<String> downloadAndSaveImageOnDisk(String url, String fileName) async {
+  var directory = await getApplicationDocumentsDirectory();
+  var filePath = '${directory.path}/$fileName';
+  var file = File(filePath);
+
+  if (!await file.exists()) {
+    var response = await Dio().get(url);
+    await file.writeAsBytes(response.data);
+  }
+
+  return filePath;
+}
+
+void lockScreenPortrait() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+}
+
+void unlockScreenPortrait() {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 }

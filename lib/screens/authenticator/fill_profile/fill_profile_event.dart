@@ -5,26 +5,16 @@ abstract class FillProfileEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FillInit extends FillProfileEvent {}
-
-class FillProfile extends FillProfileEvent {
-  final int userId;
-  final Map<String, dynamic> userData;
-
-  FillProfile({
-    required this.userId,
-    required this.userData,
-  });
-
+class FillInit extends FillProfileEvent {
   @override
-  List<Object> get props => [userId, userData];
+  List<Object> get props => [];
 }
 
-class SearchStudentBySSID extends FillProfileEvent {
-  final String studentSSID;
+class FillProfile extends FillProfileEvent {
+  final Map<String, dynamic> userMap;
 
-  SearchStudentBySSID({required this.studentSSID});
+  FillProfile({required this.userMap});
 
   @override
-  List<Object> get props => [studentSSID];
+  List<Object> get props => [userMap];
 }

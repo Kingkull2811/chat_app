@@ -1,16 +1,15 @@
-import 'dart:developer';
-
 import 'package:chat_app/network/api/api_path.dart';
+import 'package:chat_app/network/model/refresh_token_model.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
-import 'package:chat_app/network/response/base_response.dart';
-import 'package:chat_app/network/response/refresh_token_response.dart';
 import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
+import '../../services/notification_controller.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../response/base_get_response.dart';
+import '../response/base_response.dart';
 import '../response/login_response.dart';
 
 class AuthProvider with ProviderMixin {
@@ -24,12 +23,11 @@ class AuthProvider with ProviderMixin {
 
       if (DateTime.parse(refreshTokenExpired).isAfter(DateTime.now())) {
         String refreshToken = await SecureStorage().getRefreshToken();
-        print('ref: $refreshToken');
 
         final response = await AuthProvider().refreshToken(
           refreshToken: refreshToken,
         );
-        await _pref.saveInfoWhenRefreshToken(data: response.data);
+        await _pref.saveInfoWhenRefreshToken(data: response);
         return true;
       }
       return false;
@@ -37,7 +35,7 @@ class AuthProvider with ProviderMixin {
     return true;
   }
 
-  Future<RefreshTokenResponse> refreshToken({
+  Future<RefreshTokenModel?> refreshToken({
     required String refreshToken,
   }) async {
     try {
@@ -45,14 +43,10 @@ class AuthProvider with ProviderMixin {
         ApiPath.refreshToken,
         data: {"refreshToken": refreshToken},
       );
-      return RefreshTokenResponse.fromJson(response.data);
+      return RefreshTokenModel.fromJson(response.data['data']);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.refreshToken);
-      if (error is DioError) {
-        return RefreshTokenResponse.fromJson(error.response?.data);
-      }
-      return RefreshTokenResponse();
-      // return errorResponse(error, stacktrace, ApiPath.refreshToken);
+      return null;
     }
   }
 
@@ -63,14 +57,19 @@ class AuthProvider with ProviderMixin {
     try {
       final response = await dio.post(
         ApiPath.login,
-        data: {"password": password, "username": username},
+        data: {
+          "deviceToken": await NotificationController.requestFirebaseToken(),
+          "password": password,
+          "username": username,
+        },
       );
 
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);
       if (error is DioError) {
-        return LoginResponse.fromJson(error.response?.data);
+        return LoginResponse.fromJson(
+            error.response?.data as Map<String, dynamic>);
       }
       return LoginResponse();
     }
@@ -96,11 +95,9 @@ class AuthProvider with ProviderMixin {
     }
   }
 
-  Future<Object> getUserInfo({
-    required int userId,
-  }) async {
+  Future<Object> getUserInfo({required int userId}) async {
     if (await isExpiredToken()) {
-      return ExpiredTokenGetResponse();
+      return ExpiredTokenResponse();
     }
     final String apiGetProfile = join(ApiPath.fillProfile, userId.toString());
 
@@ -112,8 +109,7 @@ class AuthProvider with ProviderMixin {
 
       return UserInfoModel.fromJson(response.data);
     } catch (error, stacktrace) {
-      log(error.toString(), stackTrace: stacktrace);
-      return UserInfoModel();
+      return errorResponse(error, stacktrace, apiGetProfile);
     }
   }
 
@@ -133,7 +129,6 @@ class AuthProvider with ProviderMixin {
         data: data,
         options: await defaultOptions(url: apiFillProfile),
       );
-      // log(response.toString());
 
       return UserInfoModel.fromJson(response.data);
     } catch (error) {

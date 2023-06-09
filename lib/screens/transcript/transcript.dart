@@ -250,25 +250,20 @@ class TranscriptPageState extends State<TranscriptPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                          'GPA 1: ${student.hk1SubjectMediumScore ?? '---'}'),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        'GPA 1: ${(student.hk1SubjectMediumScore?.toStringAsFixed(3)) ?? '---'}'),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                          'GPA 2:  ${student.hk2SubjectMediumScore ?? '---'}'),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        'GPA 2:  ${(student.hk2SubjectMediumScore?.toStringAsFixed(3)) ?? '---'}'),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text('GPA year:  ${student.mediumScore ?? '---'}'),
-                    ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                        'GPA year:  ${(student.mediumScore?.toStringAsFixed(3)) ?? '---'}'),
                   ),
                 ],
               ),

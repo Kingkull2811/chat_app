@@ -27,30 +27,33 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-<<<<<<< HEAD
 
-=======
 	<key>NSCameraUsageDescription</key>
-	<string>Take  photo from camera.</string>
+	<string>We require camera access.</string>
+
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Use to capture audio for image picker plugin.</string>
+	<string>We require microphone access to connect.</string>
+
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Choose photo from gallery.</string>
+	<string>>We require library access to choose photo from gallery.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 	</array>
->>>>>>> chat
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -58,18 +61,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-<<<<<<< HEAD
+
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Choose photo from gallery.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>Take  photo from camera.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Use to capture audio for image picker plugin.</string>
 
      <key>UIBackgroundModes</key>
      <array>
@@ -77,7 +74,12 @@
      <string>remote-notification</string>
      <string>voip</string>
      </array>
-=======
->>>>>>> chat
+
+     <key>UIBackgroundModes</key>
+     <array>
+         <string>remote-notification</string>
+         <string>voip</string>
+     </array>
+
 </dict>
 </plist>

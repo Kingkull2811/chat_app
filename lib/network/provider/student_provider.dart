@@ -1,6 +1,7 @@
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/network/response/base_response.dart';
+import 'package:chat_app/network/response/student_response.dart';
 import 'package:path/path.dart';
 
 import '../api/api_path.dart';
@@ -27,9 +28,9 @@ class StudentProvider with ProviderMixin {
     }
   }
 
-  Future<Object> getStudentBySSID({required String studentSSID}) async {
+  Future<BaseResponse> getStudentBySSID({required String studentSSID}) async {
     if (await isExpiredToken()) {
-      return ExpiredTokenGetResponse();
+      return ExpiredTokenResponse();
     }
     try {
       final response = await dio.get(
@@ -38,9 +39,9 @@ class StudentProvider with ProviderMixin {
         options: await defaultOptions(url: ApiPath.getStudentInfo),
       );
 
-      return Student.fromJson(response.data);
+      return StudentResponse.fromJson(response.data);
     } catch (error, stacktrace) {
-      return errorGetResponse(error, stacktrace, ApiPath.getStudentInfo);
+      return errorResponse(error, stacktrace, ApiPath.getStudentInfo);
     }
   }
 

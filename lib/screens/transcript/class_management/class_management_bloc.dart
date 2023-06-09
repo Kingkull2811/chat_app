@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../network/repository/class_repository.dart';
+import '../../../network/response/base_get_response.dart';
 import '../../../utilities/enum/api_error_result.dart';
+import '../../../utilities/screen_utilities.dart';
 import 'class_management_event.dart';
 import 'class_management_state.dart';
 
@@ -33,6 +35,8 @@ class ClassManagementBloc
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
+          } else if (response is ExpiredTokenGetResponse) {
+            logoutIfNeed(this.context);
           } else {
             emit(state.copyWith(
               isLoading: false,

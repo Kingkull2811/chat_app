@@ -39,6 +39,8 @@ class TranscriptManagementBloc
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
+          } else if (response is ExpiredTokenGetResponse) {
+            logoutIfNeed(this.context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -47,7 +49,7 @@ class TranscriptManagementBloc
             ));
           }
           final Map<String, dynamic> queryParameters = {
-            'search': '',
+            // 'search': '',
             // 'classId': 0,
             'semesterYear': '2023-2024'
           };

@@ -1,9 +1,14 @@
 import 'package:chat_app/network/model/user_from_firebase.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../services/notification_controller.dart';
+import '../../../services/permission.dart';
+import '../../../utilities/call_utils.dart';
+import '../../../utilities/enum/call_type.dart';
 import '../../settings/profile/profile.dart';
 import '../../settings/profile/profile_bloc.dart';
 import '../chat_room/message_view.dart';
@@ -23,6 +28,8 @@ class _ContactTabState extends State<ContactTab> {
   bool _showSearchResult = false;
 
   List<UserFirebaseData> listUsers = [];
+
+  final _pref = SharedPreferencesStorage();
 
   @override
   void initState() {
@@ -159,6 +166,13 @@ class _ContactTabState extends State<ContactTab> {
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
+                      Text(
+                        item.phone ?? '',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -198,7 +212,23 @@ class _ContactTabState extends State<ContactTab> {
                   padding: const EdgeInsets.only(left: 10),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () {},
+                    onTap: () async =>
+                        await PermissionsServices.microphonePermissionsGranted()
+                            ? CallUtils.dialVoice(
+                                context: context,
+                                isFromChat: false,
+                                callerId: _pref.getUserId().toString(),
+                                callerName: _pref.getFullName(),
+                                callerPic: _pref.getImageAvartarUrl(),
+                                callerFCMToken: await NotificationController
+                                    .requestFirebaseToken(),
+                                receiverId: item.id.toString(),
+                                receiverName: item.fullName ?? '',
+                                receiverPic: item.fileUrl ?? '',
+                                receiverFCMToken: item.fcmToken,
+                                callType: CallType.call_audio,
+                              )
+                            : {},
                     child: Container(
                       height: 35,
                       width: 35,

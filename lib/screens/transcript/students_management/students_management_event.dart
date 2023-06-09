@@ -7,6 +7,17 @@ abstract class StudentsManagementEvent extends Equatable {
 
 class InitStudentsEvent extends StudentsManagementEvent {}
 
+class SearchEvent extends StudentsManagementEvent {
+  final String? searchQuery;
+  final String? schoolYear;
+  final int? classId;
+
+  SearchEvent({this.searchQuery, this.schoolYear, this.classId});
+
+  @override
+  List<Object?> get props => [searchQuery, schoolYear, classId];
+}
+
 class AddStudentsEvent extends StudentsManagementEvent {
   final Map<String, dynamic> data;
 

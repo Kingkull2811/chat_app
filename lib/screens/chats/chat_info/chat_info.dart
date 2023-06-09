@@ -1,6 +1,4 @@
 import 'package:chat_app/routes.dart';
-import 'package:chat_app/screens/chats/call/audio_call/audio_call.dart';
-import 'package:chat_app/screens/chats/call/video_call/video_call.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/services/firebase_services.dart';
@@ -96,15 +94,16 @@ class ChatInfoPage extends StatelessWidget {
                     icon: Icons.call_outlined,
                     itemTitle: 'Audio',
                     onTapItemControl: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AudioCallPage(
-                            imageUrl: imageUrl ?? '',
-                            name: name,
-                          ),
-                        ),
-                      );
+                      //todo
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => AudioCallPage(
+                      //       imageUrl: imageUrl ?? '',
+                      //       name: name,
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                   _itemControl(
@@ -112,15 +111,16 @@ class ChatInfoPage extends StatelessWidget {
                     icon: Icons.videocam_outlined,
                     itemTitle: 'Video',
                     onTapItemControl: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoCallPage(
-                            imageUrl: imageUrl ?? '',
-                            name: name,
-                          ),
-                        ),
-                      );
+                      //todo
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => VideoCallPage(
+                      //       imageUrl: imageUrl ?? '',
+                      //       name: name,
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                   _itemControl(

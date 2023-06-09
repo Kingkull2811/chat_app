@@ -8,15 +8,14 @@ import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
 import '../network/repository/push_notification_repository.dart';
 import '../utilities/enum/message_type.dart';
+import 'notification_controller.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -29,99 +28,10 @@ class FirebaseService {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   final _prefs = SharedPreferencesStorage();
 
-  ///*************initial fcm******************
-  late AndroidNotificationChannel channel;
-
-  /// Initialize the [FlutterLocalNotificationsPlugin] package.
-  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
-  bool isFlutterLocalNotificationsInitialized = false;
-
-  Future<void> setupFlutterNotifications() async {
-    if (isFlutterLocalNotificationsInitialized) {
-      return;
-    }
-    channel = const AndroidNotificationChannel(
-      'high_importance_channel', // id
-      'High Importance Notifications', // title
-      description:
-          'This channel is used for important notifications.', // description
-      importance: Importance.high,
-    );
-
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    /// Create an Android Notification Channel.
-    ///
-    /// We use this channel in the `AndroidManifest.xml` file to override the
-    /// default FCM channel to enable heads up notifications.
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    /// Update the iOS foreground notification presentation options to allow
-    /// heads up notifications.
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    isFlutterLocalNotificationsInitialized = true;
-  }
-
-  void showFlutterNotification(RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-    if (notification != null && android != null && !kIsWeb) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: channel.description,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
-            icon: 'launch_background',
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<void> initialState(context) async {
-    _messaging.getInitialMessage().then(
-      (value) {
-        // bool resolved = true;
-        // String? initialMessage = value?.data.toString();
-      },
-    );
-
-    FirebaseMessaging.onMessage.listen(showFlutterNotification);
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        print('A new onMessageOpenedApp event was published!');
-      }
-    });
-  }
-
   /// /// *****************Firebase Service*************
-
-  UploadTask uploadTask(String imagePath, String fileName) {
-    Reference reference =
-        _firebaseStorage.ref().child('images').child('/$fileName');
-    UploadTask uploadTask = reference.putFile(File(imagePath));
-    reference.getDownloadURL();
-    return uploadTask;
-  }
 
   Future uploadImageToStorage({
     required String titleName,
@@ -182,6 +92,13 @@ class FirebaseService {
     } on FirebaseException catch (_) {}
   }
 
+  Future updateOnlineStatus(bool isOnline) async {
+    await _firestore
+        .collection(AppConstants.userCollection)
+        .doc('user_id_${_prefs.getUserId()}')
+        .update({'isOnline': isOnline});
+  }
+
   Future<UserFirebaseData?> getUserDetails({required int userId}) async {
     final snapshot = await _firestore
         .collection(AppConstants.userCollection)
@@ -227,7 +144,7 @@ class FirebaseService {
       for (var element in snapshot.docChanges) {
         final doc = element.doc;
         if (doc.exists) {
-          log('data: ${doc.data().toString()}');
+          // log('data: ${doc.data().toString()}');
           if (doc.data() is Map<String, dynamic>) {
             final message =
                 MessageModel.fromJson(doc.data() as Map<String, dynamic>);
@@ -270,7 +187,8 @@ class FirebaseService {
                   .doc(docID)
                   .update(
                 {
-                  'fcm_token_$currentUserId': _prefs.getFCMToken(),
+                  'fcm_token_$currentUserId':
+                      await NotificationController.requestFirebaseToken(),
                   'fcm_token_$receiverId': receiverFCMToken,
                 },
               );
@@ -289,7 +207,8 @@ class FirebaseService {
                     currentUserId.toString(): _prefs.getImageAvartarUrl(),
                     receiverId: receiverAvt,
                   },
-                  'fcm_token_$currentUserId': _prefs.getFCMToken(),
+                  'fcm_token_$currentUserId':
+                      await NotificationController.requestFirebaseToken(),
                   'fcm_token_$receiverId': receiverFCMToken,
                   'time': Timestamp.now(),
                 },
@@ -321,6 +240,7 @@ class FirebaseService {
     required var docID,
     required String messageText,
     required int currentUserId,
+    required String receiverFCMToken,
   }) async {
     final MessageModel message = MessageModel(
       fromId: currentUserId,
@@ -350,16 +270,28 @@ class FirebaseService {
         'message_type': setMessageType(message.messageType)
       },
     );
+
+    await sendPushNotification(
+      receiverFCMToken: receiverFCMToken,
+      senderName: _prefs.getFullName(),
+      message: message.message,
+    );
   }
 
-  Future<void> sendImageMessage(var docID, String imagePath) async {
+  Future<void> sendImageMessage(
+    var docID,
+    String imagePath,
+    receiverFCMToken,
+  ) async {
+    final imageUrl = await FirebaseService().uploadImageToStorage(
+      titleName: 'image_message',
+      childFolder: AppConstants.imageMessageChild,
+      image: File(imagePath),
+    );
+
     MessageModel message = MessageModel(
       fromId: _prefs.getUserId(),
-      message: await FirebaseService().uploadImageToStorage(
-        titleName: 'image_message',
-        childFolder: AppConstants.imageMessageChild,
-        image: File(imagePath),
-      ),
+      message: imageUrl,
       messageType: MessageType.image,
       time: Timestamp.now(),
     );
@@ -385,30 +317,34 @@ class FirebaseService {
         'message_type': setMessageType(message.messageType)
       },
     );
+
+    await sendPushNotification(
+      receiverFCMToken: receiverFCMToken,
+      senderName: _prefs.getFullName(),
+      imageUrl: imageUrl,
+    );
   }
 
   Future<void> sendPushNotification({
     required String receiverFCMToken,
     required String senderName,
-    required String message,
+    String? message,
+    String? imageUrl,
   }) async {
-    final data = {
-      'to': receiverFCMToken,
+    Map<String, dynamic> data = {
+      "to": receiverFCMToken,
       "notification": {
-        "body": message,
-        "title": senderName, //our name should be send
-        // "android_channel_id": "chats"
+        if (message != null) "body": message,
+        "title": senderName,
+        "sound": true,
+        if (imageUrl != null) 'image': imageUrl,
       },
+      "data": {"content_type": "notification", "value": 1},
+      "content_available": true,
+      "priority": "high"
     };
-    //onTap:
-    // _messaging.subscribeToTopic('topic');
-    log('dataSendL $data');
 
-    await PushNotificationRepository().messagePN(
-      fcmToken: receiverFCMToken,
-      title: senderName,
-      message: message,
-    );
+    await PushNotificationRepository().messagePN(data: data);
 
     ///send to api fcmGoogle
     // final data2 = {
@@ -428,10 +364,59 @@ class FirebaseService {
 
   ///call - video - audio
 
-  Stream<DocumentSnapshot> callStream({required String uid}) =>
-      _firestore.collection(AppConstants.callCollection).doc(uid).snapshots();
+  Future<void> sendCallNotification({
+    required String channel,
+    required String receiverFCMToken,
+    required String senderName,
+    String? message,
+    String? imageUrl,
+  }) async {
+    final data = {
+      "to": receiverFCMToken,
+      "notification": {
+        "body": "$senderName is calling you",
+        "title": "Incoming Call",
+        "sound": true
+      },
+      "data": {"content_type": channel, "value": -1},
+      "content_available": true,
+      "priority": "high"
+    };
 
-  Future<bool> makeVideoCall({required CallModel call}) async {
+    await PushNotificationRepository().messagePN(data: data);
+  }
+
+  Stream<DocumentSnapshot> callStream() => _firestore
+      .collection(AppConstants.callCollection)
+      .doc('call_id_${SharedPreferencesStorage().getUserId()}')
+      .snapshots();
+
+  Stream<DocumentSnapshot> readStateCall({required String receiverDoc}) =>
+      _firestore
+          .collection(AppConstants.callCollection)
+          .doc(receiverDoc)
+          .snapshots();
+
+  Future<bool> updateCallStatus({
+    required String receiverDoc,
+    required bool isAcceptCall,
+  }) async {
+    try {
+      await _firestore
+          .collection(AppConstants.callCollection)
+          .doc(receiverDoc)
+          .update({'is_accept_call': isAcceptCall});
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> makeVideoCall({
+    required CallModel call,
+    required String receiverToken,
+  }) async {
     try {
       call.hasDialled = true;
       call.isCall = "video";
@@ -441,14 +426,20 @@ class FirebaseService {
       call.isCall = "video";
       Map<String, dynamic> hasNotDialledMap = call.toMap(call);
 
+      await sendCallNotification(
+        channel: 'call_video',
+        receiverFCMToken: receiverToken,
+        senderName: call.receiverName ?? '',
+      );
+
       await _firestore
           .collection(AppConstants.callCollection)
-          .doc(call.callerId)
+          .doc('call_id_${call.callerId}')
           .set(hasDialledMap);
 
       await _firestore
           .collection(AppConstants.callCollection)
-          .doc(call.receiverId)
+          .doc('call_id_${call.receiverId}')
           .set(hasNotDialledMap);
 
       return true;
@@ -459,7 +450,10 @@ class FirebaseService {
     }
   }
 
-  Future<bool> makeVoiceCall({required CallModel call}) async {
+  Future<bool> makeVoiceCall({
+    required CallModel call,
+    required String receiverToken,
+  }) async {
     try {
       call.hasDialled = true;
       call.isCall = "audio";
@@ -467,16 +461,23 @@ class FirebaseService {
 
       call.hasDialled = false;
       call.isCall = "audio";
+      call.isAcceptCall = null;
       Map<String, dynamic> hasNotDialledMap = call.toMap(call);
+
+      await sendCallNotification(
+        channel: 'call_audio',
+        receiverFCMToken: receiverToken,
+        senderName: call.receiverName ?? '',
+      );
 
       await _firestore
           .collection(AppConstants.callCollection)
-          .doc(call.callerId)
+          .doc('call_id_${call.callerId}')
           .set(hasDialledMap);
 
       await _firestore
           .collection(AppConstants.callCollection)
-          .doc(call.receiverId)
+          .doc('call_id_${call.receiverId}')
           .set(hasNotDialledMap);
 
       return true;
@@ -490,12 +491,12 @@ class FirebaseService {
     try {
       await _firestore
           .collection(AppConstants.callCollection)
-          .doc(call.callerId)
+          .doc('call_id_${call.callerId}')
           .delete();
 
       await _firestore
           .collection(AppConstants.callCollection)
-          .doc(call.receiverId)
+          .doc('call_id_${call.receiverId}')
           .delete();
 
       return true;
@@ -512,7 +513,9 @@ class FirebaseService {
       await _firestore
           .collection(AppConstants.userCollection)
           .doc('user_id_$userId')
-          .update({'fcm_token': _prefs.getFCMToken()});
+          .update({
+        'fcm_token': await NotificationController.requestFirebaseToken()
+      });
     }
 
     if (isNotNullOrEmpty(docID)) {
@@ -521,12 +524,11 @@ class FirebaseService {
           .doc(docID)
           .update(
         {
-          'fcm_token_${_prefs.getUserId()}': _prefs.getFCMToken().toString(),
+          'fcm_token_${_prefs.getUserId()}':
+              await NotificationController.requestFirebaseToken(),
         },
       );
     }
-    //todo
-    print('device token: ${_prefs.getFCMToken()}');
   }
 
   String constructFCMPayload(String? token) {
@@ -552,7 +554,7 @@ class FirebaseService {
               'FlutterFire Messaging Example: Subscribing to topic "fcm_test".',
             );
           }
-          await FirebaseMessaging.instance.subscribeToTopic('fcm_test');
+          // await FirebaseMessaging.instance.subscribeToTopic('fcm_test');
           if (kDebugMode) {
             print(
               'FlutterFire Messaging Example: Subscribing to topic "fcm_test" successful.',
@@ -567,7 +569,7 @@ class FirebaseService {
               'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test".',
             );
           }
-          await FirebaseMessaging.instance.unsubscribeFromTopic('fcm_test');
+          // await FirebaseMessaging.instance.unsubscribeFromTopic('fcm_test');
           if (kDebugMode) {
             print(
               'FlutterFire Messaging Example: Unsubscribing from topic "fcm_test" successful.',
@@ -582,9 +584,9 @@ class FirebaseService {
             if (kDebugMode) {
               print('FlutterFire Messaging Example: Getting APNs token...');
             }
-            String? token = await FirebaseMessaging.instance.getAPNSToken();
+            // String? token = await FirebaseMessaging.instance.getAPNSToken();
             if (kDebugMode) {
-              print('FlutterFire Messaging Example: Got APNs token: $token');
+              print('FlutterFire Messaging Example: Got APNs token: ');
             }
           } else {
             if (kDebugMode) {

@@ -184,7 +184,6 @@ class _ClassManagementState extends State<ClassManagement> {
                                   _classManagementBloc.add(DeleteClassEvent(
                                     classId: classInfo.classId ?? 0,
                                   ));
-                                  Navigator.pop(context);
                                   await _reloadPage();
                                 },
                               );

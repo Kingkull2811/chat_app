@@ -1,4 +1,3 @@
-import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/utilities/enum/api_error_result.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -7,14 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../network/model/student_firebase.dart';
 import '../../../network/model/user_info_model.dart';
-import '../../../network/repository/student_repository.dart';
 import '../../../services/firebase_services.dart';
+import '../../../services/notification_controller.dart';
 import 'fill_profile_event.dart';
 import 'fill_profile_state.dart';
 
 class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
   final _authRepository = AuthRepository();
-  final _studentRepository = StudentRepository();
+  final SharedPreferencesStorage _pref = SharedPreferencesStorage();
 
   final BuildContext context;
 
@@ -22,38 +21,16 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
     on((event, emit) async {
       if (event is FillInit) {}
 
-      if (event is SearchStudentBySSID) {
-        emit(state.copyWith(isLoading: true));
-        final response = await _studentRepository.getStudentBySSID(
-          studentSSID: event.studentSSID,
-        );
-        if (response is Student) {
-          emit(state.copyWith(
-            isLoading: false,
-            isNotFind: false,
-            studentInfo: response,
-          ));
-        } else {
-          Future.delayed(const Duration(seconds: 2), () {
-            emit(state.copyWith(
-              isLoading: false,
-              isNotFind: true,
-            ));
-          });
-        }
-      }
-
       if (event is FillProfile) {
         emit(state.copyWith(isLoading: true));
 
         final response = await _authRepository.fillProfile(
-          userID: event.userId,
-          data: event.userData,
+          userID: _pref.getUserId(),
+          data: event.userMap,
         );
         if (response is UserInfoModel) {
-          await SharedPreferencesStorage().setFullName(response.fullName ?? '');
-          await SharedPreferencesStorage()
-              .setImageAvartarUrl(response.fileUrl ?? '');
+          await _pref.setFullName(response.fullName ?? '');
+          await _pref.setImageAvartarUrl(response.fileUrl ?? '');
           final List<StudentFirebase>? listStudentFireBase = response.parentOf
               ?.map(
                 (student) => StudentFirebase(
@@ -77,11 +54,11 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
             'phone': response.phone,
             'fileUrl': response.fileUrl,
             'parentOf': listToFirestore,
-            'fcm_token': SharedPreferencesStorage().getFCMToken(),
+            'fcm_token': await NotificationController.requestFirebaseToken(),
           };
 
           await FirebaseService().uploadUserData(
-            userId: event.userId,
+            userId: _pref.getUserId(),
             data: data,
           );
 

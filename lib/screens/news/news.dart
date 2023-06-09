@@ -284,7 +284,7 @@ class NewsPageState extends State<NewsPage> {
                   textAlign: TextAlign.left,
                   trimMode: TrimMode.Line,
                   trimCollapsedText: ' show more',
-                  trimExpandedText: ' show less',
+                  trimExpandedText: '\nshow less',
                   lessStyle: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,

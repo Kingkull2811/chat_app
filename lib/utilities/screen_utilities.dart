@@ -147,29 +147,30 @@ Future<void> showCupertinoMessageDialog(
   bool barrierDismiss = false,
 }) async {
   await showCupertinoDialog(
-      barrierDismissible: barrierDismiss,
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: title == null ? null : Text(title),
-          content: content == null
-              ? null
-              : Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(content),
-                ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  if (onClose != null) {
-                    onClose();
-                  }
-                },
-                child: Text(buttonLabel ?? 'OK')),
-          ],
-        );
-      });
+    barrierDismissible: barrierDismiss,
+    context: context,
+    builder: (context) {
+      return CupertinoAlertDialog(
+        title: title == null ? null : Text(title),
+        content: content == null
+            ? null
+            : Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(content),
+              ),
+        actions: <Widget>[
+          CupertinoDialogAction(
+              onPressed: () {
+                Navigator.pop(context);
+                if (onClose != null) {
+                  onClose();
+                }
+              },
+              child: Text(buttonLabel ?? 'OK')),
+        ],
+      );
+    },
+  );
 }
 
 Future<void> showMessageTwoOption(
@@ -185,42 +186,43 @@ Future<void> showMessageTwoOption(
   bool barrierDismiss = false,
 }) async {
   await showCupertinoDialog(
-      barrierDismissible: barrierDismiss,
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: title == null ? null : Text(title),
-          content: content == null
-              ? null
-              : Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(content),
-                ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              onPressed: () {
-                Navigator.pop(context);
-                if (onCancel != null) {
-                  onCancel();
-                }
-              },
-              child: Text(cancelLabel ?? 'Cancel'),
-            ),
-            CupertinoDialogAction(
-              onPressed: () {
-                Navigator.pop(context);
-                if (onOk != null) {
-                  onOk();
-                }
-              },
-              child: Text(
-                okLabel ?? 'OK',
-                style: const TextStyle(color: Colors.red),
+    barrierDismissible: barrierDismiss,
+    context: context,
+    builder: (context) {
+      return CupertinoAlertDialog(
+        title: title == null ? null : Text(title),
+        content: content == null
+            ? null
+            : Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(content),
               ),
+        actions: <Widget>[
+          CupertinoDialogAction(
+            onPressed: () {
+              Navigator.pop(context);
+              if (onCancel != null) {
+                onCancel();
+              }
+            },
+            child: Text(cancelLabel ?? 'Cancel'),
+          ),
+          CupertinoDialogAction(
+            onPressed: () {
+              Navigator.pop(context);
+              if (onOk != null) {
+                onOk();
+              }
+            },
+            child: Text(
+              okLabel ?? 'OK',
+              style: const TextStyle(color: Colors.red),
             ),
-          ],
-        );
-      });
+          ),
+        ],
+      );
+    },
+  );
 }
 
 Future<void> showSuccessBottomSheet(

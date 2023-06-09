@@ -267,7 +267,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   "email": _emailController.text.trim(),
                   "isFillProfileKey": false,
                   "password": _passwordController.text.trim(),
-                  "roles": [isTeacher ? 'ROLE_USER' : 'ROLE_TEACHER'],
+                  "roles": [!isTeacher ? 'ROLE_USER' : 'ROLE_TEACHER'],
                   "username": _userNameController.text.trim()
                 };
                 // _signUpBloc.add(WaitingSignUp(userInfo: data));

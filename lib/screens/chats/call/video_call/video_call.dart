@@ -1,267 +1,192 @@
-import 'dart:async';
-
-import 'package:chat_app/theme.dart';
+// import 'package:agora_uikit/agora_uikit.dart';
+import 'package:chat_app/network/model/call_model.dart';
+import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
+
+import '../../../../services/firebase_services.dart';
+import '../../../../services/zego_config.dart';
 
 class VideoCallPage extends StatefulWidget {
-  final String imageUrl;
-  final String name;
+  final CallModel call;
+  final bool isFromWaiting;
 
-  const VideoCallPage({Key? key, required this.imageUrl, required this.name})
-      : super(key: key);
+  const VideoCallPage({
+    Key? key,
+    required this.call,
+    this.isFromWaiting = false,
+  }) : super(key: key);
 
   @override
   State<VideoCallPage> createState() => _VideoCallPageState();
 }
 
 class _VideoCallPageState extends State<VideoCallPage> {
-  bool isMute = false;
-  bool isOpenMic = true;
-  bool isOnCalling = true;
+  // AgoraClient? _client;
 
-  late Timer _timer;
-  Duration duration = const Duration();
-  String countTime = '0:00:00';
-
-  setTime() {
-    setState(() {
-      final seconds = duration.inSeconds + 1;
-
-      duration = Duration(seconds: seconds);
-      String hh = duration.inHours.toString();
-      String mm = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-      String ss = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-
-      countTime = "$hh:$mm:$ss";
-    });
-  }
+  // bool isMute = false;
+  // bool isOpenMic = true;
+  // bool isOnCalling = true;
+  //
+  // late Timer _timer;
+  // Duration duration = const Duration();
+  // String countTime = '0:00:00';
+  //
+  // setTime() {
+  //   setState(() {
+  //     final seconds = duration.inSeconds + 1;
+  //
+  //     duration = Duration(seconds: seconds);
+  //     String hh = duration.inHours.toString();
+  //     String mm = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+  //     String ss = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+  //
+  //     countTime = "$hh:$mm:$ss";
+  //   });
+  // }
+  //
+  // void initAgora() async {
+  //   // await _client!.initialize();
+  // }
 
   @override
   void initState() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setTime());
+    // _timer = Timer.periodic(const Duration(seconds: 1), (_) => setTime());
     super.initState();
+    // // _client = AgoraClient(
+    // //   agoraConnectionData: AgoraConnectionData(
+    // //     appId: AgoraConfig.appId,
+    // //     channelName: AgoraConfig.channelName,
+    // //     tokenUrl: ApiPath.agoraServerDomain,
+    // //   ),
+    // // );
+    // initAgora();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    // _timer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_outlined,
-            size: 24,
-            color: Colors.black,
+    bool isMe = widget.call.callerId ==
+            SharedPreferencesStorage().getUserId().toString()
+        ? true
+        : false;
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: SafeArea(
+          child: ZegoUIKitPrebuiltCall(
+            appID: ZegoConfig.appID,
+            appSign: ZegoConfig.appSign,
+            userID: isMe
+                ? (widget.call.callerId ?? '')
+                : (widget.call.receiverId ?? ''),
+            userName: isMe
+                ? (widget.call.callerName ?? '')
+                : (widget.call.receiverName ?? ''),
+            callID: widget.call.channelName,
+            config: ZegoUIKitPrebuiltCallConfig.oneOnOneVideoCall()
+              ..avatarBuilder = (context, Size size, ZegoUIKitUser? user,
+                  Map<String, dynamic> map) {
+                return user != null
+                    ? Container(
+                        height: 150,
+                        width: 150,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: NetworkImage(
+                              isMe
+                                  ? (widget.call.callerPic ?? '')
+                                  : (widget.call.receiverPic ?? ''),
+                            ),
+                          ),
+                        ),
+                      )
+                    : const SizedBox();
+              }
+              ..onOnlySelfInRoom = (context) {
+                // Navigator.pop(context);
+                Navigator.pop(context);
+              }
+              ..turnOnCameraWhenJoining = true
+              ..turnOnMicrophoneWhenJoining = true
+              ..useSpeakerWhenJoining = false
+              ..durationConfig.isVisible = true
+              ..layout = ZegoLayout.pictureInPicture(
+                isSmallViewDraggable: true,
+                switchLargeOrSmallViewByClick: true,
+              )
+              ..audioVideoViewConfig = ZegoPrebuiltAudioVideoViewConfig(
+                foregroundBuilder: (BuildContext context, Size size,
+                    ZegoUIKitUser? user, Map extraInfo) {
+                  return user != null
+                      ? Positioned(
+                          bottom: 5,
+                          left: 5,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  isMe
+                                      ? (widget.call.receiverPic ?? '')
+                                      : (widget.call.callerPic ?? ''),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox();
+                },
+                showAvatarInAudioMode: true,
+                showSoundWavesInAudioMode: true,
+              )
+              ..onHangUp = () {
+                FirebaseService().endCall(call: widget.call);
+                Navigator.pop(context);
+                if (widget.isFromWaiting) Navigator.pop(context);
+              }
+              ..onOnlySelfInRoom = (context) {
+                Navigator.of(context).pop(true);
+              }
+              ..audioVideoViewConfig = ZegoPrebuiltAudioVideoViewConfig(
+                showAvatarInAudioMode: false,
+                showSoundWavesInAudioMode: true,
+              ),
           ),
         ),
-      ),
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.grey.withOpacity(0.45),
-      body: Stack(
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16, top: 0, right: 16),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
-                ),
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  if (index == 5) {
-                    return Column(
-                      children: [
-                        Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(75),
-                            // image: DecorationImage(
-                            //   image: NetworkImage(
-                            //     widget.imageUrl,
-                            //   ),
-                            //   fit: BoxFit.cover,
-                            // ),
-                          ),
-                          // child: CircleAvatar(
-                          //   radius: 75,
-                          //   child: Image.asset(
-                          //     widget.imageUrl,
-                          //     fit: BoxFit.cover,
-                          //   ),
-                          // ),
-                          child: const Center(
-                            child: Text(
-                              '+3',
-                              style: TextStyle(
-                                  fontSize: 32,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        // const Padding(
-                        //   padding: EdgeInsets.only(top: 10.0),
-                        //   child: Text(
-                        //     'Other People',
-                        //     style: TextStyle(
-                        //         fontWeight: FontWeight.bold,
-                        //         fontSize: 20,
-                        //         color: Colors.white),
-                        //   ),
-                        // ),
-                      ],
-                    );
-                  }
-                  return Column(
-                    children: [
-                      Container(
-                          height: 100,
-                          width: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(75),
-                            // image: DecorationImage(
-                            //   image: NetworkImage(
-                            //     widget.imageUrl,
-                            //   ),
-                            //   fit: BoxFit.cover,
-                            // ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 75,
-                            child: Image.asset(
-                              widget.imageUrl,
-                              fit: BoxFit.cover,
-                            ),
-                          )),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Text(
-                          widget.name,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 40.0),
-              child: SizedBox(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        isOnCalling ? countTime : 'connecting ...',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 200,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isMute = !isMute;
-                              });
-                            },
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  color: const Color(0xffEAEAEA)),
-                              child: Icon(
-                                isMute
-                                    ? Icons.volume_off_outlined
-                                    : Icons.volume_up_outlined,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                isOpenMic = !isOpenMic;
-                              });
-                            },
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25),
-                                  color: const Color(0xffEAEAEA)),
-                              child: Icon(
-                                // isOpenMic? CupertinoIcons.mic : CupertinoIcons.mic_off,
-                                isOpenMic
-                                    ? Icons.mic_none_outlined
-                                    : Icons.mic_off_outlined,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              //todo::print('end audio call. time_call: $countTime');
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: AppColors.red700,
-                              ),
-                              child: const Icon(
-                                Icons.call_end_outlined,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+        // body: _client == null
+        //     ? const AnimationLoading()
+        //     : SafeArea(
+        //         child: Stack(
+        //           children: [
+        //             AgoraVideoViewer(client: _client!),
+        //             AgoraVideoButtons(
+        //               client: _client!,
+        //               disconnectButtonChild: IconButton(
+        //                 onPressed: () async {
+        //                   await _client!.engine.leaveChannel();
+        //                   // ref.read(callControllerProvider).endCall(
+        //                   //   widget.call.callerId,
+        //                   //   widget.call.receiverId,
+        //                   //   context,
+        //                   // );
+        //                   await FirebaseService().endCall(call: widget.call);
+        //                   Navigator.pop(this.context);
+        //                 },
+        //                 icon: const Icon(Icons.call_end),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
       ),
     );
   }

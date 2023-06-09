@@ -14,7 +14,6 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../utilities/enum/media_type.dart';
 import '../../../utilities/screen_utilities.dart';
@@ -457,21 +456,21 @@ class _NewsInfoState extends State<NewsInfo> {
     );
   }
 
-  //todo: fix me late, assign TruongTran pickVideo but can't get video thumbnail
+  //todo: fix me late, pickVideo but can't get video thumbnail
   Future<String> getVideoThumbnail(String videoPath) async {
     try {
-      final thumb = await VideoThumbnail.thumbnailFile(
-        video: videoPath,
-        thumbnailPath: (await getTemporaryDirectory()).path,
-        imageFormat: ImageFormat.JPEG,
-        quality: 100,
-      );
+      // final thumb = await VideoThumbnail.thumbnailFile(
+      //   video: videoPath,
+      //   thumbnailPath: (await getTemporaryDirectory()).path,
+      //   imageFormat: ImageFormat.JPEG,
+      //   quality: 100,
+      // );
 
       final appDocDir = await getApplicationDocumentsDirectory();
       final thumbnailPath = join(appDocDir.path, 'thumbnail.jpg');
-
-      final file = File(thumbnailPath);
-      await file.writeAsBytes(File(thumb!).readAsBytesSync());
+      //
+      // final file = File(thumbnailPath);
+      // await file.writeAsBytes(File(thumb!).readAsBytesSync());
 
       return thumbnailPath;
     } on PlatformException catch (e) {
