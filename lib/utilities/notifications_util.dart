@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../network/model/media_model.dart';
+import '../theme.dart';
 import 'media_player_central.dart';
 
 /* *********************************************
@@ -600,7 +601,6 @@ class NotificationUtils {
   ************************************************ */
 
   static Future<void> showCallNotification(int id, int timeToWait) async {
-    String platformVersion = await getPlatformVersion();
     // Schedule only for test purposes. For real applications, you MUST
     // create call or alarm notifications using AndroidForegroundService.
     await AwesomeNotifications().createNotification(
@@ -617,9 +617,7 @@ class NotificationUtils {
         wakeUpScreen: true,
         fullScreenIntent: true,
         autoDismissible: false,
-        backgroundColor: (platformVersion == 'Android-31')
-            ? const Color(0xFF00796a)
-            : Colors.white,
+        backgroundColor: AppColors.primaryColor,
         payload: {'username': 'Little Mary'},
       ),
       actionButtons: [

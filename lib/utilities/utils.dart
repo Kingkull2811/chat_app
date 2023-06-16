@@ -5,7 +5,6 @@ import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:chat_app/utilities/enum/media_type.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -210,22 +209,23 @@ void loadSingletonPage(
   );
 }
 
-Future<String> getPlatformVersion() async {
-  if (Platform.isAndroid) {
-    var androidInfo = await DeviceInfoPlugin().androidInfo;
-    var sdkInt = androidInfo.version.sdkInt;
-    return 'Android-$sdkInt';
-  }
-
-  if (Platform.isIOS) {
-    var iosInfo = await DeviceInfoPlugin().iosInfo;
-    var systemName = iosInfo.systemName;
-    var version = iosInfo.systemVersion;
-    return '$systemName-$version';
-  }
-
-  return 'unknown';
-}
+//get device info
+// Future<String> getPlatformVersion() async {
+//   if (Platform.isAndroid) {
+//     var androidInfo = await DeviceInfoPlugin().androidInfo;
+//     var sdkInt = androidInfo.version.sdkInt;
+//     return 'Android-$sdkInt';
+//   }
+//
+//   if (Platform.isIOS) {
+//     var iosInfo = await DeviceInfoPlugin().iosInfo;
+//     var systemName = iosInfo.systemName;
+//     var version = iosInfo.systemVersion;
+//     return '$systemName-$version';
+//   }
+//
+//   return 'unknown';
+// }
 
 Future<String> downloadAndSaveImageOnDisk(String url, String fileName) async {
   var directory = await getApplicationDocumentsDirectory();

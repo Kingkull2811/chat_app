@@ -14,7 +14,6 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-
 	<key>CFBundleName</key>
 	<string>chat_app</string>
 	<key>CFBundlePackageType</key>
@@ -27,33 +26,29 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-
 	<key>NSCameraUsageDescription</key>
 	<string>We require camera access.</string>
-
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We require microphone access to connect.</string>
-
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>>We require library access to choose photo from gallery.</string>
+	<string>&gt;We require library access to choose photo from gallery.</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
+		<string>remote-notification</string>
+		<string>voip</string>
 	</array>
-
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-
+	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
-
+	<key>UIStatusBarStyle</key>
+	<string></string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -61,25 +56,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-
-	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-
-     <key>UIBackgroundModes</key>
-     <array>
-     <string>processing</string>
-     <string>remote-notification</string>
-     <string>voip</string>
-     </array>
-
-     <key>UIBackgroundModes</key>
-     <array>
-         <string>remote-notification</string>
-         <string>voip</string>
-     </array>
-
 </dict>
 </plist>

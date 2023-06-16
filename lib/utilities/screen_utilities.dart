@@ -6,8 +6,6 @@ import 'package:chat_app/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:local_auth_android/local_auth_android.dart';
-import 'package:local_auth_ios/types/auth_messages_ios.dart';
 
 import '../widgets/primary_button.dart';
 import '../widgets/text_edit_dialog_widget.dart';
@@ -63,23 +61,23 @@ clearFocus(BuildContext context) {
   }
 }
 
-AndroidAuthMessages androidLocalAuthMessage(//BuildContext context,
-        ) =>
-    const AndroidAuthMessages(
-      cancelButton: 'OK',
-      goToSettingsButton: 'Setting',
-      goToSettingsDescription:
-          'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
-    );
-
-IOSAuthMessages iosLocalAuthMessages(//BuildContext context,
-        ) =>
-    const IOSAuthMessages(
-      cancelButton: 'OK',
-      goToSettingsButton: 'Setting',
-      goToSettingsDescription:
-          'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
-    );
+// AndroidAuthMessages androidLocalAuthMessage(//BuildContext context,
+//         ) =>
+//     const AndroidAuthMessages(
+//       cancelButton: 'OK',
+//       goToSettingsButton: 'Setting',
+//       goToSettingsDescription:
+//           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
+//     );
+//
+// IOSAuthMessages iosLocalAuthMessages(//BuildContext context,
+//         ) =>
+//     const IOSAuthMessages(
+//       cancelButton: 'OK',
+//       goToSettingsButton: 'Setting',
+//       goToSettingsDescription:
+//           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
+//     );
 
 Future<void> showMessageNoInternetDialog(
   BuildContext context, {

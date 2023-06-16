@@ -5,7 +5,6 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:vibration/vibration.dart';
 
 import '../../../utilities/notifications_util.dart';
 import '../../../utilities/utils.dart';
@@ -40,7 +39,7 @@ class _CallPageState extends State<CallPage> {
   }
 
   void finishCall() {
-    Vibration.vibrate(duration: 100);
+    // Vibration.vibrate(duration: 100);
     NotificationUtils.cancelNotification(widget.receivedAction.id!);
     AndroidForegroundService.stopForeground(widget.receivedAction.id!);
     Navigator.pop(context);
@@ -187,7 +186,7 @@ class _CallPageState extends State<CallPage> {
                               ),
                               SingleSliderToConfirm(
                                 onConfirmation: () {
-                                  Vibration.vibrate(duration: 100);
+                                  // Vibration.vibrate(duration: 100);
                                   startCallingTimer();
                                 },
                                 width: mediaQueryData.size.width * 0.55,

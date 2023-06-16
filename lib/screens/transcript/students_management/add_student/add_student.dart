@@ -7,9 +7,10 @@ import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/widgets/app_image.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide DatePickerTheme;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart'
+    as data_time_pick;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -232,7 +233,7 @@ class _AddStudentState extends State<AddStudent> {
                   hintText: 'yyyy/MM/dd',
                   showSuffix: true,
                   onTap: () {
-                    DatePicker.showDatePicker(
+                    data_time_pick.DatePicker.showDatePicker(
                       context,
                       showTitleActions: true,
                       minTime: DateTime(1990, 01, 01),
@@ -246,7 +247,7 @@ class _AddStudentState extends State<AddStudent> {
                       currentTime:
                           DateTime.tryParse(_calendarController.text) ??
                               DateTime.now(),
-                      locale: LocaleType.en,
+                      locale: data_time_pick.LocaleType.en,
                     );
                   },
                   validator: (value) {
