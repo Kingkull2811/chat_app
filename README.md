@@ -1,6 +1,6 @@
 # chat_app project
 
-The last project of my lifetime in KMA (Academy of Cryptography Techniques) for my graduation project.
+The last project in the course of studying at KMA (Academy of Cryptography Techniques) for my graduation project.
 
 ## Project Description 
 
