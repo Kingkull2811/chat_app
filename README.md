@@ -1,44 +1,22 @@
-# chat_app
+# chat_app project
 
-App chat
+The last project of my lifetime in KMA (Academy of Cryptography Techniques) for my graduation project.
 
-## Getting Started
+## Project Description 
 
-This project is a starting point for a Flutter application.
+>This project was developed with the topic: Building an application to manage student learning outcomes and exchange information between teachers and parents in online learning.
+>It consists of 2 parts, learning results management and real-time online chat (chatting, calling audio, calling video).
+>- Learning results management: using RESTful API for getting and posting data to my server.
+>- Real-time chat: using Firebase for real-time chatting and [ZegoCloud](https://www.zegocloud.com/) for real-time calling.
 
-A few resources to get you started if this is your first Flutter project:
+## Major Dependencies
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-chatAppWeb
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-apiKey: "AIzaSyDGD4HfInR7ybpXD7sYguYP-5j-U2vDQ80",
-authDomain: "chatapp-97dbc.firebaseapp.com",
-projectId: "chatapp-97dbc",
-storageBucket: "chatapp-97dbc.appspot.com",
-messagingSenderId: "103251286025",
-appId: "1:103251286025:web:03d480e7b5bdae42f840d8"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-
-//config using localhost for connect physic mobile device to mac IP:
-//follow: https://stackoverflow.com/a/36605431
-- get IP address mobile device
-- get IP address mac: using command 'config'
-- On MAC, open Terminal, run command 'sudo nano /etc/hosts'. 
-- Enter password, add line '<ip mac>  <ip mobile device>' to end, Ctrl+X, Y, Enter to save
-- note: mobile device and MAC must using share the same wifi network
+| Dependency | Description |
+| ------------ | ------------ |
+| [Bloc](https://pub.dev/packages/flutter_bloc) | Reactive State-Management helps implement the BLoC pattern. |
+| [Dio](https://pub.dev/packages/dio) | A powerful HTTP client for Dart/Flutter, which supports global configuration, interceptors, FormData, request cancellation, file uploading/downloading, timeout, and custom adapters, etc. |
+| [Shared Preferences](https://pub.dev/packages/shared_preferences) | Flutter plugin for reading and writing simple key-value pairs. Wraps NSUserDefaults on iOS and SharedPreferences on Android. |
+| [Flutter Secure Storage](https://pub.dev/packages/flutter_secure_storage) | Flutter Secure Storage provides API to store data in secure storage. Keychain is used in iOS and KeyStore-based solution is used in Android. |
+| [Awesome Notification](https://pub.dev/packages/awesome_notifications) | A complete solution to create Local and Push Notifications, customizing buttons, images, sounds, and emoticons, and applying many different layouts for Flutter apps. |
+| [Flutter Local Notifications](https://pub.dev/packages/flutter_local_notifications) | A cross-platform plugin for displaying and scheduling local notifications for Flutter applications with the ability to customize each platform. |
+| [ZegoCloud Call Kit](https://pub.dev/packages/zego_uikit_prebuilt_call) | Call Kit is a prebuilt feature-rich call component of ZegoCloud, which enables you to build one-on-one and group voice/video calls into your app with only a few lines of code. |
