@@ -68,7 +68,7 @@ class _WaitingCallPageState extends State<WaitingCallPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        call.channelName == CallType.call_audio.name
+                        call.channelName == CallType.audioCall.name
                             ? VoiceCallPage(call: call)
                             : VideoCallPage(call: call),
                   ),

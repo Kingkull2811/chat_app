@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "103251286025-qgj685ko98cko0u85uq5rc8v0tfofhb6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kull.chat_app",
+            "certificate_hash": "32f19b95e82aeec62e8e6b70dc64eb4986e09bf6"
+          }
+        },
+        {
           "client_id": "103251286025-ms52enj6jjjttp2q67v4g31hr7l8t4k7.apps.googleusercontent.com",
           "client_type": 3
         }

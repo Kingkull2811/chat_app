@@ -37,8 +37,8 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
               apiError: ApiError.noError,
               listNews: response.listNews,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,

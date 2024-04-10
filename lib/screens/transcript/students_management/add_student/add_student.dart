@@ -9,8 +9,7 @@ import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide DatePickerTheme;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart'
-    as data_time_pick;
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart' as data_time_pick;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 

@@ -1,4 +1,4 @@
-enum CallType { call_audio, call_video }
+enum CallType { audioCall, videoCall }
 
 enum CallStatus {
   none,

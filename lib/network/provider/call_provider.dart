@@ -5,7 +5,6 @@ import 'package:chat_app/network/provider/provider_mixin.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 
@@ -79,7 +78,7 @@ class CallApi with ProviderMixin {
         throw Exception(
             'Error: ${response.data} Status Code: ${response.statusCode}');
       }
-    } on DioError catch (error) {
+    } catch (error) {
       debugPrint("fireVideoCallError: ${error.toString()}");
     }
   }

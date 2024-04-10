@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:chat_app/utilities/enum/biometrics_button_type.dart';
 import 'package:chat_app/utilities/enum/media_type.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
@@ -196,7 +195,7 @@ double matchGPA(double? oral, m15, m45, finalE) {
 void loadSingletonPage(
   NavigatorState? navigatorState, {
   required String targetPage,
-  required ReceivedAction receivedAction,
+  // required ReceivedAction receivedAction,
 }) {
   // Avoid to open the notification details page over another details page already opened
   // Navigate into pages, avoiding to open the notification details page over another details page already opened
@@ -205,7 +204,7 @@ void loadSingletonPage(
     (route) {
       return (route.settings.name != targetPage) || route.isFirst;
     },
-    arguments: receivedAction,
+    // arguments: receivedAction,
   );
 }
 

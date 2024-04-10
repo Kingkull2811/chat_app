@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/fill_profile_state.dart';
@@ -309,7 +309,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
             listStudent = students;
           });
         },
-        child: Badge(
+        child: badges.Badge(
           showBadge: listStudent.isNotEmpty,
           badgeContent: Text(
             listStudent.length.toString(),
@@ -320,11 +320,11 @@ class _FillProfilePageState extends State<FillProfilePage> {
               color: Colors.white,
             ),
           ),
-          badgeStyle: const BadgeStyle(
+          badgeStyle: const badges.BadgeStyle(
             badgeColor: Colors.red,
             padding: EdgeInsets.fromLTRB(8, 6, 8, 6),
           ),
-          position: BadgePosition.topEnd(top: -5, end: -8),
+          position: badges.BadgePosition.topEnd(top: -5, end: -8),
           child: Container(
             height: 50,
             decoration: BoxDecoration(
@@ -335,9 +335,9 @@ class _FillProfilePageState extends State<FillProfilePage> {
                 color: const Color.fromARGB(128, 130, 130, 130),
               ),
             ),
-            child: Row(
+            child: const Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
+              children:  [
                 Padding(
                   padding: EdgeInsets.only(left: 10, right: 16),
                   child: Icon(

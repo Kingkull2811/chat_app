@@ -368,7 +368,7 @@ class TranscriptPageState extends State<TranscriptPage> {
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           ),
-          dataRowHeight: 50,
+          dataRowMinHeight: 50,
           columns: getColumns(columns),
           rows: getRows(listLearningInfo),
         ),

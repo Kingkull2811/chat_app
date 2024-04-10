@@ -8,11 +8,8 @@ import 'package:chat_app/screens/authenticator/signup/sign_up.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/main/main_app.dart';
 import 'package:chat_app/screens/term_and_policy/term_and_policy.dart';
-import 'package:chat_app/theme.dart';
-import 'package:chat_app/utilities/enum/highlight_status.dart';
 import 'package:chat_app/utilities/screen_utilities.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
-import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/input_field.dart';
 import 'package:chat_app/widgets/input_password_field.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -273,31 +270,31 @@ class _LoginFormPageState extends State<LoginFormPage> {
   _navigateToMainPage() async => await Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)));
 
-  _buildBiometricsButton(LoginFormState currentState) {
-    if (currentState.buttonStatus != HighlightStatus.notAvailable) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 30, bottom: 32),
-        child: Center(
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () {
-              _loginFormBloc.add(LoginWithBiometrics());
-            },
-            child: Image.asset(
-              getBiometricsButtonPath(
-                  buttonType: currentState.biometricButtonType),
-              width: 80,
-              height: 80,
-              color: currentState.buttonStatus == HighlightStatus.active
-                  ? Theme.of(context).primaryColor
-                  : AppColors.greyLight,
-            ),
-          ),
-        ),
-      );
-    }
-    return const SizedBox(height: 142);
-  }
+  // _buildBiometricsButton(LoginFormState currentState) {
+  //   if (currentState.buttonStatus != HighlightStatus.notAvailable) {
+  //     return Padding(
+  //       padding: const EdgeInsets.only(top: 30, bottom: 32),
+  //       child: Center(
+  //         child: GestureDetector(
+  //           behavior: HitTestBehavior.translucent,
+  //           onTap: () {
+  //             _loginFormBloc.add(LoginWithBiometrics());
+  //           },
+  //           child: Image.asset(
+  //             getBiometricsButtonPath(
+  //                 buttonType: currentState.biometricButtonType),
+  //             width: 80,
+  //             height: 80,
+  //             color: currentState.buttonStatus == HighlightStatus.active
+  //                 ? Theme.of(context).primaryColor
+  //                 : AppColors.greyLight,
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //   }
+  //   return const SizedBox(height: 142);
+  // }
 
   _validateForm() {
     setState(() {

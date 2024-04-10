@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/widgets.dart';
 
 class CloseCaptionElement {
@@ -110,8 +109,7 @@ class MediaModel {
         _diskImagePath = diskImagePath,
         isPlaying = false;
 
-  ImageProvider get diskImage =>
-      AwesomeBitmapUtils().getFromMediaPath(_diskImagePath);
+  // ImageProvider get diskImage => AwesomeBitmapUtils().getFromMediaPath(_diskImagePath);
 
   String get diskImagePath => _diskImagePath;
 }

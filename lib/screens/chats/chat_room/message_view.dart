@@ -8,12 +8,12 @@ import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/photo_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../services/notification_controller.dart';
 import '../../../services/permission.dart';
 import '../../../theme.dart';
 import '../../../utilities/call_utils.dart';
@@ -337,11 +337,7 @@ class _MessageViewState extends State<MessageView> {
           textEditingController: _inputTextController,
           config: Config(
             columns: 7,
-            emojiSizeMax: 32 *
-                (foundation.defaultTargetPlatform == TargetPlatform.iOS ||
-                        Platform.isIOS
-                    ? 1.30
-                    : 1.0),
+            emojiSizeMax: 32 * (foundation.defaultTargetPlatform == TargetPlatform.iOS || Platform.isIOS ? 1.30 : 1.0),
             verticalSpacing: 0,
             horizontalSpacing: 0,
             gridPadding: EdgeInsets.zero,
@@ -400,8 +396,7 @@ class _MessageViewState extends State<MessageView> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -430,10 +425,8 @@ class _MessageViewState extends State<MessageView> {
           borderRadius: BorderRadius.only(
             topRight: const Radius.circular(10),
             topLeft: const Radius.circular(10),
-            bottomRight:
-                isMe ? const Radius.circular(0) : const Radius.circular(10),
-            bottomLeft:
-                isMe ? const Radius.circular(10) : const Radius.circular(0),
+            bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(10),
+            bottomLeft: isMe ? const Radius.circular(10) : const Radius.circular(0),
           ),
         ),
         child: Text(
@@ -460,8 +453,7 @@ class _MessageViewState extends State<MessageView> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    PhotoViewPage(imageUrl: itemMessage.message),
+                builder: (context) => PhotoViewPage(imageUrl: itemMessage.message),
               ),
             );
           },
@@ -536,10 +528,8 @@ class _MessageViewState extends State<MessageView> {
         borderRadius: BorderRadius.only(
           topRight: const Radius.circular(10),
           topLeft: const Radius.circular(10),
-          bottomRight:
-              isMe ? const Radius.circular(0) : const Radius.circular(10),
-          bottomLeft:
-              isMe ? const Radius.circular(10) : const Radius.circular(0),
+          bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(10),
+          bottomLeft: isMe ? const Radius.circular(10) : const Radius.circular(0),
         ),
       ),
       child: SizedBox(
@@ -718,23 +708,21 @@ class _MessageViewState extends State<MessageView> {
       actions: [
         IconButton(
           icon: const Icon(Icons.phone, size: 24, color: Colors.white),
-          onPressed: () async =>
-              await PermissionsServices.microphonePermissionsGranted()
-                  ? CallUtils.dialVoice(
-                      context: context,
-                      isFromChat: true,
-                      callerId: _pref.getUserId().toString(),
-                      callerName: _pref.getFullName(),
-                      callerPic: _pref.getImageAvartarUrl(),
-                      callerFCMToken:
-                          await NotificationController.requestFirebaseToken(),
-                      receiverId: widget.receiverId,
-                      receiverName: widget.receiverName,
-                      receiverPic: widget.receiverAvt,
-                      receiverFCMToken: widget.receiverFCMToken,
-                      callType: CallType.call_audio,
-                    )
-                  : {},
+          onPressed: () async => await PermissionsServices.microphonePermissionsGranted()
+              ? CallUtils.dialVoice(
+                  context: context,
+                  isFromChat: true,
+                  callerId: _pref.getUserId().toString(),
+                  callerName: _pref.getFullName(),
+                  callerPic: _pref.getImageAvartarUrl(),
+                  callerFCMToken: await FirebaseMessaging.instance.getToken(),
+                  receiverId: widget.receiverId,
+                  receiverName: widget.receiverName,
+                  receiverPic: widget.receiverAvt,
+                  receiverFCMToken: widget.receiverFCMToken,
+                  callType: CallType.audioCall,
+                )
+              : {},
         ),
         IconButton(
           icon: const Icon(
@@ -742,23 +730,21 @@ class _MessageViewState extends State<MessageView> {
             size: 24,
             color: Colors.white,
           ),
-          onPressed: () async =>
-              await PermissionsServices.cameraAndMicrophonePermissionsGranted()
-                  ? CallUtils.dialVideo(
-                      context: context,
-                      isFromChat: true,
-                      callerId: _pref.getUserId().toString(),
-                      callerName: _pref.getFullName(),
-                      callerPic: _pref.getImageAvartarUrl(),
-                      callerFCMToken:
-                          await NotificationController.requestFirebaseToken(),
-                      receiverId: widget.receiverId,
-                      receiverName: widget.receiverName,
-                      receiverPic: widget.receiverAvt,
-                      receiverFCMToken: widget.receiverFCMToken,
-                      callType: CallType.call_video,
-                    )
-                  : {},
+          onPressed: () async => await PermissionsServices.cameraAndMicrophonePermissionsGranted()
+              ? CallUtils.dialVideo(
+                  context: context,
+                  isFromChat: true,
+                  callerId: _pref.getUserId().toString(),
+                  callerName: _pref.getFullName(),
+                  callerPic: _pref.getImageAvartarUrl(),
+                  callerFCMToken: await FirebaseMessaging.instance.getToken(),
+                  receiverId: widget.receiverId,
+                  receiverName: widget.receiverName,
+                  receiverPic: widget.receiverAvt,
+                  receiverFCMToken: widget.receiverFCMToken,
+                  callType: CallType.videoCall,
+                )
+              : {},
         ),
         IconButton(
           icon: const Icon(

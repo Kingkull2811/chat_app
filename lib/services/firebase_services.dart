@@ -4,10 +4,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:chat_app/network/model/user_from_firebase.dart';
+import 'package:chat_app/services/notification_services.dart';
 import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
@@ -15,7 +17,6 @@ import '../network/model/call_model.dart';
 import '../network/model/message_model.dart';
 import '../network/repository/push_notification_repository.dart';
 import '../utilities/enum/message_type.dart';
-import 'notification_controller.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -40,11 +41,7 @@ class FirebaseService {
   }) async {
     try {
       String fileName = '${titleName}_${DateTime.now().millisecondsSinceEpoch}';
-      Reference reference = _firebaseStorage
-          .ref()
-          .child(AppConstants.imageChild)
-          .child(childFolder)
-          .child('/$fileName');
+      Reference reference = _firebaseStorage.ref().child(AppConstants.imageChild).child(childFolder).child('/$fileName');
       UploadTask uploadTask = reference.putFile(image);
 
       uploadTask.snapshotEvents.listen((event) async {
@@ -82,28 +79,18 @@ class FirebaseService {
       return;
     }
     try {
-      await _firestore
-          .collection(AppConstants.userCollection)
-          .doc('user_id_$userId')
-          .set(data, options)
-          .whenComplete(
+      await _firestore.collection(AppConstants.userCollection).doc('user_id_$userId').set(data, options).whenComplete(
             () => log('upload userInfo done'),
           );
     } on FirebaseException catch (_) {}
   }
 
   Future updateOnlineStatus(bool isOnline) async {
-    await _firestore
-        .collection(AppConstants.userCollection)
-        .doc('user_id_${_prefs.getUserId()}')
-        .update({'isOnline': isOnline});
+    await _firestore.collection(AppConstants.userCollection).doc('user_id_${_prefs.getUserId()}').update({'isOnline': isOnline});
   }
 
   Future<UserFirebaseData?> getUserDetails({required int userId}) async {
-    final snapshot = await _firestore
-        .collection(AppConstants.userCollection)
-        .doc('user_id_$userId')
-        .get();
+    final snapshot = await _firestore.collection(AppConstants.userCollection).doc('user_id_$userId').get();
     if (snapshot.data() == null) {
       return null;
     }
@@ -112,10 +99,7 @@ class FirebaseService {
 
   Future<List<UserFirebaseData>> getAllProfile() async {
     final List<UserFirebaseData> profiles = [];
-    await _firestore
-        .collection(AppConstants.userCollection)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
+    await _firestore.collection(AppConstants.userCollection).get().then((QuerySnapshot querySnapshot) {
       for (var element in querySnapshot.docChanges) {
         final doc = element.doc;
         if (doc.exists) {
@@ -135,19 +119,13 @@ class FirebaseService {
 
   Future<List<MessageModel>> getListMessage(String docId) async {
     List<MessageModel> listMessage = [];
-    await _firestore
-        .collection(AppConstants.messageCollection)
-        .doc(docId)
-        .collection(AppConstants.messageListCollection)
-        .get()
-        .then((QuerySnapshot snapshot) {
+    await _firestore.collection(AppConstants.messageCollection).doc(docId).collection(AppConstants.messageListCollection).get().then((QuerySnapshot snapshot) {
       for (var element in snapshot.docChanges) {
         final doc = element.doc;
         if (doc.exists) {
           // log('data: ${doc.data().toString()}');
           if (doc.data() is Map<String, dynamic>) {
-            final message =
-                MessageModel.fromJson(doc.data() as Map<String, dynamic>);
+            final message = MessageModel.fromJson(doc.data() as Map<String, dynamic>);
             listMessage.add(message);
           }
         }
@@ -174,21 +152,16 @@ class FirebaseService {
     var docID;
     await _firestore
         .collection(AppConstants.chatsCollection)
-        .where('members',
-            isEqualTo: {currentUserId.toString(): null, receiverId: null})
+        .where('members', isEqualTo: {currentUserId.toString(): null, receiverId: null})
         .limit(1)
         .get()
         .then(
           (QuerySnapshot querySnapshot) async {
             if (querySnapshot.docs.isNotEmpty) {
               docID = querySnapshot.docs.single.id;
-              await _firestore
-                  .collection(AppConstants.userCollection)
-                  .doc(docID)
-                  .update(
+              await _firestore.collection(AppConstants.userCollection).doc(docID).update(
                 {
-                  'fcm_token_$currentUserId':
-                      await NotificationController.requestFirebaseToken(),
+                  'fcm_token_$currentUserId': await FirebaseMessagingServices().getDeviceToken(),
                   'fcm_token_$receiverId': receiverFCMToken,
                 },
               );
@@ -207,8 +180,7 @@ class FirebaseService {
                     currentUserId.toString(): _prefs.getImageAvartarUrl(),
                     receiverId: receiverAvt,
                   },
-                  'fcm_token_$currentUserId':
-                      await NotificationController.requestFirebaseToken(),
+                  'fcm_token_$currentUserId': await FirebaseMessagingServices().getDeviceToken(),
                   'fcm_token_$receiverId': receiverFCMToken,
                   'time': Timestamp.now(),
                 },
@@ -221,19 +193,11 @@ class FirebaseService {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getMessage(var docID) {
-    return _firestore
-        .collection(AppConstants.chatsCollection)
-        .doc(docID)
-        .collection(AppConstants.messageListCollection)
-        .orderBy('time', descending: true)
-        .snapshots();
+    return _firestore.collection(AppConstants.chatsCollection).doc(docID).collection(AppConstants.messageListCollection).orderBy('time', descending: true).snapshots();
   }
 
   Future<void> deleteChat(String docID) async {
-    await _firestore
-        .collection(AppConstants.chatsCollection)
-        .doc(docID)
-        .delete();
+    await _firestore.collection(AppConstants.chatsCollection).doc(docID).delete();
   }
 
   Future<void> sendTextMessage({
@@ -253,10 +217,7 @@ class FirebaseService {
         .collection(AppConstants.chatsCollection)
         .doc(docID)
         .collection(AppConstants.messageListCollection)
-        .withConverter(
-            fromFirestore: MessageModel.fromFirestore,
-            toFirestore: (MessageModel messageFireStore, options) =>
-                messageFireStore.toJson())
+        .withConverter(fromFirestore: MessageModel.fromFirestore, toFirestore: (MessageModel messageFireStore, options) => messageFireStore.toJson())
         .add(message)
         .then((value) {
       if (kDebugMode) {
@@ -264,11 +225,7 @@ class FirebaseService {
       }
     });
     await _firestore.collection(AppConstants.chatsCollection).doc(docID).update(
-      {
-        'last_message': message.message,
-        'time': message.time,
-        'message_type': setMessageType(message.messageType)
-      },
+      {'last_message': message.message, 'time': message.time, 'message_type': setMessageType(message.messageType)},
     );
 
     await sendPushNotification(
@@ -300,10 +257,7 @@ class FirebaseService {
         .collection(AppConstants.chatsCollection)
         .doc(docID)
         .collection(AppConstants.messageListCollection)
-        .withConverter(
-            fromFirestore: MessageModel.fromFirestore,
-            toFirestore: (MessageModel messageFireStore, options) =>
-                messageFireStore.toJson())
+        .withConverter(fromFirestore: MessageModel.fromFirestore, toFirestore: (MessageModel messageFireStore, options) => messageFireStore.toJson())
         .add(message)
         .then((value) {
       if (kDebugMode) {
@@ -311,11 +265,7 @@ class FirebaseService {
       }
     });
     await _firestore.collection(AppConstants.chatsCollection).doc(docID).update(
-      {
-        'last_message': '📷 photo',
-        'time': message.time,
-        'message_type': setMessageType(message.messageType)
-      },
+      {'last_message': '📷 photo', 'time': message.time, 'message_type': setMessageType(message.messageType)},
     );
 
     await sendPushNotification(
@@ -373,11 +323,7 @@ class FirebaseService {
   }) async {
     final data = {
       "to": receiverFCMToken,
-      "notification": {
-        "body": "$senderName is calling you",
-        "title": "Incoming Call",
-        "sound": true
-      },
+      "notification": {"body": "$senderName is calling you", "title": "Incoming Call", "sound": true},
       "data": {"content_type": channel, "value": -1},
       "content_available": true,
       "priority": "high"
@@ -386,26 +332,16 @@ class FirebaseService {
     await PushNotificationRepository().messagePN(data: data);
   }
 
-  Stream<DocumentSnapshot> callStream() => _firestore
-      .collection(AppConstants.callCollection)
-      .doc('call_id_${SharedPreferencesStorage().getUserId()}')
-      .snapshots();
+  Stream<DocumentSnapshot> callStream() => _firestore.collection(AppConstants.callCollection).doc('call_id_${SharedPreferencesStorage().getUserId()}').snapshots();
 
-  Stream<DocumentSnapshot> readStateCall({required String receiverDoc}) =>
-      _firestore
-          .collection(AppConstants.callCollection)
-          .doc(receiverDoc)
-          .snapshots();
+  Stream<DocumentSnapshot> readStateCall({required String receiverDoc}) => _firestore.collection(AppConstants.callCollection).doc(receiverDoc).snapshots();
 
   Future<bool> updateCallStatus({
     required String receiverDoc,
     required bool isAcceptCall,
   }) async {
     try {
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc(receiverDoc)
-          .update({'is_accept_call': isAcceptCall});
+      await _firestore.collection(AppConstants.callCollection).doc(receiverDoc).update({'is_accept_call': isAcceptCall});
       return true;
     } catch (e) {
       log(e.toString());
@@ -432,15 +368,9 @@ class FirebaseService {
         senderName: call.receiverName ?? '',
       );
 
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc('call_id_${call.callerId}')
-          .set(hasDialledMap);
+      await _firestore.collection(AppConstants.callCollection).doc('call_id_${call.callerId}').set(hasDialledMap);
 
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc('call_id_${call.receiverId}')
-          .set(hasNotDialledMap);
+      await _firestore.collection(AppConstants.callCollection).doc('call_id_${call.receiverId}').set(hasNotDialledMap);
 
       return true;
     } catch (e) {
@@ -470,15 +400,9 @@ class FirebaseService {
         senderName: call.receiverName ?? '',
       );
 
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc('call_id_${call.callerId}')
-          .set(hasDialledMap);
+      await _firestore.collection(AppConstants.callCollection).doc('call_id_${call.callerId}').set(hasDialledMap);
 
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc('call_id_${call.receiverId}')
-          .set(hasNotDialledMap);
+      await _firestore.collection(AppConstants.callCollection).doc('call_id_${call.receiverId}').set(hasNotDialledMap);
 
       return true;
     } catch (e) {
@@ -489,15 +413,9 @@ class FirebaseService {
 
   Future<bool> endCall({required CallModel call}) async {
     try {
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc('call_id_${call.callerId}')
-          .delete();
+      await _firestore.collection(AppConstants.callCollection).doc('call_id_${call.callerId}').delete();
 
-      await _firestore
-          .collection(AppConstants.callCollection)
-          .doc('call_id_${call.receiverId}')
-          .delete();
+      await _firestore.collection(AppConstants.callCollection).doc('call_id_${call.receiverId}').delete();
 
       return true;
     } catch (e) {
@@ -510,22 +428,13 @@ class FirebaseService {
 
   Future<void> sendCurrentDeviceFCMToken({int? userId, String? docID}) async {
     if (userId != null) {
-      await _firestore
-          .collection(AppConstants.userCollection)
-          .doc('user_id_$userId')
-          .update({
-        'fcm_token': await NotificationController.requestFirebaseToken()
-      });
+      await _firestore.collection(AppConstants.userCollection).doc('user_id_$userId').update({'fcm_token': await FirebaseMessaging.instance.getToken()});
     }
 
     if (isNotNullOrEmpty(docID)) {
-      await _firestore
-          .collection(AppConstants.chatsCollection)
-          .doc(docID)
-          .update(
+      await _firestore.collection(AppConstants.chatsCollection).doc(docID).update(
         {
-          'fcm_token_${_prefs.getUserId()}':
-              await NotificationController.requestFirebaseToken(),
+          'fcm_token_${_prefs.getUserId()}': await FirebaseMessaging.instance.getToken(),
         },
       );
     }
@@ -579,8 +488,7 @@ class FirebaseService {
         break;
       case 'get_apns_token':
         {
-          if (defaultTargetPlatform == TargetPlatform.iOS ||
-              defaultTargetPlatform == TargetPlatform.macOS) {
+          if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
             if (kDebugMode) {
               print('FlutterFire Messaging Example: Getting APNs token...');
             }

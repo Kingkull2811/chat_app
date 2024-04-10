@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
@@ -105,7 +105,7 @@ class MainAppState extends State<MainApp>
       currentIndex: widget.currentTab ?? 0,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Badge(
+          icon: badges.Badge(
             showBadge: (newChatBadge > 0),
             badgeContent: Text(newChatBadge.toString(),
                 textAlign: TextAlign.center,
@@ -113,18 +113,18 @@ class MainAppState extends State<MainApp>
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     color: Colors.white)),
-            badgeStyle: const BadgeStyle(
+            badgeStyle: const badges.BadgeStyle(
               badgeColor: Colors.red,
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
-            position: BadgePosition.topEnd(top: -5, end: -8),
+            position: badges.BadgePosition.topEnd(top: -5, end: -8),
             child: Icon(
               Icons.message_outlined,
               size: 24,
               color: Theme.of(context).primaryColor,
             ),
           ),
-          activeIcon: Badge(
+          activeIcon: badges.Badge(
             showBadge: (newChatBadge > 0),
             badgeContent: Text(
               newChatBadge.toString(),
@@ -135,11 +135,11 @@ class MainAppState extends State<MainApp>
                 color: Colors.white,
               ),
             ),
-            badgeStyle: const BadgeStyle(
+            badgeStyle: const badges.BadgeStyle(
               badgeColor: Colors.red,
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
-            position: BadgePosition.topEnd(top: -5, end: -8),
+            position: badges.BadgePosition.topEnd(top: -5, end: -8),
             child: const Icon(
               Icons.message_outlined,
               size: 30,
@@ -149,7 +149,7 @@ class MainAppState extends State<MainApp>
           label: 'Chat',
         ),
         BottomNavigationBarItem(
-          icon: Badge(
+          icon: badges.Badge(
             showBadge: (newsBadge > 0),
             badgeContent: Text(
               newsBadge.toString(),
@@ -160,18 +160,18 @@ class MainAppState extends State<MainApp>
                 color: Colors.white,
               ),
             ),
-            badgeStyle: const BadgeStyle(
+            badgeStyle: const badges.BadgeStyle(
               badgeColor: Colors.red,
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
-            position: BadgePosition.topEnd(top: -5, end: -8),
+            position: badges.BadgePosition.topEnd(top: -5, end: -8),
             child: Icon(
               Icons.feed_outlined,
               size: 24,
               color: Theme.of(context).primaryColor,
             ),
           ),
-          activeIcon: Badge(
+          activeIcon: badges.Badge(
             showBadge: (newsBadge > 0),
             badgeContent: Text(
               newsBadge.toString(),
@@ -182,11 +182,11 @@ class MainAppState extends State<MainApp>
                 color: Colors.white,
               ),
             ),
-            badgeStyle: const BadgeStyle(
+            badgeStyle: const badges.BadgeStyle(
               badgeColor: Colors.red,
               padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
             ),
-            position: BadgePosition.topEnd(top: -5, end: -8),
+            position: badges.BadgePosition.topEnd(top: -5, end: -8),
             child: const Icon(
               Icons.feed_outlined,
               size: 30,
@@ -197,7 +197,7 @@ class MainAppState extends State<MainApp>
         ),
         BottomNavigationBarItem(
           icon: _isUser
-              ? Badge(
+              ? badges.Badge(
                   showBadge: (newTranscriptBadge > 0),
                   badgeContent: Text(
                     newTranscriptBadge.toString(),
@@ -208,11 +208,11 @@ class MainAppState extends State<MainApp>
                       color: Colors.white,
                     ),
                   ),
-                  badgeStyle: const BadgeStyle(
+                  badgeStyle: const badges.BadgeStyle(
                     badgeColor: Colors.red,
                     padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
                   ),
-                  position: BadgePosition.topEnd(top: -5, end: -8),
+                  position: badges.BadgePosition.topEnd(top: -5, end: -8),
                   child: Container(
                     width: 24,
                     height: 24,
@@ -237,7 +237,7 @@ class MainAppState extends State<MainApp>
                   ),
                 ),
           activeIcon: _isUser
-              ? Badge(
+              ? badges.Badge(
                   showBadge: (newTranscriptBadge > 0),
                   badgeContent: Text(
                     newTranscriptBadge.toString(),
@@ -248,11 +248,11 @@ class MainAppState extends State<MainApp>
                       color: Colors.white,
                     ),
                   ),
-                  badgeStyle: const BadgeStyle(
+                  badgeStyle: const badges.BadgeStyle(
                     badgeColor: Colors.red,
                     padding: EdgeInsets.fromLTRB(4, 2, 4, 2),
                   ),
-                  position: BadgePosition.topEnd(top: -5, end: -8),
+                  position: badges.BadgePosition.topEnd(top: -5, end: -8),
                   child: Image.asset(
                     'assets/images/ic_transcript.png',
                     width: 30,

@@ -2,11 +2,11 @@ import 'package:chat_app/network/api/api_path.dart';
 import 'package:chat_app/network/model/refresh_token_model.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/provider/provider_mixin.dart';
+import 'package:chat_app/services/notification_services.dart';
 import 'package:chat_app/utilities/secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:path/path.dart';
 
-import '../../services/notification_controller.dart';
 import '../../utilities/shared_preferences_storage.dart';
 import '../response/base_get_response.dart';
 import '../response/base_response.dart';
@@ -58,7 +58,7 @@ class AuthProvider with ProviderMixin {
       final response = await dio.post(
         ApiPath.login,
         data: {
-          "deviceToken": await NotificationController.requestFirebaseToken(),
+          "deviceToken": await FirebaseMessagingServices().getDeviceToken(),
           "password": password,
           "username": username,
         },
@@ -67,10 +67,6 @@ class AuthProvider with ProviderMixin {
       return LoginResponse.fromJson(response.data);
     } catch (error, stacktrace) {
       showErrorLog(error, stacktrace, ApiPath.login);
-      if (error is DioError) {
-        return LoginResponse.fromJson(
-            error.response?.data as Map<String, dynamic>);
-      }
       return LoginResponse();
     }
   }
@@ -87,9 +83,6 @@ class AuthProvider with ProviderMixin {
 
       return BaseResponse.fromJson(response.data);
     } catch (error) {
-      if (error is DioError) {
-        return BaseResponse.fromJson(error.response?.data);
-      }
       // return errorResponse(error, stacktrace, ApiPath.signup);
       return BaseResponse();
     }

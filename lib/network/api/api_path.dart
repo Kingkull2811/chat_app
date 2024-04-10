@@ -1,5 +1,5 @@
 class ApiPath {
-  static const String domain = 'http://167.99.65.226:8080';
+  static const String domain = 'http://192.168.1.187:8080';
 
   static const String agoraServerDomain =
       'https://agora-token-service-production-dabe.up.railway.app';

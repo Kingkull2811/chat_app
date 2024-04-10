@@ -1,19 +1,16 @@
 import 'dart:async';
 
-import 'package:awesome_notifications/android_foreground_service.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../utilities/notifications_util.dart';
 import '../../../utilities/utils.dart';
 import '../../../widgets/single_slider.dart';
 
 class CallPage extends StatefulWidget {
-  final ReceivedAction receivedAction;
+  // final ReceivedAction receivedAction;
 
-  const CallPage({Key? key, required this.receivedAction}) : super(key: key);
+  const CallPage({Key? key}) : super(key: key);
 
   @override
   State<CallPage> createState() => _CallPageState();
@@ -25,8 +22,8 @@ class _CallPageState extends State<CallPage> {
 
   void startCallingTimer() {
     const oneSec = Duration(seconds: 1);
-    NotificationUtils.cancelNotification(widget.receivedAction.id!);
-    AndroidForegroundService.stopForeground(widget.receivedAction.id!);
+    // NotificationUtils.cancelNotification(widget.receivedAction.id!);
+    // AndroidForegroundService.stopForeground(widget.receivedAction.id!);
 
     _timer = Timer.periodic(
       oneSec,
@@ -40,8 +37,8 @@ class _CallPageState extends State<CallPage> {
 
   void finishCall() {
     // Vibration.vibrate(duration: 100);
-    NotificationUtils.cancelNotification(widget.receivedAction.id!);
-    AndroidForegroundService.stopForeground(widget.receivedAction.id!);
+    // NotificationUtils.cancelNotification(widget.receivedAction.id!);
+    // AndroidForegroundService.stopForeground(widget.receivedAction.id!);
     Navigator.pop(context);
   }
 
@@ -49,17 +46,17 @@ class _CallPageState extends State<CallPage> {
   void initState() {
     lockScreenPortrait();
     super.initState();
-    if (widget.receivedAction.buttonKeyPressed == 'ACCEPT') {
-      startCallingTimer();
-    }
+    // if (widget.receivedAction.buttonKeyPressed == 'ACCEPT') {
+    //   startCallingTimer();
+    // }
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     unlockScreenPortrait();
-    NotificationUtils.cancelNotification(widget.receivedAction.id!);
-    AndroidForegroundService.stopForeground(widget.receivedAction.id!);
+    // NotificationUtils.cancelNotification(widget.receivedAction.id!);
+    // AndroidForegroundService.stopForeground(widget.receivedAction.id!);
     super.dispose();
   }
 
@@ -74,8 +71,8 @@ class _CallPageState extends State<CallPage> {
         fit: StackFit.expand,
         children: [
           // Image
-          Image(
-            image: widget.receivedAction.largeIconImage!,
+           Image.network(
+            '',
             fit: BoxFit.cover,
           ),
           // Black Layer
@@ -89,19 +86,16 @@ class _CallPageState extends State<CallPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    widget.receivedAction.payload?['username']
-                            ?.replaceAll(r'\s+', r'\n') ??
-                        'Unknown',
+                    'Unknown',
+                    // widget.receivedAction.payload?['username']?.replaceAll(r'\s+', r'\n') ?? 'Unknown',
                     maxLines: 4,
-                    style: themeData.textTheme.headline3?.copyWith(
+                    style: themeData.textTheme.displaySmall?.copyWith(
                       color: Colors.white,
                     ),
                   ),
                   Text(
-                    _timer == null
-                        ? 'Incoming call'
-                        : 'Call in progress: ${printDuration(_secondsElapsed)}',
-                    style: themeData.textTheme.headline6?.copyWith(
+                    _timer == null ? 'Incoming call' : 'Call in progress: ${printDuration(_secondsElapsed)}',
+                    style: themeData.textTheme.titleLarge?.copyWith(
                       color: Colors.white54,
                       fontSize: _timer == null ? 20 : 12,
                     ),
@@ -126,8 +120,7 @@ class _CallPageState extends State<CallPage> {
                                   ),
                                   Text(
                                     'Reminder me',
-                                    style:
-                                        themeData.textTheme.headline6?.copyWith(
+                                    style: themeData.textTheme.titleLarge?.copyWith(
                                       color: Colors.white54,
                                       fontSize: 12,
                                       height: 2,
@@ -152,8 +145,7 @@ class _CallPageState extends State<CallPage> {
                                   ),
                                   Text(
                                     'Message',
-                                    style:
-                                        themeData.textTheme.headline6?.copyWith(
+                                    style: themeData.textTheme.titleLarge?.copyWith(
                                       color: Colors.white54,
                                       fontSize: 12,
                                       height: 2,
@@ -193,13 +185,9 @@ class _CallPageState extends State<CallPage> {
                                 backgroundColor: Colors.white60,
                                 text: 'Slide to Talk',
                                 stickToEnd: true,
-                                textStyle: Theme.of(context)
-                                    .textTheme
-                                    .headline6
-                                    ?.copyWith(
+                                textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                                       color: Colors.white,
-                                      fontSize:
-                                          mediaQueryData.size.width * 0.05,
+                                      fontSize: mediaQueryData.size.width * 0.05,
                                     ),
                                 sliderButtonContent: RoundedButton(
                                   press: () {},

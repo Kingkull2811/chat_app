@@ -141,11 +141,11 @@ class _CallIncomingPageState extends State<CallIncomingPage> {
                                   receiverDoc: 'call_id_${call.receiverId}',
                                   isAcceptCall: true,
                                 );
-                                Navigator.push(
+                                await Navigator.push(
                                   this.context,
                                   MaterialPageRoute(
                                     builder: (context) => call.channelName ==
-                                            CallType.call_audio.name
+                                            CallType.audioCall.name
                                         ? VoiceCallPage(call: call)
                                         : VideoCallPage(call: call),
                                   ),

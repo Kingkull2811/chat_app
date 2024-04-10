@@ -26,16 +26,12 @@ mixin ProviderMixin {
       if (apiPath != null) {
         print("EXCEPTION OCCURRED: ${apiPath.toString()}");
       }
-      if (error is DioError) {
-        print("\nEXCEPTION RESPONSE: ${error.response}");
-      }
       print("\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace");
     } else {
       //record log to firebase crashlytics here
       FirebaseCrashlytics.instance.setCustomKey("$error", "ERROR in $apiPath");
 
-      FirebaseCrashlytics.instance
-          .recordError("$error", stacktrace, reason: 'fatal');
+      FirebaseCrashlytics.instance.recordError("$error", stacktrace, reason: 'fatal');
 
       FirebaseCrashlytics.instance.log(
         "EXCEPTION OCCURRED: $apiPath\nEXCEPTION WITH: $error\nSTACKTRACE: $stacktrace",
@@ -49,11 +45,8 @@ mixin ProviderMixin {
     List<dynamic> errors = error.response?.data;
 
     return BaseResponse.withHttpError(
-      // errors: (error is DioError) ? error.response?.data as List<Errors> : [],
-      errors: (error is DioError)
-          ? errors.map((e) => Errors.fromJson(e)).toList()
-          : [],
-      httpStatus: (error is DioError) ? error.response?.statusCode : null,
+      errors: errors.map((e) => Errors.fromJson(e)).toList(),
+      httpStatus: error.response?.statusCode,
     );
   }
 
@@ -94,7 +87,6 @@ mixin ProviderMixin {
 
   Future<bool> isExpiredToken() async {
     _authenticationProvider ??= AuthProvider();
-    return !(await _authenticationProvider?.checkAuthenticationStatus() ??
-        false);
+    return !(await _authenticationProvider?.checkAuthenticationStatus() ?? false);
   }
 }

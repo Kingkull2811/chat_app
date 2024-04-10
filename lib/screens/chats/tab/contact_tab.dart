@@ -2,10 +2,10 @@ import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:chat_app/widgets/app_image.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../services/notification_controller.dart';
 import '../../../services/permission.dart';
 import '../../../utilities/call_utils.dart';
 import '../../../utilities/enum/call_type.dart';
@@ -214,19 +214,18 @@ class _ContactTabState extends State<ContactTab> {
                     borderRadius: BorderRadius.circular(20),
                     onTap: () async =>
                         await PermissionsServices.microphonePermissionsGranted()
-                            ? CallUtils.dialVoice(
+                            ?  CallUtils.dialVoice(
                                 context: context,
                                 isFromChat: false,
                                 callerId: _pref.getUserId().toString(),
                                 callerName: _pref.getFullName(),
                                 callerPic: _pref.getImageAvartarUrl(),
-                                callerFCMToken: await NotificationController
-                                    .requestFirebaseToken(),
+                                callerFCMToken: await FirebaseMessaging.instance.getToken(),
                                 receiverId: item.id.toString(),
                                 receiverName: item.fullName ?? '',
                                 receiverPic: item.fileUrl ?? '',
                                 receiverFCMToken: item.fcmToken,
-                                callType: CallType.call_audio,
+                                callType: CallType.audioCall,
                               )
                             : {},
                     child: Container(

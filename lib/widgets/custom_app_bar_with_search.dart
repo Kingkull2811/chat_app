@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String imageUrl;
   final TextEditingController searchController;
@@ -9,7 +9,7 @@ class CustomAppBar extends StatelessWidget with PreferredSizeWidget {
   final Function()? onTapAppBar;
   final Function()? onTapTextField;
 
-  CustomAppBar({
+  const CustomAppBar({
     super.key,
     required this.title,
     required this.imageUrl,

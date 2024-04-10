@@ -36,8 +36,8 @@ class SelectStudentBloc extends Bloc<SelectStudentEvent, SelectStudentState> {
               isNotFind: true,
             ));
           }
-        } else if (response is ExpiredTokenResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenResponse && context.mounted) {
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(
             isLoading: false,

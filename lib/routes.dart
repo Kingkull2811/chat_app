@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
 import 'package:chat_app/screens/chats/call/call_page.dart';
@@ -7,7 +6,6 @@ import 'package:chat_app/screens/onboarding/onboarding_screen.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
 import 'package:chat_app/screens/settings/terms_policies/terms_policies.dart';
-import 'package:chat_app/services/notification_controller.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,12 +69,9 @@ class AppRoutes {
         return const TermPolicyPage();
       },
       AppRoutes.callPage: (context) {
-        ReceivedAction? receivedAction =
-            ModalRoute.of(context)!.settings.arguments == null
-                ? NotificationController.initialAction
-                : ModalRoute.of(context)!.settings.arguments as ReceivedAction;
+        // var receivedAction = ModalRoute.of(context)!.settings.arguments;
 
-        return CallPage(receivedAction: receivedAction!);
+        return const CallPage();
       }
     };
   }

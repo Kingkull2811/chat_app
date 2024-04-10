@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:chat_app/screens/authenticator/fill_profile/select_student/select_student_bloc.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/select_student/select_student_event.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/select_student/select_student_state.dart';
@@ -111,7 +111,7 @@ class _SelectStudentState extends State<SelectStudent> {
             onTap: () {
               _navToViewListStudentSelected();
             },
-            child: Badge(
+            child: badges.Badge(
               showBadge: listStudent.isNotEmpty,
               badgeContent: Text(
                 listStudent.length.toString(),
@@ -122,11 +122,11 @@ class _SelectStudentState extends State<SelectStudent> {
                   color: Colors.white,
                 ),
               ),
-              badgeStyle: const BadgeStyle(
+              badgeStyle: const badges.BadgeStyle(
                 badgeColor: Colors.red,
                 padding: EdgeInsets.fromLTRB(8, 6, 8, 6),
               ),
-              position: BadgePosition.topEnd(top: -5, end: -8),
+              position: badges.BadgePosition.topEnd(top: -5, end: -8),
               child: Container(
                 height: 40,
                 alignment: Alignment.center,

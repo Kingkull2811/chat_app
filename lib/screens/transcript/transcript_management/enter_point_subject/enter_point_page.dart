@@ -345,7 +345,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
             color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           ),
-          dataRowHeight: 50,
+          dataRowMinHeight: 50,
           columns: getColumns(columns),
           rows: getRows(listResult),
         ),
