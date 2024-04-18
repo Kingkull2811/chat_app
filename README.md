@@ -2,6 +2,8 @@
 
 The last project in the course of studying at KMA (Academy of Cryptography Techniques) for my graduation project.
 
+### using command $'flutter gen-l10n' for gen translate with multiple language 
+
 ## Project Description 
 
 >This project was developed with the topic: Building an application to manage student learning outcomes and exchange information between teachers and parents in online learning.

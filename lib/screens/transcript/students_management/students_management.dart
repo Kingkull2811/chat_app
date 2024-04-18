@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/network/repository/student_repository.dart';
 import 'package:chat_app/screens/transcript/students_management/add_student/add_student.dart';
@@ -72,11 +73,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -110,16 +107,16 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
           child: const Icon(
             Icons.arrow_back_ios,
             size: 24,
-            color: Colors.white,
+            color: Colors.white
           ),
         ),
         centerTitle: true,
-        title: const Text(
-          'Students Management',
-          style: TextStyle(
+        title:  Text(
+          context.l10n.stuManage,
+          style:const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.white
           ),
         ),
         actions: [
@@ -136,10 +133,10 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                           await _navToAddStudent(isEdit: false);
                         },
                         child: Text(
-                          'Add new student',
+                          context.l10n.addStu,
                           style: TextStyle(
                             fontSize: 18,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).primaryColor
                           ),
                         ),
                       ),
@@ -149,10 +146,10 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        'Cancel',
+                        context.l10n.cancel,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.black.withOpacity(0.7),
+                          color: Colors.black.withOpacity(0.7)
                         ),
                       ),
                     ),
@@ -163,7 +160,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
             icon: const Icon(
               Icons.more_vert_outlined,
               size: 24,
-              color: Colors.white,
+              color: Colors.white
             ),
           ),
         ],
@@ -194,7 +191,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                         onTap: () {
                           _dialogSelectSchoolYear(AppConstants.listSchoolYear);
                         },
-                        labelText: 'School Year',
+                        labelText: context.l10n.schoolY,
                       ),
                     ),
                     SizedBox(
@@ -209,7 +206,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                         onTap: () {
                           _dialogSelectClass(listClass);
                         },
-                        labelText: 'Class',
+                        labelText: context.l10n.classTitle,
                       ),
                     ),
                   ],
@@ -218,15 +215,15 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
                 child: Text(
-                  'List student:',
+                  context.l10n.students,
                   style: TextStyle(
                     fontSize: 20,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).primaryColor
                   ),
                 ),
               ),
               isNullOrEmpty(listStudent)
-                  ? const DataNotFoundPage(title: 'Students data not found')
+                  ?  DataNotFoundPage(title: context.l10n.noStu)
                   : SizedBox(
                       height: 206 * (listStudent!.length).toDouble() + 16,
                       child: ListView.builder(
@@ -237,7 +234,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                         itemBuilder: (context, index) {
                           return _createItemStudent(
                             context,
-                            listStudent[index],
+                            listStudent[index]
                           );
                         },
                       ),
@@ -267,7 +264,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
             color: Colors.grey.withOpacity(0.1),
             border: Border.all(
               width: 0.5,
-              color: Colors.grey.withOpacity(0.4),
+              color: Colors.grey.withOpacity(0.4)
             ),
           ),
           child: Padding(
@@ -291,7 +288,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                       errorWidget: Icon(
                         Icons.person,
                         size: 70,
-                        color: Colors.grey.withOpacity(0.3),
+                        color: Colors.grey.withOpacity(0.3)
                       ),
                     ),
                   ),
@@ -304,10 +301,10 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          'Student SSID:',
+                          '${context.l10n.stuSSID}:',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).primaryColor
                           ),
                         ),
                         Padding(
@@ -316,15 +313,15 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                             student.code ?? '',
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.black,
+                              color: Colors.black
                             ),
                           ),
                         ),
                         Text(
-                          'Student Name:',
+                          context.l10n.student_name,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).primaryColor
                           ),
                         ),
                         Padding(
@@ -333,15 +330,15 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                             student.name ?? '',
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.black,
+                              color: Colors.black
                             ),
                           ),
                         ),
                         Text(
-                          'Date of birth:',
+                          context.l10n.dob,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).primaryColor
                           ),
                         ),
                         Padding(
@@ -350,12 +347,12 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                             formatDate('${student.dateOfBirth}'),
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.black,
+                              color: Colors.black
                             ),
                           ),
                         ),
                         Text(
-                          'Class:',
+                          context.l10n.classTitle,
                           style: TextStyle(
                             fontSize: 14,
                             color: Theme.of(context).primaryColor,
@@ -408,7 +405,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Select School Year',
+            context.l10n.selectSY,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -468,7 +465,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                         child: Icon(
                           Icons.check,
                           size: 24,
-                          color: Colors.green,
+                          color: Colors.green
                         ),
                       ),
                   ],
@@ -489,11 +486,11 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Select Class',
+            context.l10n.selClass,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).primaryColor
             ),
           ),
         ),
@@ -506,7 +503,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
             color: Colors.white,
           ),
           child: isNullOrEmpty(listClass)
-              ? const DataNotFoundPage(title: 'Class data not found')
+              ?  DataNotFoundPage(title: context.l10n.noClass)
               : ListView.builder(
                   physics: const BouncingScrollPhysics(),
                   itemCount: listClass!.length,
@@ -550,7 +547,7 @@ class _StudentsManagementPageState extends State<StudentsManagementPage> {
                               child: Icon(
                                 Icons.check,
                                 size: 24,
-                                color: Colors.green,
+                                color: Colors.green
                               ),
                             ),
                         ],

@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/login/login_bloc.dart';
 import 'package:chat_app/screens/authenticator/login/login_page.dart';
@@ -16,10 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class SetNewPassword extends StatefulWidget {
   final String email;
 
-  const SetNewPassword({
-    Key? key,
-    required this.email,
-  }) : super(key: key);
+  const SetNewPassword({Key? key, required this.email}) : super(key: key);
 
   @override
   State<SetNewPassword> createState() => _SetNewPasswordState();
@@ -69,18 +67,10 @@ class _SetNewPasswordState extends State<SetNewPassword> {
         },
         listener: (context, state) {
           if (state.apiError == ApiError.internalServerError) {
-            showCupertinoMessageDialog(
-              context,
-              'error',
-              content: 'internal_server_error',
-            );
+            showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
           }
           if (state.apiError == ApiError.noInternetConnection) {
-            showCupertinoMessageDialog(
-              context,
-              'error',
-              content: 'no_internet_connection',
-            );
+            showMessageNoInternetDialog(context);
           }
         },
         builder: (context, state) {
@@ -105,13 +95,9 @@ class _SetNewPasswordState extends State<SetNewPassword> {
           automaticallyImplyLeading: false,
           backgroundColor: Theme.of(context).primaryColor,
           centerTitle: true,
-          title: const Text(
-            'Set a new password',
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+          title:  Text(
+            context.l10n.setNewPassword,
+            style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         body: Form(
@@ -127,12 +113,12 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                       child: Image.asset(
                         'assets/images/app_logo_light.png',
                         height: 200,
-                        width: 200,
+                        width: 200
                       ),
                     ),
                     _inputPasswordField(
-                      labelText: 'New password',
-                      hintText: 'Enter your new password',
+                      labelText: context.l10n.newPassword,
+                      // hintText: 'Enter your new password',
                       controller: _passwordController,
                       obscureText: !_isShowPassword,
                       onTapSuffixIcon: () {
@@ -143,19 +129,19 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                       onSubmitted: (_) {},
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return 'Please enter new password';
+                          return context.l10n.enterNewPassword;
                         }
                         if (value.isNotEmpty && value.length < 6) {
-                          return 'New password  must be at least 6 characters';
+                          return context.l10n.passwordLeast;
                         } else if (value.length > 40) {
-                          return 'New password must be less than 40 characters';
+                          return context.l10n.passwordLess;
                         }
                         return null;
                       },
                     ),
                     _inputPasswordField(
-                      labelText: 'Confirm new password',
-                      hintText: 'Re-enter your new password',
+                      labelText: context.l10n.confirmNewPass,
+                      // hintText: 'Re-enter your new password',
                       controller: _confirmPasswordController,
                       obscureText: !_isShowRePassword,
                       onTapSuffixIcon: () {
@@ -166,13 +152,13 @@ class _SetNewPasswordState extends State<SetNewPassword> {
                       onSubmitted: (_) {},
                       validator: (String? value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter confirm new password';
+                          return context.l10n.enterConfirmPass;
                         } else if (value.length < 6) {
-                          return 'Confirm new password must be at least 6 characters';
+                          return context.l10n.passwordLeast;
                         } else if (value.length > 40) {
-                          return 'Confirm new password must be less than 40 characters';
+                          return context.l10n.passwordLess;
                         } else if (value != _passwordController.text) {
-                          return 'New password and confirm new password do not match';
+                          return context.l10n.passwordNotMatch;
                         }
                         return null;
                       },
@@ -192,7 +178,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: PrimaryButton(
-        text: 'Set a password',
+        text: context.l10n.setPassword,
         onTap: () async {
           if (_formKey.currentState!.validate()) {
             await _handleButton();
@@ -220,9 +206,8 @@ class _SetNewPasswordState extends State<SetNewPassword> {
           context,
           enableDrag: false,
           isDismissible: false,
-          // titleMessage: 'Successfully!',
           contentMessage: '${response.message}',
-          buttonLabel: 'Login',
+          buttonLabel: context.l10n.login,
           onTap: () {
             Navigator.pushReplacement(
               context,
@@ -238,8 +223,7 @@ class _SetNewPasswordState extends State<SetNewPassword> {
       } else {
         showCupertinoMessageDialog(
           context,
-          "Error!",
-          // content: response.errors?.first.errorMessage,
+          context.l10n.error,
           content: 'Set new password failure',
         );
       }

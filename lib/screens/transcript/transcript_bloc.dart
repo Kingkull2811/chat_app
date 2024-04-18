@@ -44,8 +44,8 @@ class TranscriptBloc extends Bloc<TranscriptEvent, TranscriptState> {
               apiError: ApiError.noError,
               listStudent: listStudent,
             ));
-          } else if (userResponse is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (userResponse is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -83,8 +83,8 @@ class TranscriptBloc extends Bloc<TranscriptEvent, TranscriptState> {
               apiError: ApiError.noError,
               learningResult: response.listResult,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,

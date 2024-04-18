@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/screens/transcript/transcript_management/enter_point_subject/enter_point_subject_bloc.dart';
 import 'package:chat_app/screens/transcript/transcript_management/transcript_management_event.dart';
@@ -62,11 +63,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -86,16 +83,16 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                 child: const Icon(
                   Icons.arrow_back_ios,
                   size: 24,
-                  color: Colors.white,
+                  color: Colors.white
                 ),
               ),
               centerTitle: true,
-              title: const Text(
-                'Transcript Management',
-                style: TextStyle(
+              title:  Text(
+                context.l10n.transcriptManage,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.white
                 ),
               ),
             ),
@@ -126,7 +123,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                             _dialogSelectSchoolYear(
                                 AppConstants.listSchoolYear);
                           },
-                          labelText: 'School Year',
+                          labelText: context.l10n.schoolY,
                         ),
                       ),
                       SizedBox(
@@ -141,7 +138,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                           onTap: () {
                             _dialogSelectClass(curState.listClass);
                           },
-                          labelText: 'Class',
+                          labelText: context.l10n.classTitle,
                         ),
                       ),
                     ],
@@ -161,10 +158,10 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                         borderRadius: BorderRadius.circular(20),
                         color: Theme.of(context).primaryColor,
                       ),
-                      child: const Text(
-                        'Search',
+                      child:  Text(
+                        context.l10n.search,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style:const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.white),
@@ -208,7 +205,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
 
   Widget _listStudentView(List<Student>? listStudent) {
     if (isNullOrEmpty(listStudent)) {
-      return const DataNotFoundPage(title: 'List students not found');
+      return  DataNotFoundPage(title: context.l10n.noStu);
     }
     return SizedBox(
       height: 170 * listStudent!.length.toDouble(),
@@ -308,14 +305,14 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                             Expanded(
                               flex: 3,
                               child: _itemText(
-                                title: 'Student SSID:',
+                                title: '${context.l10n.stuSSID}:',
                                 value: student.code ?? '',
                               ),
                             ),
                             Expanded(
                               flex: 2,
                               child: _itemText(
-                                title: 'Class:',
+                                title: context.l10n.classTitle,
                                 value: student.className ?? '',
                               ),
                             ),
@@ -330,14 +327,14 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                               Expanded(
                                 flex: 3,
                                 child: _itemText(
-                                  title: 'Student Name:',
+                                  title: context.l10n.student_name,
                                   value: student.name ?? '',
                                 ),
                               ),
                               Expanded(
                                 flex: 2,
                                 child: _itemText(
-                                  title: 'Date of birth:',
+                                  title: context.l10n.dob,
                                   value: formatDate('${student.dateOfBirth}'),
                                 ),
                               ),
@@ -347,7 +344,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 9, 0, 0),
                           child: _itemPoint(
-                            title: 'Semester 1 GPA:',
+                            title: context.l10n.oneGPA,
                             value: student.hk1SubjectMediumScore
                                     ?.toStringAsFixed(3) ??
                                 '___',
@@ -356,7 +353,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
                           child: _itemPoint(
-                            title: 'Semester 2 GPA:',
+                            title: context.l10n.twoGPA,
                             value: student.hk2SubjectMediumScore
                                     ?.toStringAsFixed(3) ??
                                 '___',
@@ -365,7 +362,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
                           child: _itemPoint(
-                            title: 'School year GPA:',
+                            title: context.l10n.yGPA,
                             value: student.mediumScore?.toStringAsFixed(3) ??
                                 '___',
                           ),
@@ -438,7 +435,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Select School Year',
+            context.l10n.selectSY,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -519,7 +516,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Select Class',
+            context.l10n.selClass,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -536,7 +533,7 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
             color: Colors.white,
           ),
           child: isNullOrEmpty(listClass)
-              ? const DataNotFoundPage(title: 'Class data not found')
+              ?  DataNotFoundPage(title: context.l10n.noClass)
               : ListView.builder(
                   physics: const BouncingScrollPhysics(),
                   itemCount: listClass!.length,
@@ -619,9 +616,9 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
             }
           },
           decoration: InputDecoration(
-            hintText: 'Search student ...',
+            hintText: context.l10n.searchStu,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24.0),
+              borderRadius: BorderRadius.circular(24.0)
             ),
             prefixIcon: Icon(
               Icons.search,
@@ -632,14 +629,14 @@ class _TranscriptManagementPageState extends State<TranscriptManagementPage> {
               borderRadius: BorderRadius.circular(24),
               borderSide: BorderSide(
                 width: 1,
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).primaryColor
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
               borderSide: const BorderSide(
                 width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
+                color: Color.fromARGB(128, 130, 130, 130)
               ),
             ),
           ),

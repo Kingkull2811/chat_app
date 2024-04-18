@@ -1,11 +1,11 @@
 class ZegoConfig {
-  static int appID = 1494338619;
+  static int appID = 1672715807;
 
-  static String appSign =
-      '0d8b3516b451abbefebd90bad37c70fff247bae673fc55530eea85fa1a5db211';
-  static String serverSecret = '5625317efa01dacd79de196cf000d852';
+  static String appSign = '0abb2d36c3a49e322477dd4219cb4fb371463c4d27e0762ed2169ae8d8c075c8';
+  static String serverSecret = '123f1c67b7f9b96922a4dac4dc1769e2';
 
-  static String callbackSecret = '5625317efa01dacd79de196cf000d852';
+  static String callbackSecret = '0abb2d36c3a49e322477dd4219cb4fb3';
 
-  static String serverUrl = 'wss://webliveroom1494338619-api.coolzcloud.com/ws';
+  static String serverUrl = 'wss://webliveroom1672715807-api.coolzcloud.com/ws';
+  static String serverUrl2 = 'wss://webliveroom1672715807-api-bak.coolzcloud.com/ws';
 }

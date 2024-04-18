@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
@@ -25,9 +26,9 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: const Text(
-          'Terms and Policies',
-          style: TextStyle(
+        title: Text(
+          context.l10n.terms,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: AppColors.primaryColor,
@@ -74,17 +75,14 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
                         },
                       ),
                     ),
-                    const Expanded(
+                    Expanded(
                         child: Padding(
-                      padding: EdgeInsets.only(left: 10.0),
+                      padding: const EdgeInsets.only(left: 10.0),
                       child: Text(
-                        'Agree. I have read and understood',
+                        context.l10n.agreeTerms,
                         overflow: TextOverflow.visible,
                         softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18,
-                          height: 1.2,
-                        ),
+                        style: const TextStyle(fontSize: 18, height: 1.2),
                       ),
                     ))
                   ],
@@ -128,14 +126,13 @@ class _TermPolicyPageState extends State<TermPolicyPage> {
 
   Widget _nextButton() {
     return PrimaryButton(
-      text: 'Next',
+      text: context.l10n.next,
       isDisable: !_isRead,
       onTap: !_isRead
           ? null
           : () async {
               await SharedPreferencesStorage().setAgreeTerm(true);
-              bool isFirstTimeOpenApp =
-                  SharedPreferencesStorage().getFirstTimeOpen();
+              bool isFirstTimeOpenApp = SharedPreferencesStorage().getFirstTimeOpen();
 
               if (isFirstTimeOpenApp) {
                 await SharedPreferencesStorage().setFirstTimeOpen(false);

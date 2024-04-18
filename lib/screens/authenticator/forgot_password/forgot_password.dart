@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_bloc.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password_event.dart';
@@ -26,7 +27,6 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _emailController = TextEditingController();
-  final focusNode = FocusNode();
 
   late ForgotPasswordBloc _forgotPasswordBloc;
   final AuthRepository _authRepository = AuthRepository();
@@ -54,18 +54,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       },
       listener: (context, state) {
         if (state.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (state.apiError == ApiError.noInternetConnection) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'no_internet_connection',
-          );
+          showMessageNoInternetDialog(context);
         }
       },
       builder: (BuildContext context, state) {
@@ -86,20 +78,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'Forgot Password',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Text(
+          context.l10n.forgotPassword,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_outlined,
-            size: 24,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_outlined, size: 24, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -122,7 +106,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 20),
                         child: Text(
-                          'Reset your password',
+                          context.l10n.resetPassword,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -133,7 +117,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: Text(
-                          'Please enter your email. We will send a code to your email to reset your password.',
+                          context.l10n.enterEmailToReset,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -170,14 +154,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             await _onClickButton();
           }
         },
-        labelText: 'Email',
-        hint: 'Enter your email',
+        labelText: context.l10n.email,
+        // hint: 'Enter your email',
         prefixIcon: Icons.mail_outline,
         validator: (String? value) {
           if (value == null || value.isEmpty) {
-            return 'Please enter email';
+            return context.l10n.enter_email;
           } else if (!AppConstants.emailExp.hasMatch(value)) {
-            return 'Please enter valid email';
+            return context.l10n.valid_email;
           }
           return null;
         },
@@ -189,7 +173,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: PrimaryButton(
-        text: "Send me Code",
+        text: context.l10n.sendCode,
         isDisable: _emailController.text.isEmpty,
         onTap: _emailController.text.isEmpty
             ? null
@@ -208,10 +192,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       showMessageNoInternetDialog(context);
     } else {
       _forgotPasswordBloc.add(DisplayLoading());
-      final response = await _authRepository.forgotPassword(
-        email: _emailController.text.trim(),
-        // email: 'truong3@gmail.com',
-      );
+      final response = await _authRepository.forgotPassword(email: _emailController.text.trim());
 
       if (response.isOK() && mounted) {
         _forgotPasswordBloc.add(OnSuccess());
@@ -220,9 +201,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           MaterialPageRoute(
             builder: (context) => BlocProvider<VerifyOtpBloc>(
               create: (context) => VerifyOtpBloc(context),
-              child: VerifyOtp(
-                email: _emailController.text.trim(),
-              ),
+              child: VerifyOtp(email: _emailController.text.trim()),
             ),
           ),
         );

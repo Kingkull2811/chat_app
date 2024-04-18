@@ -177,7 +177,7 @@ class FirebaseService {
                     receiverId: receiverName,
                   },
                   'imageUrls': {
-                    currentUserId.toString(): _prefs.getImageAvartarUrl(),
+                    currentUserId.toString(): _prefs.getImageAvatarUrl(),
                     receiverId: receiverAvt,
                   },
                   'fcm_token_$currentUserId': await FirebaseMessagingServices().getDeviceToken(),

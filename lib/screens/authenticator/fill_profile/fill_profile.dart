@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/fill_profile_bloc.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/fill_profile_state.dart';
@@ -98,11 +99,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -127,7 +124,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
         return false;
       },
       child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
+        onTap: () => clearFocus(context),
         child: Scaffold(
           appBar: AppBar(
             elevation: 0,
@@ -161,13 +158,12 @@ class _FillProfilePageState extends State<FillProfilePage> {
                             child: InputField(
                               context: context,
                               controller: _usernameController,
-                              // initText: state.userData?.username,
                               readOnly: true,
-                              labelText: 'Username',
+                              labelText: context.l10n.username,
                               prefixIcon: Icons.person_outline,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter username';
+                                  return context.l10n.enter_username;
                                 }
                                 return null;
                               },
@@ -180,12 +176,11 @@ class _FillProfilePageState extends State<FillProfilePage> {
                               controller: _nameController,
                               // initText: state.userData?.fullName,
                               readOnly: false,
-                              labelText: 'Full name',
-                              hintText: 'Enter full name',
+                              labelText: context.l10n.fullname,
                               prefixIcon: Icons.contacts_outlined,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter full name';
+                                  return context.l10n.enter_fullname;
                                 }
                                 return null;
                               },
@@ -198,14 +193,13 @@ class _FillProfilePageState extends State<FillProfilePage> {
                               controller: _emailController,
                               // initText: state.userData?.email,
                               readOnly: true,
-                              labelText: 'Email',
+                              labelText: context.l10n.email,
                               prefixIcon: Icons.email_outlined,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter email';
-                                } else if (!AppConstants.emailExp
-                                    .hasMatch(value)) {
-                                  return 'Please enter valid email';
+                                  return context.l10n.enter_email;
+                                } else if (!AppConstants.emailExp.hasMatch(value)) {
+                                  return context.l10n.valid_email;
                                 }
                                 return null;
                               },
@@ -216,16 +210,15 @@ class _FillProfilePageState extends State<FillProfilePage> {
                             child: InputField(
                               context: context,
                               controller: _phoneController,
-                              // initText: state.userData?.phone,
                               readOnly: false,
-                              labelText: 'Phone number',
-                              hintText: 'Enter phone number',
+                              labelText: context.l10n.phone,
+                              // hintText: 'Enter phone number',
                               prefixIcon: Icons.phone,
                               maxText: 10,
                               keyboardType: TextInputType.phone,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter phone number';
+                                  return context.l10n.enter_phone;
                                 }
                                 return null;
                               },
@@ -235,9 +228,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 32, bottom: 32),
                             child: PrimaryButton(
-                              text: 'Save',
-                              onTap: () async =>
-                                  await onTapButton(context, state.userData),
+                              text: context.l10n.save,
+                              onTap: () async => await onTapButton(context, state.userData),
                             ),
                           ),
                         ],
@@ -253,30 +245,22 @@ class _FillProfilePageState extends State<FillProfilePage> {
   Future<void> onTapButton(BuildContext context, UserInfoModel? info) async {
     if (_formKey.currentState!.validate()) {
       if (isNullOrEmpty(_image)) {
-        showCupertinoMessageDialog(context, 'Image avartar cannot be empty');
+        showCupertinoMessageDialog(context, context.l10n.empty_avatar);
       } else {
-        showLoading(context);
-        List<int?> listStudentIdSelected =
-            listStudent.map((e) => e.id).toList();
+        // showLoading(context);
+        List<int?> listStudentIdSelected = listStudent.map((e) => e.id).toList();
 
         String image = '';
 
         if (!_isOnline) {
           image = await FirebaseService().uploadImageToStorage(
-            titleName:
-                'image_profile_${SharedPreferencesStorage().getUserId()}',
+            titleName: 'image_profile_${SharedPreferencesStorage().getUserId()}',
             childFolder: AppConstants.imageProfilesChild,
             image: File(_image!),
           );
         }
 
-        final Map<String, dynamic> userMap = {
-          "fileUrl": _isOnline ? info?.fileUrl : image,
-          "fullName": _nameController.text.trim(),
-          "isFillProfileKey": true,
-          "phone": _phoneController.text.trim(),
-          "studentIds": listStudentIdSelected
-        };
+        final Map<String, dynamic> userMap = {"fileUrl": _isOnline ? info?.fileUrl : image, "fullName": _nameController.text.trim(), "isFillProfileKey": true, "phone": _phoneController.text.trim(), "studentIds": listStudentIdSelected};
         _fillBloc.add(FillProfile(userMap: userMap));
       }
     }
@@ -335,10 +319,10 @@ class _FillProfilePageState extends State<FillProfilePage> {
                 color: const Color.fromARGB(128, 130, 130, 130),
               ),
             ),
-            child: const Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-              children:  [
-                Padding(
+              children: [
+                const Padding(
                   padding: EdgeInsets.only(left: 10, right: 16),
                   child: Icon(
                     Icons.group,
@@ -346,22 +330,10 @@ class _FillProfilePageState extends State<FillProfilePage> {
                     color: AppColors.greyLight,
                   ),
                 ),
-                Expanded(
-                  child: Text(
-                    'Student\'s Parent',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                Padding(
+                Expanded(child: Text(context.l10n.parent, style: const TextStyle(fontSize: 16, color: Colors.grey))),
+                const Padding(
                   padding: EdgeInsets.only(left: 10, right: 10),
-                  child: Icon(
-                    Icons.navigate_next,
-                    size: 20,
-                    color: Colors.grey,
-                  ),
+                  child: Icon(Icons.navigate_next, size: 20, color: Colors.grey),
                 ),
               ],
             ),
@@ -381,9 +353,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
       child: Container(
         height: 200,
         width: 200,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(100)),
         child: Stack(
           children: [
             ClipRRect(
@@ -414,9 +384,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
                           onPressed: () async {
                             Navigator.pop(context);
 
-                            final imagePicked = await pickPhoto(
-                              ImageSource.camera,
-                            );
+                            final imagePicked = await pickPhoto(ImageSource.camera);
 
                             setState(() {
                               _image = imagePicked;
@@ -424,7 +392,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
                             });
                           },
                           child: Text(
-                            'Take a photo from camera',
+                            context.l10n.photo_camera,
                             style: TextStyle(
                               fontSize: 16,
                               color: Theme.of(context).primaryColor,
@@ -435,8 +403,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
                           onPressed: () async {
                             Navigator.pop(context);
 
-                            final imagePicked =
-                                await pickPhoto(ImageSource.gallery);
+                            final imagePicked = await pickPhoto(ImageSource.gallery);
 
                             setState(() {
                               _image = imagePicked;
@@ -444,7 +411,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
                             });
                           },
                           child: Text(
-                            'Choose a photo from gallery',
+                            context.l10n.photo_gallery,
                             style: TextStyle(
                               fontSize: 16,
                               color: Theme.of(context).primaryColor,
@@ -457,11 +424,8 @@ class _FillProfilePageState extends State<FillProfilePage> {
                           Navigator.pop(context);
                         },
                         child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black.withOpacity(0.7),
-                          ),
+                          context.l10n.cancel,
+                          style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7)),
                         ),
                       ),
                     );
@@ -473,10 +437,7 @@ class _FillProfilePageState extends State<FillProfilePage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: Colors.white,
-                    border: Border.all(
-                      width: 2,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                    border: Border.all(width: 2, color: Theme.of(context).primaryColor),
                   ),
                   child: Icon(
                     Icons.add_a_photo_outlined,

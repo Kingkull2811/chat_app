@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password.dart';
 import 'package:chat_app/screens/authenticator/set_new_password/set_new_password_bloc.dart';
@@ -54,18 +55,10 @@ class _VerifyOtpState extends State<VerifyOtp> {
       },
       listener: (context, state) {
         if (state.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (state.apiError == ApiError.noInternetConnection) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'no_internet_connection',
-          );
+          showMessageNoInternetDialog(context);
         }
       },
       builder: (context, state) {
@@ -94,11 +87,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: const Icon(
-                  Icons.arrow_back_ios_outlined,
-                  size: 24,
-                  color: Colors.black,
-                ),
+                child: const Icon(Icons.arrow_back_ios_outlined, size: 24, color: Colors.black),
               ),
             ),
             Positioned(
@@ -118,23 +107,16 @@ class _VerifyOtpState extends State<VerifyOtp> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
-                            'OTP Verification',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor,
-                            ),
+                            context.l10n.otp,
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.only(top: 20),
                           width: 300,
                           child: Text(
-                            'We will send you an onetime OTP code on the email: ${widget.email}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            '${context.l10n.willSend} ${widget.email}',
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                             textAlign: TextAlign.center,
                             maxLines: 2,
                           ),
@@ -160,11 +142,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
       child: OtpTextField(
         numberOfFields: 6,
         fieldWidth: 45,
-        textStyle: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).primaryColor,
-        ),
+        textStyle: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),
         focusedBorderColor: Theme.of(context).primaryColor,
         enabledBorderColor: Theme.of(context).primaryColor,
         disabledBorderColor: Colors.grey,
@@ -191,12 +169,11 @@ class _VerifyOtpState extends State<VerifyOtp> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: PrimaryButton(
-        text: 'Verify',
+        text: context.l10n.verify,
         isDisable: !state.isEnable,
         onTap: state.isEnable
             ? () async {
-                ConnectivityResult connectivityResult =
-                    await Connectivity().checkConnectivity();
+                ConnectivityResult connectivityResult = await Connectivity().checkConnectivity();
                 if (connectivityResult == ConnectivityResult.none && mounted) {
                   showMessageNoInternetDialog(context);
                 } else {
@@ -213,28 +190,22 @@ class _VerifyOtpState extends State<VerifyOtp> {
                       context,
                       enableDrag: false,
                       isDismissible: false,
-                      titleMessage: 'Verified!',
-                      contentMessage: 'You have verified your account.',
-                      buttonLabel: 'Set a new password',
+                      titleMessage: context.l10n.verified,
+                      contentMessage: context.l10n.accVerified,
+                      buttonLabel: context.l10n.setPassword,
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                BlocProvider<SetNewPasswordBloc>(
+                            builder: (context) => BlocProvider<SetNewPasswordBloc>(
                               create: (context) => SetNewPasswordBloc(context),
-                              child: SetNewPassword(
-                                email: widget.email,
-                              ),
+                              child: SetNewPassword(email: widget.email),
                             ),
                           ),
                         );
                       },
                     );
                   } else {
-                    // setState(() {
-                    //   state.isLoading = false;
-                    // });
                     _verifyOtpBloc.add(OnFailure(
                       errorMessage: response.errors?.first.errorMessage,
                     ));
@@ -266,30 +237,22 @@ class _VerifyOtpState extends State<VerifyOtp> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Didn\'t you receive the OTP code? ',
-            style: TextStyle(
-              fontSize: 14,
-            ),
+          Text(
+            context.l10n.resendOtp,
+            style: const TextStyle(fontSize: 14),
           ),
           GestureDetector(
             onTap: () async {
               //todo: resend OTP code
-              final response = await _authRepository.forgotPassword(
-                email: widget.email,
-              );
+              final response = await _authRepository.forgotPassword(email: widget.email);
               if (response.isOK()) {
                 setState(() {});
               }
             },
             child: Text(
-              (_timerCounter == 0) ? 'Resend Code' : '00:$_timerCounter',
+              (_timerCounter == 0) ? context.l10n.resend : '00:$_timerCounter',
               // (duration.inSeconds == 0) ? 'Resend Code' : countTime,
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-              ),
+              style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic),
             ),
           )
         ],

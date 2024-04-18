@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/message_model.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/utilities/enum/message_type.dart';
@@ -206,7 +207,7 @@ class _MessageViewState extends State<MessageView> {
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
-              'Say hi 👋 to start chat with ${widget.receiverName}',
+              context.l10n.sayHi + widget.receiverName,
               style: const TextStyle(
                 fontWeight: FontWeight.normal,
                 fontSize: 16,
@@ -353,9 +354,9 @@ class _MessageViewState extends State<MessageView> {
             // showRecentsTab: true,
             recentsLimit: 28,
             replaceEmojiOnLimitExceed: false,
-            noRecents: const Text(
-              'No Recents',
-              style: TextStyle(fontSize: 20, color: Colors.black26),
+            noRecents: Text(
+              context.l10n.noRecent,
+              style: const TextStyle(fontSize: 20, color: Colors.black26),
               textAlign: TextAlign.center,
             ),
             loadingIndicator: const SizedBox.shrink(),
@@ -603,9 +604,9 @@ class _MessageViewState extends State<MessageView> {
                   );
                 }
               },
-              child: const Text(
-                'Take a photo from camera',
-                style: TextStyle(
+              child:  Text(
+                context.l10n.photo_camera,
+                style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.primaryColor,
                 ),
@@ -625,9 +626,9 @@ class _MessageViewState extends State<MessageView> {
                   );
                 }
               },
-              child: const Text(
-                'Choose a photo from gallery',
-                style: TextStyle(
+              child:  Text(
+                context.l10n.photo_gallery,
+                style:const TextStyle(
                   fontSize: 16,
                   color: AppColors.primaryColor,
                 ),
@@ -639,7 +640,7 @@ class _MessageViewState extends State<MessageView> {
               Navigator.pop(context);
             },
             child: Text(
-              'Cancel',
+              context.l10n.cancel,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black.withOpacity(0.7),
@@ -714,7 +715,7 @@ class _MessageViewState extends State<MessageView> {
                   isFromChat: true,
                   callerId: _pref.getUserId().toString(),
                   callerName: _pref.getFullName(),
-                  callerPic: _pref.getImageAvartarUrl(),
+                  callerPic: _pref.getImageAvatarUrl(),
                   callerFCMToken: await FirebaseMessaging.instance.getToken(),
                   receiverId: widget.receiverId,
                   receiverName: widget.receiverName,
@@ -736,7 +737,7 @@ class _MessageViewState extends State<MessageView> {
                   isFromChat: true,
                   callerId: _pref.getUserId().toString(),
                   callerName: _pref.getFullName(),
-                  callerPic: _pref.getImageAvartarUrl(),
+                  callerPic: _pref.getImageAvatarUrl(),
                   callerFCMToken: await FirebaseMessaging.instance.getToken(),
                   receiverId: widget.receiverId,
                   receiverName: widget.receiverName,

@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
@@ -57,8 +58,7 @@ class _ContactTabState extends State<ContactTab> {
             children: [
               _searchBox(context),
               Expanded(
-                child:
-                    _listView(_showSearchResult ? listUsers : widget.listUser),
+                child: _listView(_showSearchResult ? listUsers : widget.listUser),
               ),
             ],
           ),
@@ -70,11 +70,10 @@ class _ContactTabState extends State<ContactTab> {
   Widget _listView(List<UserFirebaseData>? listUserData) {
     if (isNullOrEmpty(listUserData)) {
       return Center(
-        child: Text(
-          'No contact',
+        child: Text( context.l10n.noContact,
           style: TextStyle(
             fontSize: 16,
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).primaryColor
           ),
         ),
       );
@@ -212,22 +211,21 @@ class _ContactTabState extends State<ContactTab> {
                   padding: const EdgeInsets.only(left: 10),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () async =>
-                        await PermissionsServices.microphonePermissionsGranted()
-                            ?  CallUtils.dialVoice(
-                                context: context,
-                                isFromChat: false,
-                                callerId: _pref.getUserId().toString(),
-                                callerName: _pref.getFullName(),
-                                callerPic: _pref.getImageAvartarUrl(),
-                                callerFCMToken: await FirebaseMessaging.instance.getToken(),
-                                receiverId: item.id.toString(),
-                                receiverName: item.fullName ?? '',
-                                receiverPic: item.fileUrl ?? '',
-                                receiverFCMToken: item.fcmToken,
-                                callType: CallType.audioCall,
-                              )
-                            : {},
+                    onTap: () async => await PermissionsServices.microphonePermissionsGranted()
+                        ? CallUtils.dialVoice(
+                            context: context,
+                            isFromChat: false,
+                            callerId: _pref.getUserId().toString(),
+                            callerName: _pref.getFullName(),
+                            callerPic: _pref.getImageAvatarUrl(),
+                            callerFCMToken: await FirebaseMessaging.instance.getToken(),
+                            receiverId: item.id.toString(),
+                            receiverName: item.fullName ?? '',
+                            receiverPic: item.fileUrl ?? '',
+                            receiverFCMToken: item.fcmToken,
+                            callType: CallType.audioCall,
+                          )
+                        : {},
                     child: Container(
                       height: 35,
                       width: 35,
@@ -299,27 +297,12 @@ class _ContactTabState extends State<ContactTab> {
       });
     }
     List<UserFirebaseData> suggestion = widget.listUser?.where((user) {
-          bool matchesFullName = user.fullName
-                  ?.toLowerCase()
-                  .contains(searchQuery.toLowerCase()) ??
-              false;
-          bool matchesEmail =
-              user.email?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-                  false;
-          bool matchesPhone =
-              user.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-                  false;
-          bool matchesParentClassName = user.parentOf?.any((student) =>
-                  student.className
-                      ?.toLowerCase()
-                      .contains(searchQuery.toLowerCase()) ??
-                  false) ??
-              false;
+          bool matchesFullName = user.fullName?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false;
+          bool matchesEmail = user.email?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false;
+          bool matchesPhone = user.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false;
+          bool matchesParentClassName = user.parentOf?.any((student) => student.className?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false) ?? false;
 
-          return matchesFullName ||
-              matchesEmail ||
-              matchesPhone ||
-              matchesParentClassName;
+          return matchesFullName || matchesEmail || matchesPhone || matchesParentClassName;
         }).toList() ??
         [];
     setState(() {

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:chat_app/utilities/app_constants.dart';
@@ -28,8 +29,7 @@ class AddStudent extends StatefulWidget {
   final bool isEdit;
   final Student? student;
 
-  const AddStudent({Key? key, this.isEdit = false, this.student})
-      : super(key: key);
+  const AddStudent({Key? key, this.isEdit = false, this.student}) : super(key: key);
 
   @override
   State<AddStudent> createState() => _AddStudentState();
@@ -70,8 +70,7 @@ class _AddStudentState extends State<AddStudent> {
 
   @override
   void initState() {
-    _studentBloc = BlocProvider.of<AddStudentBloc>(context)
-      ..add(InitialEvent());
+    _studentBloc = BlocProvider.of<AddStudentBloc>(context)..add(InitialEvent());
     initEdit();
     super.initState();
   }
@@ -95,11 +94,7 @@ class _AddStudentState extends State<AddStudent> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -143,26 +138,16 @@ class _AddStudentState extends State<AddStudent> {
                 },
                 child: const Padding(
                   padding: EdgeInsets.only(left: 16),
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    size: 24,
-                    color: Colors.white,
-                  ),
+                  child: Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
                 ),
               ),
               centerTitle: true,
               title: Text(
-                widget.isEdit ? 'Edit student' : 'Add a new student',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                widget.isEdit ? context.l10n.editStu : context.l10n.addStu,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
-            body: curState.isLoading
-                ? const AnimationLoading()
-                : _body(context, curState),
+            body: curState.isLoading ? const AnimationLoading() : _body(context, curState),
           ),
         );
       },
@@ -189,15 +174,13 @@ class _AddStudentState extends State<AddStudent> {
                     controller: _codeController,
                     inputAction: TextInputAction.next,
                     prefixIcon: Icons.badge_outlined,
-                    labelText: 'Student SSID',
-                    hintText: 'Enter student SSID',
+                    labelText: context.l10n.stuSSID,
+                    // hintText: 'Enter student SSID',
                     validator: (value) {
                       if (widget.isEdit && (value == null || value.isEmpty)) {
-                        return 'SSID can\'t be empty';
-                      } else if (widget.isEdit &&
-                          !RegExp(r'^SSID\d{3}$')
-                              .hasMatch(value!.toUpperCase())) {
-                        return 'Please enter SSID like SSID**** with * is the number';
+                        return context.l10n.noEmptySSID;
+                      } else if (widget.isEdit && !RegExp(r'^SSID\d{3}$').hasMatch(value!.toUpperCase())) {
+                        return context.l10n.enterSSID;
                       }
                       return null;
                     },
@@ -210,11 +193,11 @@ class _AddStudentState extends State<AddStudent> {
                   controller: _nameController,
                   inputAction: TextInputAction.next,
                   prefixIcon: Icons.badge_outlined,
-                  labelText: 'Student name',
-                  hintText: 'Enter student name',
+                  labelText: context.l10n.stuName,
+                  // hintText: 'Enter student name',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the student\'s name';
+                      return context.l10n.enterStuName;
                     }
                     return null;
                   },
@@ -228,7 +211,7 @@ class _AddStudentState extends State<AddStudent> {
                   controller: _calendarController,
                   inputAction: TextInputAction.next,
                   prefixIcon: Icons.calendar_month,
-                  labelText: 'Date of birth',
+                  labelText: context.l10n.dob,
                   hintText: 'yyyy/MM/dd',
                   showSuffix: true,
                   onTap: () {
@@ -239,19 +222,16 @@ class _AddStudentState extends State<AddStudent> {
                       maxTime: DateTime(2030, 12, 31),
                       onConfirm: (date) {
                         setState(() {
-                          _calendarController.text =
-                              DateFormat('yyyy-MM-dd', 'en').format(date);
+                          _calendarController.text = DateFormat('yyyy-MM-dd', 'en').format(date);
                         });
                       },
-                      currentTime:
-                          DateTime.tryParse(_calendarController.text) ??
-                              DateTime.now(),
+                      currentTime: DateTime.tryParse(_calendarController.text) ?? DateTime.now(),
                       locale: data_time_pick.LocaleType.en,
                     );
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter date of birth';
+                      return context.l10n.enterDOB;
                     }
                     return null;
                   },
@@ -272,8 +252,8 @@ class _AddStudentState extends State<AddStudent> {
                         controller: _classController,
                         inputAction: TextInputAction.next,
                         iconPath: 'assets/images/ic_presentation.png',
-                        labelText: 'Class',
-                        hintText: 'Select Class',
+                        labelText: context.l10n.classTitle,
+                        // hintText: 'Select Class',
                         showSuffix: true,
                         isShow: _showClass,
                         onTap: () {
@@ -283,7 +263,7 @@ class _AddStudentState extends State<AddStudent> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please select class';
+                            return context.l10n.selectClass;
                           }
                           return null;
                         },
@@ -309,8 +289,8 @@ class _AddStudentState extends State<AddStudent> {
                         inputAction: TextInputAction.next,
                         // icon: Icons.badge_outlined,
                         iconPath: 'assets/images/ic_semester.png',
-                        labelText: 'School Year',
-                        hintText: 'Select School Year',
+                        labelText: context.l10n.schoolY,
+                        // hintText: 'Select School Year',
                         showSuffix: true,
                         isShow: _showYear,
                         onTap: () {
@@ -320,13 +300,12 @@ class _AddStudentState extends State<AddStudent> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please select school year';
+                            return context.l10n.selectScY;
                           }
                           return null;
                         },
                       ),
-                      if (_showYear)
-                        _listSchoolYear(AppConstants.listSchoolYear),
+                      if (_showYear) _listSchoolYear(AppConstants.listSchoolYear),
                     ],
                   ),
                 ),
@@ -334,11 +313,8 @@ class _AddStudentState extends State<AddStudent> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
-                  'Student Image',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  context.l10n.stuImage,
+                  style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
                 ),
               ),
               _image(),
@@ -355,21 +331,13 @@ class _AddStudentState extends State<AddStudent> {
                               width: MediaQuery.of(context).size.width * 0.4,
                               child: PrimaryButton(
                                 isWarning: true,
-                                text: 'Delete',
+                                text: context.l10n.delete,
                                 onTap: () async {
-                                  showMessageTwoOption(context,
-                                      'Do you want to delete this student?',
-                                      okLabel: 'Delete', onOk: () {
+                                  showMessageTwoOption(context, context.l10n.deleteStu, okLabel: context.l10n.delete, onOk: () {
                                     if (widget.student?.id == null) {
-                                      showCupertinoMessageDialog(
-                                        context,
-                                        'Error',
-                                        content: 'Student not found',
-                                      );
+                                      showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.noStu);
                                     }
-                                    _studentBloc.add(DeleteStudentsEvent(
-                                      (widget.student?.id)!,
-                                    ));
+                                    _studentBloc.add(DeleteStudentsEvent((widget.student?.id)!));
                                     Navigator.of(context).pop(true);
                                   });
                                 },
@@ -378,11 +346,10 @@ class _AddStudentState extends State<AddStudent> {
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.4,
                               child: PrimaryButton(
-                                text: 'Update',
+                                text: context.l10n.update,
                                 onTap: () async {
                                   if (imagePath == null) {
-                                    showCupertinoMessageDialog(
-                                        context, 'Please add student image');
+                                    showCupertinoMessageDialog(context, context.l10n.addImageStu);
                                   } else {
                                     if (_formKey.currentState!.validate()) {
                                       showLoading(context);
@@ -395,11 +362,10 @@ class _AddStudentState extends State<AddStudent> {
                           ],
                         )
                       : PrimaryButton(
-                          text: 'Save',
+                          text: context.l10n.save,
                           onTap: () async {
                             if (imagePath == null) {
-                              showCupertinoMessageDialog(
-                                  context, 'Please add student image');
+                              showCupertinoMessageDialog(context, context.l10n.addImageStu);
                             } else {
                               if (_formKey.currentState!.validate()) {
                                 showLoading(context);
@@ -418,18 +384,11 @@ class _AddStudentState extends State<AddStudent> {
   }
 
   Future<void> _buttonAdd(BuildContext context) async {
-    final Map<String, dynamic> data = {
-      "classId": _classId,
-      "dateOfBirth": _calendarController.text.trim(),
-      "imageUrl": _isOnline ? imagePath : await _sendImageToStorage(imagePath!),
-      "name": _nameController.text.trim(),
-      "semesterYear": _yearController.text.trim()
-    };
+    final Map<String, dynamic> data = {"classId": _classId, "dateOfBirth": _calendarController.text.trim(), "imageUrl": _isOnline ? imagePath : await _sendImageToStorage(imagePath!), "name": _nameController.text.trim(), "semesterYear": _yearController.text.trim()};
 
     final response = await _studentRepository.addStudent(data: data);
-    if (response is Student) {
-      await showCupertinoMessageDialog(this.context, 'Add new student success',
-          onClose: () {
+    if (response is Student && context.mounted) {
+      await showCupertinoMessageDialog(this.context, context.l10n.successfully, onClose: () {
         setState(() {
           _nameController.clear();
           _calendarController.clear();
@@ -440,23 +399,16 @@ class _AddStudentState extends State<AddStudent> {
         });
         Navigator.pop(context);
       });
-    } else if (response is ExpiredTokenResponse) {
+    } else if (response is ExpiredTokenResponse && context.mounted) {
       logoutIfNeed(this.context);
     } else {
-      showCupertinoMessageDialog(
-        this.context,
-        'Add student failed',
-      );
+      showCupertinoMessageDialog(this.context, context.l10n.addStuFail);
     }
   }
 
   Future<void> _buttonUpdate(BuildContext context) async {
     if (widget.student?.id == null) {
-      showCupertinoMessageDialog(
-        context,
-        'Error',
-        content: 'Student not found',
-      );
+      showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.noStu);
     }
     final Map<String, dynamic> data = {
       "classId": _classId,
@@ -472,19 +424,19 @@ class _AddStudentState extends State<AddStudent> {
       data: data,
     );
 
-    if (response is Student) {
+    if (response is Student && context.mounted) {
       showCupertinoMessageDialog(
         this.context,
-        'Update student success',
+        context.l10n.updateStuSuccess,
         onClose: () {
           Navigator.pop(context);
           Navigator.of(context).pop(true);
         },
       );
-    } else if (response is ExpiredTokenResponse) {
+    } else if (response is ExpiredTokenResponse && context.mounted) {
       logoutIfNeed(this.context);
     } else {
-      showCupertinoMessageDialog(this.context, 'Update student failed');
+      showCupertinoMessageDialog(this.context, context.l10n.updateStuFail);
     }
   }
 
@@ -517,9 +469,7 @@ class _AddStudentState extends State<AddStudent> {
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: (_yearController.text == listSchoolYear[index])
-                          ? Colors.grey.withOpacity(0.25)
-                          : null,
+                      color: (_yearController.text == listSchoolYear[index]) ? Colors.grey.withOpacity(0.25) : null,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 10, 0),
@@ -529,20 +479,13 @@ class _AddStudentState extends State<AddStudent> {
                           Expanded(
                             child: Text(
                               listSchoolYear[index],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
+                              style: const TextStyle(fontSize: 14, color: Colors.black),
                             ),
                           ),
                           if (_yearController.text == listSchoolYear[index])
                             const Padding(
                               padding: EdgeInsets.only(left: 10),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
+                              child: Icon(Icons.check, color: Colors.green, size: 20),
                             ),
                         ],
                       ),
@@ -554,7 +497,7 @@ class _AddStudentState extends State<AddStudent> {
           : Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                'List semester not found',
+                context.l10n.noSemester,
                 style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).primaryColor,
@@ -586,9 +529,7 @@ class _AddStudentState extends State<AddStudent> {
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: (_classId == listClass[index].classId)
-                          ? Colors.grey.withOpacity(0.25)
-                          : null,
+                      color: (_classId == listClass[index].classId) ? Colors.grey.withOpacity(0.25) : null,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 10, 0),
@@ -598,20 +539,13 @@ class _AddStudentState extends State<AddStudent> {
                           Expanded(
                             child: Text(
                               '${listClass[index].className}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
+                              style: const TextStyle(fontSize: 14, color: Colors.black),
                             ),
                           ),
                           if (_classId == listClass[index].classId)
                             const Padding(
                               padding: EdgeInsets.only(left: 10),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
+                              child: Icon(Icons.check, color: Colors.green, size: 20),
                             ),
                         ],
                       ),
@@ -623,7 +557,7 @@ class _AddStudentState extends State<AddStudent> {
           : Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
-                'List class not found',
+                context.l10n.noClass,
                 style: TextStyle(
                   fontSize: 14,
                   color: Theme.of(context).primaryColor,
@@ -649,12 +583,7 @@ class _AddStudentState extends State<AddStudent> {
                   localPathOrUrl: imagePath ?? 'http://',
                   boxFit: BoxFit.cover,
                   errorWidget: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          width: 1,
-                          color: Theme.of(context).primaryColor,
-                        )),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(width: 1, color: Theme.of(context).primaryColor)),
                     child: InkWell(
                       onTap: () async {
                         await showCupertinoModalPopup(
@@ -665,33 +594,26 @@ class _AddStudentState extends State<AddStudent> {
                                 CupertinoActionSheetAction(
                                   onPressed: () async {
                                     Navigator.pop(context);
-                                    imagePath = await pickPhoto(
-                                      ImageSource.camera,
-                                    );
+                                    imagePath = await pickPhoto(ImageSource.camera);
                                     setState(() {
                                       _isOnline = false;
                                     });
                                   },
                                   child: Text(
-                                    'Take a photo from camera',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
+                                    context.l10n.photo_camera,
+                                    style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
                                   ),
                                 ),
                                 CupertinoActionSheetAction(
                                   onPressed: () async {
                                     Navigator.pop(context);
-                                    imagePath = await pickPhoto(
-                                      ImageSource.gallery,
-                                    );
+                                    imagePath = await pickPhoto(ImageSource.gallery);
                                     setState(() {
                                       _isOnline = false;
                                     });
                                   },
                                   child: Text(
-                                    'Choose a photo from gallery',
+                                    context.l10n.photo_gallery,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Theme.of(context).primaryColor,
@@ -704,11 +626,8 @@ class _AddStudentState extends State<AddStudent> {
                                   Navigator.pop(context);
                                 },
                                 child: Text(
-                                  'Cancel',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black.withOpacity(0.7),
-                                  ),
+                                  context.l10n.cancel,
+                                  style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7)),
                                 ),
                               ),
                             );
@@ -728,11 +647,8 @@ class _AddStudentState extends State<AddStudent> {
                             Padding(
                               padding: const EdgeInsets.only(top: 16),
                               child: Text(
-                                'Add a student image',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).primaryColor,
-                                ),
+                                context.l10n.addStuImage,
+                                style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
                               ),
                             ),
                           ],
@@ -754,11 +670,7 @@ class _AddStudentState extends State<AddStudent> {
                           _isOnline = false;
                         });
                       },
-                      child: const Icon(
-                        Icons.cancel_outlined,
-                        size: 24,
-                        color: Colors.red,
-                      ),
+                      child: const Icon(Icons.cancel_outlined, size: 24, color: Colors.red),
                     ),
                   )
                 : const SizedBox.shrink(),

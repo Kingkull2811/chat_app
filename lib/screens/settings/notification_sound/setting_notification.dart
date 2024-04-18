@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
@@ -7,8 +8,7 @@ class SettingNotificationPage extends StatefulWidget {
   const SettingNotificationPage({Key? key}) : super(key: key);
 
   @override
-  State<SettingNotificationPage> createState() =>
-      _SettingNotificationPageState();
+  State<SettingNotificationPage> createState() => _SettingNotificationPageState();
 }
 
 class _SettingNotificationPageState extends State<SettingNotificationPage> {
@@ -36,13 +36,9 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
           ),
         ),
         centerTitle: true,
-        title: const Text(
-          'Notification & Sound',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
+        title: Text(
+          context.l10n.notiSound,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
       body: SingleChildScrollView(
@@ -54,7 +50,7 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _itemWithButtonSwitch(
-                title: 'Turn on the notification',
+                title: context.l10n.notiOn,
                 value: SharedPreferencesStorage().getNightMode() ?? false,
                 onToggle: (value) {
                   setState(() {
@@ -63,9 +59,8 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
                 },
               ),
               _itemWithButtonSwitch(
-                title: 'Turn on the notification preview',
-                value: SharedPreferencesStorage().getPreviewNotification() ??
-                    false,
+                title: context.l10n.notiPreviewOn,
+                value: SharedPreferencesStorage().getPreviewNotification() ?? false,
                 onToggle: (value) {
                   setState(() {
                     SharedPreferencesStorage().setPreviewNotification(value);
@@ -73,7 +68,7 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
                 },
               ),
               _itemWithButtonSwitch(
-                title: 'Vibrate when a call coming',
+                title: context.l10n.vibrateCall,
                 value: SharedPreferencesStorage().getVibrateMode() ?? false,
                 onToggle: (value) {
                   setState(() {
@@ -85,8 +80,7 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
                 isShow: SharedPreferencesStorage().getNightMode() ?? false,
               ),
               _itemLockScreen(
-                isShow: SharedPreferencesStorage().getPreviewNotification() ??
-                    false,
+                isShow: SharedPreferencesStorage().getPreviewNotification() ?? false,
               ),
             ],
           ),
@@ -156,7 +150,7 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
               children: [
                 Expanded(
                   child: Text(
-                    'Sound',
+                    context.l10n.sound,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
@@ -190,12 +184,12 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _itemOnSound(
-                        title: 'Incoming message sound',
+                        title: context.l10n.incomeCallSound,
                         content: '__sound__',
                         isShow: isShow,
                       ),
                       _itemOnSound(
-                        title: 'Incoming call waiting sound',
+                        title: context.l10n.waitingCallSound,
                         content: '_content',
                         isShow: isShow,
                       ),
@@ -271,7 +265,7 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
               children: [
                 Expanded(
                   child: Text(
-                    'Notifications on lock screen',
+                    context.l10n.notiOnLock,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
@@ -282,9 +276,7 @@ class _SettingNotificationPageState extends State<SettingNotificationPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 16),
                   child: Icon(
-                    showMoreNotification
-                        ? Icons.expand_more
-                        : Icons.navigate_next,
+                    showMoreNotification ? Icons.expand_more : Icons.navigate_next,
                     size: 24,
                     color: isShow ? Colors.black : Colors.grey[400],
                   ),

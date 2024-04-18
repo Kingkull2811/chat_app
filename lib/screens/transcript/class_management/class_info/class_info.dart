@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/class_model.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/screens/transcript/class_management/class_info/class_info_bloc.dart';
@@ -60,8 +61,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
 
   @override
   void initState() {
-    _cLassInfoBloc = BlocProvider.of<ClassInfoBloc>(context)
-      ..add(ClassInfoInit());
+    _cLassInfoBloc = BlocProvider.of<ClassInfoBloc>(context)..add(ClassInfoInit());
     initEdit();
     super.initState();
   }
@@ -83,11 +83,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -103,24 +99,18 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
               centerTitle: true,
               leading: IconButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                icon: const Icon(
-                  Icons.arrow_back_ios,
-                  size: 24,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
               ),
               title: Text(
-                widget.isEdit ? 'Edit class' : 'Add new class',
+                widget.isEdit ? context.l10n.editClass : context.l10n.addClass,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.white
                 ),
               ),
             ),
-            body: state.isLoading
-                ? const AnimationLoading()
-                : _body(context, state.listSubject),
+            body: state.isLoading ? const AnimationLoading() : _body(context, state.listSubject),
           ),
         );
       },
@@ -143,7 +133,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                     context,
                     controller: _codeController,
                     inputAction: TextInputAction.done,
-                    labelText: 'Class Code',
+                    labelText: context.l10n.classCode,
                   ),
                 ),
               Padding(
@@ -152,10 +142,10 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                   context: context,
                   controller: _nameController,
                   inputAction: TextInputAction.done,
-                  labelText: 'Class Name',
+                  labelText: context.l10n.className,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter class name';
+                      return context.l10n.enterClass;
                     }
                     return null;
                   },
@@ -172,7 +162,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                     children: [
                       InputField(
                         context: context,
-                        labelText: 'Select year',
+                        labelText:context.l10n.selectYear,
                         controller: _yearController,
                         inputAction: TextInputAction.done,
                         readOnly: true,
@@ -185,13 +175,12 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please select school year';
+                            return context.l10n.plsYear;
                           }
                           return null;
                         },
                       ),
-                      if (_showListYear)
-                        _listSemesterYear(AppConstants.listSchoolYear),
+                      if (_showListYear) _listSemesterYear(AppConstants.listSchoolYear),
                     ],
                   ),
                 ),
@@ -199,9 +188,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
               _listSubject(listSubject),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-                child: widget.isEdit
-                    ? _buttonUpdate(context)
-                    : _buttonSave(context),
+                child: widget.isEdit ? _buttonUpdate(context) : _buttonSave(context),
               ),
             ],
           ),
@@ -212,51 +199,43 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
 
   Widget _buttonUpdate(BuildContext context) {
     return PrimaryButton(
-      text: 'Update',
+      text: context.l10n.update,
       onTap: () async {
         if (_codeController.text.isEmpty) {
-          showCupertinoMessageDialog(
-            context,
-            'Please enter class code',
-          );
+          showCupertinoMessageDialog(context, context.l10n.enterClassCode);
         } else if (listSubjectSelected.isEmpty) {
           showCupertinoMessageDialog(
             context,
-            'Please select the subject for class',
+              context.l10n.enterSubject
           );
         } else {
           if (_formKey.currentState!.validate()) {
             if (widget.classInfoEdit?.classId == null) {
-              showCupertinoMessageDialog(context, 'Class not found');
+              showCupertinoMessageDialog(context, context.l10n.noClass);
             }
             showLoading(context);
 
-            final Map<String, dynamic> data = {
-              "code": _codeController.text.trim(),
-              "name": _nameController.text.trim(),
-              "subjectIds": listSubjectSelected,
-              "year": _yearController.text.trim()
-            };
+            final Map<String, dynamic> data = {"code": _codeController.text.trim(), "name": _nameController.text.trim(), "subjectIds": listSubjectSelected, "year": _yearController.text.trim()};
             // _cLassInfoBloc.add(EditClassEvent(
             //   classId: (widget.classInfoEdit?.classId)!,
             //   data: data,
             // ));
             final response = await _classRepository.addClass(data: data);
-            if (response is ClassModel) {
+            if (response is ClassModel && context.mounted) {
               showCupertinoMessageDialog(
                 this.context,
-                'Update class successfully',
+                context.l10n.successfully,
                 onClose: () {
                   Navigator.pop(context);
                   Navigator.of(context).pop(true);
                 },
               );
-            } else if (response is ExpiredTokenGetResponse) {
+            } else if (response is ExpiredTokenGetResponse && context.mounted) {
               logoutIfNeed(this.context);
             } else {
               showCupertinoMessageDialog(
                 this.context,
-                'Update class failure',
+                context.l10n.failClass,
                 onClose: () {
                   Navigator.pop(context);
                   Navigator.of(context).pop(true);
@@ -271,27 +250,23 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
 
   Widget _buttonSave(BuildContext context) {
     return PrimaryButton(
-      text: 'Save',
+      text: context.l10n.save,
       onTap: () async {
         if (listSubjectSelected.isEmpty) {
           showCupertinoMessageDialog(
             context,
-            'Please select the subject for class',
+              context.l10n.enterSubject
           );
         } else {
           if (_formKey.currentState!.validate()) {
-            final Map<String, dynamic> data = {
-              "name": _nameController.text.trim(),
-              "subjectIds": listSubjectSelected,
-              "year": _yearController.text.trim()
-            };
+            final Map<String, dynamic> data = {"name": _nameController.text.trim(), "subjectIds": listSubjectSelected, "year": _yearController.text.trim()};
             // _cLassInfoBloc.add(AddClassEvent(data: data));
 
             final response = await _classRepository.addClass(data: data);
-            if (response is ClassModel) {
+            if (response is ClassModel && context.mounted) {
               showCupertinoMessageDialog(
                 this.context,
-                'Add new class successfully',
+                context.l10n.successfully,
                 onClose: () {
                   // Navigator.of(context).pop(true);
                   setState(() {
@@ -302,12 +277,12 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                   });
                 },
               );
-            } else if (response is ExpiredTokenGetResponse) {
+            } else if (response is ExpiredTokenGetResponse && context.mounted) {
               logoutIfNeed(this.context);
             } else {
               showCupertinoMessageDialog(
                 this.context,
-                'Add new class failure',
+                context.l10n.addFailClass,
                 onClose: () => Navigator.pop(context),
               );
             }
@@ -328,11 +303,8 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Text(
-                'Select the subject for class',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).primaryColor,
-                ),
+                context.l10n.selectSubject,
+                style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
               ),
             ),
             Padding(
@@ -346,28 +318,22 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                         color: Colors.grey.withOpacity(0.1),
                       ),
                       child: Text(
-                        'Subject data not found',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                          context.l10n.noSubject,
+                        style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
                       ),
                     )
                   : Container(
                       height: 54 * listSubject!.length.toDouble() - 4,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.withOpacity(0.1)
                       ),
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: listSubject.length,
                         itemBuilder: (context, index) {
-                          return _createItemSubject(
-                            context,
-                            listSubject[index],
-                          );
+                          return _createItemSubject(context, listSubject[index]);
                         },
                       ),
                     ),
@@ -389,10 +355,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            width: 0.5,
-            color: Theme.of(context).primaryColor,
-          ),
+          border: Border.all(width: 0.5, color: Theme.of(context).primaryColor),
         ),
         child: Theme(
           data: Theme.of(context).copyWith(
@@ -404,10 +367,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
               padding: const EdgeInsets.only(left: 10),
               child: Text(
                 '${subject.code} - ${subject.subjectName}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.black),
               ),
             ),
             value: listSubjectSelected.contains(subject.subjectId),
@@ -441,10 +401,10 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                     child: SizedBox(
                       height: 30,
                       child: Text(
-                        'Select School Year:',
+                        '${context.l10n.selectSY}:',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).primaryColor
                         ),
                       ),
                     ),
@@ -460,9 +420,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: (_yearController.text == listSchoolYear[index - 1])
-                          ? Colors.grey.withOpacity(0.25)
-                          : null,
+                      color: (_yearController.text == listSchoolYear[index - 1]) ? Colors.grey.withOpacity(0.25) : null,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -474,18 +432,14 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                               listSchoolYear[index - 1],
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                color: Colors.black
                               ),
                             ),
                           ),
                           if (_yearController.text == listSchoolYear[index - 1])
                             const Padding(
                               padding: EdgeInsets.only(left: 10),
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.green,
-                                size: 20,
-                              ),
+                              child: Icon(Icons.check, color: Colors.green, size: 20),
                             ),
                         ],
                       ),
@@ -494,7 +448,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
                 );
               },
             )
-          : const DataNotFoundPage(title: 'List semester not found'),
+          :  DataNotFoundPage(title: context.l10n.noSemester),
     );
   }
 
@@ -529,10 +483,7 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
         onFieldSubmitted: (value) {},
         onChanged: (_) {},
         keyboardType: TextInputType.text,
-        style: const TextStyle(
-          fontSize: 16,
-          color: Color.fromARGB(255, 26, 26, 26),
-        ),
+        style: const TextStyle(fontSize: 16, color: Color.fromARGB(255, 26, 26, 26)),
         decoration: InputDecoration(
             labelText: labelText,
             labelStyle: TextStyle(color: Theme.of(context).primaryColor),
@@ -541,17 +492,11 @@ class _ClassInfoPageState extends State<ClassInfoPage> {
             fillColor: const Color.fromARGB(102, 230, 230, 230),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(
-                width: 1,
-                color: Theme.of(context).primaryColor,
-              ),
+              borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(
-                width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
-              ),
+              borderSide: const BorderSide(width: 1, color: Color.fromARGB(128, 130, 130, 130)),
             ),
             suffixIcon: showSuffixIcon
                 ? Icon(

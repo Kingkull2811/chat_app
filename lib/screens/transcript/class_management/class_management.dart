@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/class_model.dart';
 import 'package:chat_app/screens/transcript/class_management/class_management_state.dart';
 import 'package:chat_app/utilities/utils.dart';
@@ -39,8 +40,7 @@ class _ClassManagementState extends State<ClassManagement> {
 
   @override
   void initState() {
-    _classManagementBloc = BlocProvider.of<ClassManagementBloc>(context)
-      ..add(InitClassEvent());
+    _classManagementBloc = BlocProvider.of<ClassManagementBloc>(context)..add(InitClassEvent());
     super.initState();
   }
 
@@ -58,11 +58,7 @@ class _ClassManagementState extends State<ClassManagement> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -71,9 +67,7 @@ class _ClassManagementState extends State<ClassManagement> {
       builder: (context, curState) {
         return Scaffold(
           appBar: _appBar(curState.listSubject),
-          body: curState.isLoading
-              ? const AnimationLoading()
-              : _body(context, curState.listClass),
+          body: curState.isLoading ? const AnimationLoading() : _body(context, curState.listClass),
         );
       },
     );
@@ -81,7 +75,7 @@ class _ClassManagementState extends State<ClassManagement> {
 
   Widget _body(BuildContext context, List<ClassModel>? listClass) {
     if (isNullOrEmpty(listClass)) {
-      return const DataNotFoundPage(title: 'Class data not found');
+      return  DataNotFoundPage(title: context.l10n.noClass);
     }
     return RefreshIndicator(
       onRefresh: () async => await _reloadPage(),
@@ -96,11 +90,8 @@ class _ClassManagementState extends State<ClassManagement> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
                 child: Text(
-                  'List class:',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  context.l10n.listClass,
+                  style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
                 ),
               ),
               SizedBox(
@@ -128,18 +119,12 @@ class _ClassManagementState extends State<ClassManagement> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.grey.withOpacity(0.1),
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.1)),
         child: Column(
           children: [
             Container(
               height: 70,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.grey.withOpacity(0.1),
-              ),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.1)),
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
                 onTap: () {
@@ -159,26 +144,23 @@ class _ClassManagementState extends State<ClassManagement> {
                               await _navToEditClass(classInfo);
                             },
                             child: Text(
-                              'Edit class',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Theme.of(context).primaryColor,
-                              ),
+                              context.l10n.editClass,
+                              style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
                             ),
                           ),
                           CupertinoActionSheetAction(
                             onPressed: () {
                               showMessageTwoOption(
                                 context,
-                                'Do you want to delete this class?',
-                                okLabel: 'Delete',
+                                context.l10n.deleteClass,
+                                okLabel: context.l10n.delete,
                                 onOk: () async {
                                   Navigator.pop(context);
                                   if (classInfo.classId == null) {
                                     showCupertinoMessageDialog(
                                       context,
-                                      'Error!',
-                                      content: 'Clas not found',
+                                      context.l10n.error,
+                                      content: context.l10n.noClass
                                     );
                                   }
                                   _classManagementBloc.add(DeleteClassEvent(
@@ -188,11 +170,11 @@ class _ClassManagementState extends State<ClassManagement> {
                                 },
                               );
                             },
-                            child: const Text(
-                              'Delete class',
-                              style: TextStyle(
+                            child: Text(
+                              context.l10n.delete,
+                              style:const TextStyle(
                                 fontSize: 18,
-                                color: Colors.redAccent,
+                                color: Colors.redAccent
                               ),
                             ),
                           ),
@@ -202,11 +184,8 @@ class _ClassManagementState extends State<ClassManagement> {
                             Navigator.pop(context);
                           },
                           child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black.withOpacity(0.7),
-                            ),
+                            context.l10n.cancel,
+                            style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7)),
                           ),
                         ),
                       );
@@ -224,18 +203,18 @@ class _ClassManagementState extends State<ClassManagement> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Class code: ${classInfo.code} - Year: ${classInfo.schoolYear}',
+                              '${context.l10n.classCode}: ${classInfo.code} - ${context.l10n.year}: ${classInfo.schoolYear}',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).primaryColor
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Class name: ${classInfo.className}',
+                              '${context.l10n.className}: ${classInfo.className}',
                               style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: Colors.black
                               ),
                             ),
                           ],
@@ -269,7 +248,7 @@ class _ClassManagementState extends State<ClassManagement> {
           create: (context) => ClassInfoBloc(context)..add(ClassInfoInit()),
           child: ClassInfoPage(
             isEdit: true,
-            classInfoEdit: classInfo,
+            classInfoEdit: classInfo
           ),
         ),
       ),
@@ -286,10 +265,10 @@ class _ClassManagementState extends State<ClassManagement> {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Text(
-          'no subject data',
+          context.l10n.noSubject,
           style: TextStyle(
             fontSize: 16,
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).primaryColor
           ),
         ),
       );
@@ -304,7 +283,7 @@ class _ClassManagementState extends State<ClassManagement> {
           itemCount: listSubject.length + 1,
           itemBuilder: (context, index) {
             if (index == 0) {
-              return _createItem('Serial', 'Subject code', 'Subject name');
+              return _createItem(context.l10n.serial, context.l10n.subCode, context.l10n.subName);
             }
             return _createItem(
               (index).toString(),
@@ -328,36 +307,15 @@ class _ClassManagementState extends State<ClassManagement> {
           children: [
             Expanded(
               flex: 1,
-              child: Text(
-                serial,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
+              child: Text(serial, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: Colors.black)),
             ),
             Expanded(
               flex: 2,
-              child: Text(
-                code,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
+              child: Text(code, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: Colors.black)),
             ),
             Expanded(
               flex: 2,
-              child: Text(
-                name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
+              child: Text(name, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: Colors.black)),
             ),
           ],
         ),
@@ -372,20 +330,12 @@ class _ClassManagementState extends State<ClassManagement> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
-            Icons.arrow_back_ios,
-            size: 24,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: const Text(
-          'Class Management',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title:  Text(
+          context.l10n.classManage,
+          style:const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -414,11 +364,8 @@ class _ClassManagementState extends State<ClassManagement> {
                           }
                         },
                         child: Text(
-                          'Add new class',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          context.l10n.addClass,
+                          style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
                         ),
                       ),
                     ],
@@ -427,22 +374,15 @@ class _ClassManagementState extends State<ClassManagement> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black.withOpacity(0.7),
-                        ),
+                        context.l10n.cancel,
+                        style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7)),
                       ),
                     ),
                   );
                 },
               );
             },
-            icon: const Icon(
-              Icons.more_vert_outlined,
-              size: 24,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.more_vert_outlined, size: 24, color: Colors.white),
           ),
         ],
       );

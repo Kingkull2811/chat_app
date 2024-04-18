@@ -35,8 +35,8 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
               apiError: ApiError.noError,
               listSubject: response.listSubject,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
             return;
           } else {
             emit(state.copyWith(
@@ -55,8 +55,8 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
             isLoading: false,
             isAddSuccess: true,
           ));
-        } else if (response is ExpiredTokenGetResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenGetResponse && context.mounted) {
+          logoutIfNeed(context);
           return;
         } else {
           emit(state.copyWith(
@@ -77,8 +77,8 @@ class ClassInfoBloc extends Bloc<ClassInfoEvent, ClassInfoState> {
             isLoading: false,
             isUpdateSuccess: true,
           ));
-        } else if (response is ExpiredTokenGetResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenGetResponse && context.mounted) {
+          logoutIfNeed(context);
           return;
         } else {
           emit(state.copyWith(

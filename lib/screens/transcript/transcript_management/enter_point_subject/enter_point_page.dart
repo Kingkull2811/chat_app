@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/student.dart';
 import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:chat_app/widgets/data_not_found.dart';
@@ -46,8 +47,8 @@ class _EnterPointPageState extends State<EnterPointPage> {
     _enterPointSubjectBloc = BlocProvider.of<EnterPointSubjectBloc>(context)
       ..add(InitEvent());
     listSemester = [
-      SemesterYear(semester: 1, title: 'Semester 1 ${widget.schoolYear}'),
-      SemesterYear(semester: 2, title: 'Semester 2 ${widget.schoolYear}'),
+      SemesterYear(semester: 1, title: '${context.l10n.semester} 1 ${widget.schoolYear}'),
+      SemesterYear(semester: 2, title: '${context.l10n.semester} 2 ${widget.schoolYear}'),
     ];
 
     super.initState();
@@ -68,11 +69,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -92,16 +89,16 @@ class _EnterPointPageState extends State<EnterPointPage> {
                 child: const Icon(
                   Icons.arrow_back_ios,
                   size: 24,
-                  color: Colors.white,
+                  color: Colors.white
                 ),
               ),
               centerTitle: true,
-              title: const Text(
-                'Enter point',
-                style: TextStyle(
+              title:  Text(
+                context.l10n.enterPoint,
+                style:const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.white
                 ),
               ),
               actions: [
@@ -118,7 +115,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
                     child: Icon(
                       Icons.edit_note_outlined,
                       size: 24,
-                      color: Colors.white,
+                      color: Colors.white
                     ),
                   ),
                 ),
@@ -144,10 +141,10 @@ class _EnterPointPageState extends State<EnterPointPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
               child: Text(
-                'Enter point subject for student:',
+                context.l10n.point4Stu,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).primaryColor
                 ),
               ),
             ),
@@ -155,10 +152,10 @@ class _EnterPointPageState extends State<EnterPointPage> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
               child: Text(
-                'Select semester:',
+                '${context.l10n.selectSemester}:',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).primaryColor
                 ),
               ),
             ),
@@ -172,8 +169,8 @@ class _EnterPointPageState extends State<EnterPointPage> {
                   textAlign: TextAlign.center,
                   readOnly: true,
                   showSuffix: true,
-                  labelText: 'Semester',
-                  hintText: 'Select Semester',
+                  labelText: context.l10n.semester,
+                  // hintText: 'Select Semester',
                   onTap: () {
                     _dialogSelectSemester(listSemester);
                   },
@@ -189,7 +186,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
                 child: Container(
                   alignment: Alignment.center,
                   child: PrimaryButton(
-                    text: 'Save',
+                    text: context.l10n.save,
                     onTap: () async {
                       if (listResult.isNotEmpty) {
                         _enterPointSubjectBloc.add(UpdatePointEvent(
@@ -207,7 +204,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
                           if (state.updateDone) {
                             showCupertinoMessageDialog(
                               context,
-                              'Update transcript done',
+                              context.l10n.updateTranscriptDone,
                               onClose: () {
                                 _enterPointSubjectBloc.add(GetListSubjectEvent(
                                   studentId: widget.student.id!,
@@ -218,15 +215,12 @@ class _EnterPointPageState extends State<EnterPointPage> {
                               },
                             );
                             //todo:: fix me after
-                            // } else {
-                            //   showCupertinoMessageDialog(
-                            //       context, 'Update transcript failure');
                           }
                         });
                       } else {
                         showCupertinoMessageDialog(
                           this.context,
-                          'No change in the transcript yet.',
+                            context.l10n.noChange
                         );
                       }
                     },
@@ -243,7 +237,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
     if (_semesterController.text.isEmpty) {
       return Center(
         child: Text(
-          'Please select semester to show list subject point.',
+          context.l10n.plsSelectSemester,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
@@ -356,7 +350,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
   Future editOralPoint(LearningResultInfo dataEdit) async {
     String result = await showTextDialog(
           context,
-          title: 'Change Oral Test Point',
+          title: context.l10n.changeOral,
           value: (dataEdit.oralTestScore ?? '').toString(),
         ) ??
         '';
@@ -383,7 +377,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
   Future editM15Point(LearningResultInfo dataEdit) async {
     String m15Input = await showTextDialog<String>(
           context,
-          title: 'Change 15 Minutes Test Point',
+          title: context.l10n.change15,
           value: (dataEdit.m15TestScore ?? '').toString(),
         ) ??
         '';
@@ -409,7 +403,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
   Future editM45Point(LearningResultInfo dataEdit) async {
     String result = await showTextDialog(
           context,
-          title: 'Change 45 Minutes Test Point',
+          title: context.l10n.change45,
           value: (dataEdit.m45TestScore ?? '').toString(),
         ) ??
         '';
@@ -435,7 +429,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
   Future editFinalExam(LearningResultInfo dataEdit) async {
     String result = await showTextDialog(
           context,
-          title: 'Change Final Exam Test Point',
+          title: context.l10n.changeFinal,
           value: (dataEdit.semesterTestScore ?? '').toString(),
         ) ??
         '';
@@ -481,7 +475,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Select semester',
+            context.l10n.selectSemester,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -505,12 +499,11 @@ class _EnterPointPageState extends State<EnterPointPage> {
                 if (listResult.isNotEmpty) {
                   showMessageTwoOption(
                     context,
-                    'Save changes?',
-                    content:
-                        'The transcript has been changed, do you want to save this changes?',
+                    context.l10n.saveChange,
+                    content: context.l10n.saveChangeContent,
                     barrierDismiss: true,
-                    okLabel: "Save",
-                    cancelLabel: 'Not save',
+                    okLabel: context.l10n.save,
+                    cancelLabel: context.l10n.cancel,
                     onCancel: () {
                       _onTapSelectSemester(listSemester[index]);
                     },
@@ -557,7 +550,7 @@ class _EnterPointPageState extends State<EnterPointPage> {
                         child: Icon(
                           Icons.check,
                           size: 24,
-                          color: Colors.green,
+                          color: Colors.green
                         ),
                       ),
                   ],
@@ -617,19 +610,19 @@ class _EnterPointPageState extends State<EnterPointPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _itemText(
-                        title: 'Student SSID:',
+                        title: '${context.l10n.stuSSID}:',
                         value: student.code ?? '',
                       ),
                       _itemText(
-                        title: 'Class:',
+                        title: context.l10n.classTitle,
                         value: student.className ?? '',
                       ),
                       _itemText(
-                        title: 'Student Name:',
+                        title: context.l10n.student_name,
                         value: student.name ?? '',
                       ),
                       _itemText(
-                        title: 'Date of birth:',
+                        title: context.l10n.dob,
                         value: formatDate('${student.dateOfBirth}'),
                       ),
                     ],

@@ -120,8 +120,8 @@ class SharedPreferencesStorage {
 
   String getUserEmail() => _prefs.getString(AppConstants.emailKey) ?? '';
 
-  String getImageAvartarUrl() =>
-      _prefs.getString(AppConstants.imageAvartarUrlKey) ?? '';
+  String getImageAvatarUrl() =>
+      _prefs.getString(AppConstants.imageAvatarUrlKey) ?? '';
 
   bool getFillProfileStatus() {
     return _prefs.getBool(AppConstants.isFillProfileKey) ?? false;
@@ -134,8 +134,8 @@ class SharedPreferencesStorage {
 
   bool getUserRole() => !getAdminRole() && !getTeacherRole();
 
-  Future<void> setImageAvartarUrl(String imageUrl) async {
-    await _prefs.setString(AppConstants.imageAvartarUrlKey, imageUrl);
+  Future<void> setImageAvatarUrl(String imageUrl) async {
+    await _prefs.setString(AppConstants.imageAvatarUrlKey, imageUrl);
   }
 
   int getUserId() {

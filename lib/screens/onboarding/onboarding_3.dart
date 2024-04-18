@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/main/main_app.dart';
@@ -41,12 +42,12 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                   height: 200,
                   width: 350,
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 50.0),
+                Padding(
+                  padding: const EdgeInsets.only(top: 50.0),
                   child: Text(
-                    'Real-time Notifications',
+                    context.l10n.onboardingTitle3,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.bold,
@@ -54,12 +55,12 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 32.0),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
                   child: Text(
-                    'Stay up-to-date with real-time notifications. Receive instant alerts regarding important deadlines, upcoming events, and announcements from the school. Be notified when a teacher sends a message or when a new grade is added, ensuring that you never miss crucial information.',
+                    context.l10n.onboardingContent3 + context.l10n.onboardingContent33,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryColor,
                     ),
@@ -71,23 +72,15 @@ class _OnBoarding3PageState extends State<OnBoarding3Page> {
           Padding(
             padding: EdgeInsets.only(bottom: 100 + padding.bottom),
             child: PrimaryButton(
-              text: 'Next',
+              text: context.l10n.next,
               onTap: () async {
                 showLoading(context);
-                final userInfo = await AuthRepository().getUserInfo(
-                  userId: SharedPreferencesStorage().getUserId(),
-                );
-                // log('user: $userInfo');
+                final userInfo = await AuthRepository().getUserInfo(userId: SharedPreferencesStorage().getUserId());
 
                 if (userInfo is UserInfoModel) {
-                  // log('nav to Main or Fill');
-                  await SharedPreferencesStorage()
-                      .setFullName(userInfo.fullName ?? '');
-                  await SharedPreferencesStorage()
-                      .setImageAvartarUrl(userInfo.fileUrl ?? '');
-                  userInfo.isFillProfileKey
-                      ? _navigateToMainPage()
-                      : _navigateToFillProfilePage(userInfo);
+                  await SharedPreferencesStorage().setFullName(userInfo.fullName ?? '');
+                  await SharedPreferencesStorage().setImageAvatarUrl(userInfo.fileUrl ?? '');
+                  userInfo.isFillProfileKey ? _navigateToMainPage() : _navigateToFillProfilePage(userInfo);
                 } else {
                   // log(userInfo.toString());
                 }

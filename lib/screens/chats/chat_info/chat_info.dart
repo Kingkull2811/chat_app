@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/settings/profile/profile.dart';
 import 'package:chat_app/screens/settings/profile/profile_bloc.dart';
@@ -34,11 +35,7 @@ class ChatInfoPage extends StatelessWidget {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
-            Icons.arrow_back_ios_outlined,
-            size: 24,
-            color: Colors.black,
-          ),
+          child: const Icon(Icons.arrow_back_ios_outlined, size: 24, color: Colors.black),
         ),
       ),
       body: Padding(
@@ -53,10 +50,7 @@ class ChatInfoPage extends StatelessWidget {
                 width: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    width: 1.5,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  border: Border.all(width: 1.5, color: Theme.of(context).primaryColor),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(75),
@@ -64,11 +58,7 @@ class ChatInfoPage extends StatelessWidget {
                     isOnline: true,
                     localPathOrUrl: imageUrl,
                     boxFit: BoxFit.cover,
-                    errorWidget: const Icon(
-                      CupertinoIcons.person,
-                      size: 30,
-                      color: Colors.grey,
-                    ),
+                    errorWidget: const Icon(CupertinoIcons.person, size: 30, color: Colors.grey),
                   ),
                 ),
               ),
@@ -77,11 +67,7 @@ class ChatInfoPage extends StatelessWidget {
               padding: const EdgeInsets.only(top: 10, bottom: 10),
               child: Text(
                 name,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ),
             Padding(
@@ -92,7 +78,7 @@ class ChatInfoPage extends StatelessWidget {
                   _itemControl(
                     context,
                     icon: Icons.call_outlined,
-                    itemTitle: 'Audio',
+                    itemTitle: context.l10n.audio,
                     onTapItemControl: () {
                       //todo
                       // Navigator.push(
@@ -109,7 +95,7 @@ class ChatInfoPage extends StatelessWidget {
                   _itemControl(
                     context,
                     icon: Icons.videocam_outlined,
-                    itemTitle: 'Video',
+                    itemTitle: context.l10n.video,
                     onTapItemControl: () {
                       //todo
                       // Navigator.push(
@@ -126,7 +112,7 @@ class ChatInfoPage extends StatelessWidget {
                   _itemControl(
                     context,
                     icon: Icons.person_outline,
-                    itemTitle: 'Profile',
+                    itemTitle: context.l10n.profile,
                     onTapItemControl: () {
                       Navigator.push(
                         context,
@@ -148,15 +134,14 @@ class ChatInfoPage extends StatelessWidget {
                 child: Column(
                   children: [
                     _itemInfo(
-                      itemTitle: 'Block',
+                      itemTitle: context.l10n.block,
                       icon: Icons.speaker_notes_off_outlined,
                       onTapItem: () async {
                         showMessageTwoOption(
                           context,
-                          'Block $name?',
-                          content:
-                              'Do you want block $name.\nAfter block, you can send message to $name and vice versa.',
-                          okLabel: 'Block',
+                          '${context.l10n.block} $name?',
+                          content: '${context.l10n.blockContent} $name.${context.l10n.blockContent2} $name ${context.l10n.blockContent3}',
+                          okLabel: context.l10n.block,
                           onOk: () {
                             //todo:::
                             //bloc user and back to chat
@@ -166,17 +151,15 @@ class ChatInfoPage extends StatelessWidget {
                       },
                     ),
                     _itemInfo(
-                      itemTitle: 'Delete chat',
+                      itemTitle: context.l10n.deleteChat,
                       icon: CupertinoIcons.delete,
                       isRed: true,
                       onTapItem: () async {
                         showMessageTwoOption(
                           context,
-                          'Delete chat',
-                          content:
-                              'Do you want to delete this chat? Once deleted, you cannot restore this chat.'
-                              'At the same time, this conversation will also be deleted for the remaining person in this chat.',
-                          okLabel: 'Delete',
+                          context.l10n.deleteChat,
+                          content: context.l10n.deleteContent,
+                          okLabel: context.l10n.delete,
                           onOk: () async {
                             //delete this chat and go to main app
                             showLoading(context);
@@ -184,11 +167,7 @@ class ChatInfoPage extends StatelessWidget {
                             Future.delayed(
                               const Duration(seconds: 2),
                               () {
-                                Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  AppRoutes.chat,
-                                  (route) => false,
-                                );
+                                Navigator.pushNamedAndRemoveUntil(context, AppRoutes.chat, (route) => false);
                               },
                             );
                           },
@@ -245,9 +224,7 @@ class ChatInfoPage extends StatelessWidget {
               width: 50,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25),
-                color: isActive
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey.withOpacity(0.2),
+                color: isActive ? Theme.of(context).primaryColor : Colors.grey.withOpacity(0.2),
               ),
               child: Icon(
                 icon,

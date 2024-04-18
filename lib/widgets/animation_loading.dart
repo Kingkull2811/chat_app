@@ -23,8 +23,7 @@ class AnimationLoading extends StatelessWidget {
                 height: size,
                 child: CircularProgressIndicator(
                   strokeWidth: strokeWidth ?? 4,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).primaryColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
                 ),
               ),
             ),
@@ -35,8 +34,7 @@ class AnimationLoading extends StatelessWidget {
               height: size,
               child: CircularProgressIndicator(
                 strokeWidth: strokeWidth ?? 4,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).primaryColor),
+                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
               ),
             ),
           );

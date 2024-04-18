@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
@@ -24,12 +25,12 @@ class OnBoarding1Page extends StatelessWidget {
             height: 200,
             width: 350,
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 50.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 50.0),
             child: Text(
-              'Learning Results Tracking',
+              context.l10n.onboardingTitle1,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
@@ -37,15 +38,12 @@ class OnBoarding1Page extends StatelessWidget {
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 32.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 32.0),
             child: Text(
-              'Our app allows teachers to easily record and track student\'s learning outcomes. Teachers can assess individual progress, identify areas of improvement, and tailor their teaching strategies accordingly. With comprehensive analytics and visualizations, educators can gain valuable insights into student performance.',
+              context.l10n.onboardingContent1 + context.l10n.onboardingContent11,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.primaryColor,
-              ),
+              style: const TextStyle(fontSize: 16, color: AppColors.primaryColor),
             ),
           ),
         ],

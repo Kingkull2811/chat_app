@@ -35,8 +35,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
               apiError: ApiError.noError,
               userInfo: response,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,

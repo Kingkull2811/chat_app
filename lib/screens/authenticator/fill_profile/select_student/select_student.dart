@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/select_student/select_student_bloc.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/select_student/select_student_event.dart';
 import 'package:chat_app/screens/authenticator/fill_profile/select_student/select_student_state.dart';
@@ -58,11 +59,7 @@ class _SelectStudentState extends State<SelectStudent> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -73,28 +70,18 @@ class _SelectStudentState extends State<SelectStudent> {
           appBar: AppBar(
             backgroundColor: AppColors.primaryColor,
             centerTitle: true,
-            title: const Text(
-              'Select Student',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+            title: Text(
+              context.l10n.select_student,
+              style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
             ),
             leading: InkWell(
               onTap: () {
                 Navigator.of(context).pop(listStudent);
               },
-              child: const Icon(
-                Icons.arrow_back_ios,
-                size: 24,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
             ),
           ),
-          body: state.isLoading
-              ? const AnimationLoading()
-              : _body(context, state),
+          body: state.isLoading ? const AnimationLoading() : _body(context, state),
         );
       },
     );
@@ -116,11 +103,7 @@ class _SelectStudentState extends State<SelectStudent> {
               badgeContent: Text(
                 listStudent.length.toString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               badgeStyle: const badges.BadgeStyle(
                 badgeColor: Colors.red,
@@ -133,17 +116,11 @@ class _SelectStudentState extends State<SelectStudent> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.white,
-                  border: Border.all(
-                    width: 1,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  border: Border.all(width: 1, color: Theme.of(context).primaryColor),
                 ),
                 child: Text(
-                  'View the list of students added',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  context.l10n.view_list_added,
+                  style: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
                 ),
               ),
             ),
@@ -154,21 +131,15 @@ class _SelectStudentState extends State<SelectStudent> {
           child: Container(
             height: 150,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
             child: isNullOrEmpty(studentSSID)
                 ? const SizedBox.shrink()
                 : state.isNotFind || isNullOrEmpty(state.studentInfo)
                     ? Center(
                         child: Text(
-                          'Can\'t find student with student SSID:  $studentSSID',
+                          '${context.l10n.no_find_student} $studentSSID',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
                         ),
                       )
                     : _itemStudent(state.studentInfo!),
@@ -181,11 +152,7 @@ class _SelectStudentState extends State<SelectStudent> {
   Future<void> _navToViewListStudentSelected() async {
     final List<Student>? result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => ViewListStudentSelected(
-          listStudent: listStudent,
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => ViewListStudentSelected(listStudent: listStudent)),
     );
     if (!mounted) {
       return;
@@ -232,21 +199,14 @@ class _SelectStudentState extends State<SelectStudent> {
                 Container(
                   height: 150,
                   width: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.grey.withOpacity(0.1),
-                  ),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.grey.withOpacity(0.1)),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: AppImage(
                       isOnline: true,
                       localPathOrUrl: student.imageUrl,
                       boxFit: BoxFit.cover,
-                      errorWidget: Icon(
-                        Icons.person,
-                        size: 70,
-                        color: Colors.grey.withOpacity(0.3),
-                      ),
+                      errorWidget: Icon(Icons.person, size: 70, color: Colors.grey.withOpacity(0.3)),
                     ),
                   ),
                 ),
@@ -258,24 +218,18 @@ class _SelectStudentState extends State<SelectStudent> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          'Student Id:',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          context.l10n.student_id,
+                          style: TextStyle(fontSize: 10, color: Theme.of(context).primaryColor),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
                             student.code ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                         ),
                         Text(
-                          'Student Name:',
+                          context.l10n.student_name,
                           style: TextStyle(
                             fontSize: 10,
                             color: Theme.of(context).primaryColor,
@@ -285,14 +239,11 @@ class _SelectStudentState extends State<SelectStudent> {
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
                             student.name ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                         ),
                         Text(
-                          'Date of birth:',
+                          context.l10n.dob,
                           style: TextStyle(
                             fontSize: 10,
                             color: Theme.of(context).primaryColor,
@@ -302,18 +253,12 @@ class _SelectStudentState extends State<SelectStudent> {
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Text(
                             formatDate('${student.dateOfBirth}'),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
+                            style: const TextStyle(fontSize: 14, color: Colors.black),
                           ),
                         ),
                         Text(
-                          'Class:',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          context.l10n.classTitle,
+                          style: TextStyle(fontSize: 10, color: Theme.of(context).primaryColor),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 10.0),
@@ -336,9 +281,7 @@ class _SelectStudentState extends State<SelectStudent> {
             top: 6,
             right: 6,
             child: Icon(
-              _isShowAddedIcon
-                  ? Icons.add_circle_outline
-                  : Icons.check_circle_outline,
+              _isShowAddedIcon ? Icons.add_circle_outline : Icons.check_circle_outline,
               size: 30,
               color: Theme.of(context).primaryColor,
             ),
@@ -353,10 +296,7 @@ class _SelectStudentState extends State<SelectStudent> {
       padding: const EdgeInsets.all(16),
       child: Container(
         height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-        ),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.white),
         alignment: Alignment.center,
         child: TextFormField(
           textInputAction: TextInputAction.done,
@@ -399,40 +339,23 @@ class _SelectStudentState extends State<SelectStudent> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(
-                width: 1,
-                color: Color.fromARGB(128, 130, 130, 130),
-              ),
+              borderSide: const BorderSide(width: 1, color: Color.fromARGB(128, 130, 130, 130)),
             ),
             errorBorder: InputBorder.none,
             disabledBorder: InputBorder.none,
-            prefixIcon: const Icon(
-              Icons.search,
-              size: 24,
-              color: Colors.grey,
-            ),
+            prefixIcon: const Icon(Icons.search, size: 24, color: Colors.grey),
             suffixIcon: _isShowClear
                 ? IconButton(
                     onPressed: () {
                       _searchController.clear();
                     },
-                    icon: const Icon(
-                      Icons.cancel,
-                      size: 20,
-                      color: Colors.grey,
-                    ),
+                    icon: const Icon(Icons.cancel, size: 20, color: Colors.grey),
                   )
                 : null,
-            labelText: 'Search with SSID',
-            labelStyle: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).primaryColor,
-            ),
-            hintText: 'Search student with student SSID',
-            hintStyle: const TextStyle(
-              fontSize: 14,
-              color: Colors.grey,
-            ),
+            labelText: context.l10n.search_ssid,
+            labelStyle: TextStyle(fontSize: 14, color: Theme.of(context).primaryColor),
+            hintText: context.l10n.search_w_ssid,
+            hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
           ),
         ),
       ),

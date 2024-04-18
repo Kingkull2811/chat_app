@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/settings/security/security.dart';
 import 'package:chat_app/theme.dart';
@@ -18,17 +19,6 @@ class SettingPage extends StatefulWidget {
 
 class _SettingPageState extends State<SettingPage> {
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return _body();
   }
@@ -40,13 +30,9 @@ class _SettingPageState extends State<SettingPage> {
         backgroundColor: Theme.of(context).primaryColor,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: const Text(
-          'Setting',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Text(
+          context.l10n.settings,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
       body: SingleChildScrollView(
@@ -86,25 +72,20 @@ class _SettingPageState extends State<SettingPage> {
               //   },
               // ),
               // _itemWithIcon(
-              //   title: 'Privacy & Safety',
+              //   title: 'Privacy & S/**/afety',
               //   iconPath: 'assets/images/ic_shield.png',
               //   onTap: () {},
               // ),
               _itemWithIcon(
-                title: 'Security',
+                title: context.l10n.security,
                 iconPath: '',
                 icon: Icons.lock_outline,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SecurityPage(),
-                    ),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityPage()));
                 },
               ),
               _itemWithIcon(
-                title: 'Terms & Policies:',
+                title: context.l10n.terms,
                 iconPath: '',
                 icon: Icons.policy_outlined,
                 onTap: () {
@@ -113,7 +94,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
               _itemWithIcon(
                 hasColor: true,
-                title: 'Logout',
+                title: context.l10n.logout,
                 iconPath: '',
                 icon: Icons.logout_outlined,
                 onTap: () {
@@ -121,22 +102,19 @@ class _SettingPageState extends State<SettingPage> {
                     context: context,
                     builder: (BuildContext context) {
                       return CupertinoAlertDialog(
-                        title: const Text(
-                          'Logout',
-                          style: TextStyle(
+                        title: Text(
+                          context.l10n.logout,
+                          style: const TextStyle(
                             fontSize: 18,
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        content: const Padding(
-                          padding: EdgeInsets.only(top: 16.0),
+                        content: Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
                           child: Text(
-                            'Do you want to log out ?',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
+                            context.l10n.wantLogout,
+                            style: const TextStyle(fontSize: 14, color: Colors.grey),
                           ),
                         ),
                         actions: <Widget>[
@@ -144,12 +122,9 @@ class _SettingPageState extends State<SettingPage> {
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
-                              ),
+                            child: Text(
+                              context.l10n.cancel,
+                              style: const TextStyle(fontSize: 14, color: Colors.black),
                             ),
                           ),
                           CupertinoDialogAction(
@@ -157,12 +132,9 @@ class _SettingPageState extends State<SettingPage> {
                             onPressed: () async {
                               logout(context);
                             },
-                            child: const Text(
-                              'Logout',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.red700,
-                              ),
+                            child: Text(
+                              context.l10n.logout,
+                              style: const TextStyle(fontSize: 14, color: AppColors.red700),
                             ),
                           ),
                         ],
@@ -217,8 +189,7 @@ class _SettingPageState extends State<SettingPage> {
                           borderRadius: BorderRadius.circular(40),
                           child: AppImage(
                             isOnline: true,
-                            localPathOrUrl:
-                                SharedPreferencesStorage().getImageAvartarUrl(),
+                            localPathOrUrl: SharedPreferencesStorage().getImageAvatarUrl(),
                             boxFit: BoxFit.cover,
                             errorWidget: SizedBox(
                               height: 80,

@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/news_model.dart';
 import 'package:chat_app/network/repository/news_repository.dart';
 import 'package:chat_app/services/firebase_services.dart';
@@ -87,19 +88,11 @@ class _NewsInfoState extends State<NewsInfo> {
             onPressed: () {
               Navigator.of(context).pop(true);
             },
-            icon: const Icon(
-              Icons.arrow_back_ios_outlined,
-              size: 24,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.arrow_back_ios_outlined, size: 24, color: Colors.white),
           ),
           title: Text(
-            isEdit ? 'Edit News' : 'Add News',
-            style: const TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            isEdit ? context.l10n.editNews : context.l10n.addNews,
+            style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
         body: SingleChildScrollView(
@@ -117,19 +110,12 @@ class _NewsInfoState extends State<NewsInfo> {
                     onChanged: (_) {},
                     onSubmitted: (_) {},
                     textInputAction: TextInputAction.done,
-                    placeholder: 'Write the title ...',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black,
-                    ),
+                    placeholder: context.l10n.writeTitle,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(15),
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
+                      border: Border.all(color: Colors.grey, width: 1),
                     ),
                     keyboardType: TextInputType.text,
                     textAlign: TextAlign.start,
@@ -148,19 +134,12 @@ class _NewsInfoState extends State<NewsInfo> {
                       textInputAction: TextInputAction.none,
                       onChanged: (_) {},
                       onSubmitted: (_) {},
-                      placeholder: 'Write the content ...',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.black,
-                      ),
+                      placeholder: context.l10n.writeContent,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1,
-                        ),
+                        border: Border.all(color: Colors.grey, width: 1),
                       ),
                       keyboardType: TextInputType.text,
                       textAlign: TextAlign.start,
@@ -183,16 +162,12 @@ class _NewsInfoState extends State<NewsInfo> {
                               maxHeight: 300,
                               minHeight: 150,
                             ),
-                            width: MediaQuery.of(context).size.width -
-                                16 * 2 -
-                                6 * 2,
+                            width: MediaQuery.of(context).size.width - 16 * 2 - 6 * 2,
                             child: Container(
                               color: Colors.grey,
                               child: AppImage(
                                 isOnline: isOnline,
-                                localPathOrUrl: isNullOrEmpty(videoThumbPath)
-                                    ? mediaUrl
-                                    : videoThumbPath,
+                                localPathOrUrl: isNullOrEmpty(videoThumbPath) ? mediaUrl : videoThumbPath,
                                 boxFit: BoxFit.contain,
                                 errorWidget: InkWell(
                                   onTap: () async {
@@ -202,32 +177,18 @@ class _NewsInfoState extends State<NewsInfo> {
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(15),
-                                      border: Border.all(
-                                        color: Colors.grey,
-                                        width: 1,
-                                      ),
+                                      border: Border.all(color: Colors.grey, width: 1),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(
-                                          Icons.add,
-                                          size: 80,
-                                          color: Colors.grey.withOpacity(0.4),
-                                        ),
+                                        Icon(Icons.add, size: 80, color: Colors.grey.withOpacity(0.4)),
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
+                                          padding: const EdgeInsets.only(top: 10),
                                           child: Text(
-                                            'Add an image or video',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color:
-                                                  Colors.grey.withOpacity(0.4),
-                                            ),
+                                            context.l10n.addImage,
+                                            style: TextStyle(fontSize: 20, color: Colors.grey.withOpacity(0.4)),
                                           ),
                                         ),
                                       ],
@@ -270,7 +231,7 @@ class _NewsInfoState extends State<NewsInfo> {
                 Padding(
                   padding: const EdgeInsets.only(top: 100),
                   child: PrimaryButton(
-                    text: isEdit ? 'Update' : 'Post News',
+                    text: isEdit ? context.l10n.update : context.l10n.postNews,
                     onTap: () async {
                       showLoading(context);
                       if (isEdit) {
@@ -297,10 +258,10 @@ class _NewsInfoState extends State<NewsInfo> {
       mediaType: setMediaType(mediaType),
     );
 
-    if (response is NewsModel) {
+    if (response is NewsModel && context.mounted) {
       showCupertinoMessageDialog(
         this.context,
-        'Post news successfully',
+        context.l10n.successfully,
         barrierDismiss: true,
         onClose: () {
           Navigator.pop(context);
@@ -312,11 +273,7 @@ class _NewsInfoState extends State<NewsInfo> {
         },
       );
     } else {
-      showCupertinoMessageDialog(
-        this.context,
-        'Error!',
-        content: 'Internal_server_error',
-      );
+      showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
     }
   }
 
@@ -333,23 +290,19 @@ class _NewsInfoState extends State<NewsInfo> {
       mediaType: setMediaType(mediaType),
     );
 
-    if (response is NewsModel) {
+    if (response is NewsModel && context.mounted) {
       showCupertinoMessageDialog(
         this.context,
-        'Update news successfully',
+        context.l10n.successfully,
         barrierDismiss: true,
-        buttonLabel: 'Go to news page',
+        buttonLabel: context.l10n.backNews,
         onClose: () {
           Navigator.pop(context);
           Navigator.of(context).pop(true);
         },
       );
     } else {
-      showCupertinoMessageDialog(
-        this.context,
-        'Error!',
-        content: 'Internal_server_error',
-      );
+      showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
     }
   }
 
@@ -379,12 +332,9 @@ class _NewsInfoState extends State<NewsInfo> {
                   });
                 }
               },
-              child: const Text(
-                'Take a photo from camera',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+              child: Text(
+                context.l10n.photo_camera,
+                style: const TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
             CupertinoActionSheetAction(
@@ -399,12 +349,9 @@ class _NewsInfoState extends State<NewsInfo> {
                   });
                 }
               },
-              child: const Text(
-                'Choose a photo from gallery',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+              child: Text(
+                context.l10n.photo_gallery,
+                style: const TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
             // CupertinoActionSheetAction(
@@ -444,11 +391,8 @@ class _NewsInfoState extends State<NewsInfo> {
               Navigator.pop(context);
             },
             child: Text(
-              'Cancel',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black.withOpacity(0.7),
-              ),
+              context.l10n.cancel,
+              style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7)),
             ),
           ),
         );

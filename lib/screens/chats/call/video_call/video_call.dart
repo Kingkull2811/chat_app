@@ -162,31 +162,6 @@ class _VideoCallPageState extends State<VideoCallPage> {
               ),
           ),
         ),
-        // body: _client == null
-        //     ? const AnimationLoading()
-        //     : SafeArea(
-        //         child: Stack(
-        //           children: [
-        //             AgoraVideoViewer(client: _client!),
-        //             AgoraVideoButtons(
-        //               client: _client!,
-        //               disconnectButtonChild: IconButton(
-        //                 onPressed: () async {
-        //                   await _client!.engine.leaveChannel();
-        //                   // ref.read(callControllerProvider).endCall(
-        //                   //   widget.call.callerId,
-        //                   //   widget.call.receiverId,
-        //                   //   context,
-        //                   // );
-        //                   await FirebaseService().endCall(call: widget.call);
-        //                   Navigator.pop(this.context);
-        //                 },
-        //                 icon: const Icon(Icons.call_end),
-        //               ),
-        //             ),
-        //           ],
-        //         ),
-        //       ),
       ),
     );
   }

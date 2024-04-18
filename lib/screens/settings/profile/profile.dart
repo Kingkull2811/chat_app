@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/screens/settings/profile/profile_event.dart';
 import 'package:chat_app/theme.dart';
@@ -42,11 +43,7 @@ class ProfilePageState extends State<ProfilePage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -95,12 +92,12 @@ class ProfilePageState extends State<ProfilePage> {
 
   Widget _userInfoView(UserInfoModel? userInfo) {
     if (isNullOrEmpty(userInfo)) {
-      return const Center(
+      return  Center(
         child: Text(
-          'This user data could not be found',
-          style: TextStyle(
+          context.l10n.userNotFound,
+          style:const TextStyle(
             fontSize: 16,
-            color: AppColors.primaryColor,
+            color: AppColors.primaryColor
           ),
         ),
       );
@@ -134,21 +131,21 @@ class ProfilePageState extends State<ProfilePage> {
               ),
             ),
           ),
-          itemText('Username:', '@${userInfo.username}'),
-          itemText('Full name:', userInfo.fullName ?? ''),
-          itemText('Email:', userInfo.email ?? ''),
-          itemText('Phone number:', userInfo.phone ?? ''),
-          itemText('Parent of students:', ''),
+          itemText( '${context.l10n.username}:', '@${userInfo.username}'),
+          itemText('${context.l10n.fullname}:', userInfo.fullName ?? ''),
+          itemText('${context.l10n.email}:', userInfo.email ?? ''),
+          itemText('${context.l10n.phone}:', userInfo.phone ?? ''),
+          itemText('${context.l10n.parentOf}:', ''),
           isNullOrEmpty(userInfo.parentOf)
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 48),
+              ?  Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 48),
                   child: Text(
-                    'There is no data on students who are children of this parent',
+                    context.l10n.noStudent,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style:const TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryColor,
-                      fontStyle: FontStyle.italic,
+                      fontStyle: FontStyle.italic
                     ),
                   ),
                 )
@@ -176,7 +173,7 @@ class ProfilePageState extends State<ProfilePage> {
           // color: Colors.grey.withOpacity(0.1),
           border: Border.all(
             width: 0.5,
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withOpacity(0.5)
           ),
         ),
         child: Padding(
@@ -189,7 +186,7 @@ class ProfilePageState extends State<ProfilePage> {
                 width: 90,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withOpacity(0.1)
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -200,7 +197,7 @@ class ProfilePageState extends State<ProfilePage> {
                     errorWidget: Icon(
                       Icons.person,
                       size: 70,
-                      color: Colors.grey.withOpacity(0.3),
+                      color: Colors.grey.withOpacity(0.3)
                     ),
                   ),
                 ),
@@ -213,12 +210,12 @@ class ProfilePageState extends State<ProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       itemTextStudent('SSID:', student.code ?? ''),
-                      itemTextStudent('Name:', student.name ?? ''),
+                      itemTextStudent(context.l10n.name, student.name ?? ''),
                       itemTextStudent(
-                          'D.O.B:', formatDate('${student.dateOfBirth}')),
+                          context.l10n.dOB, formatDate('${student.dateOfBirth}')),
                       itemTextStudent(
-                          'Class:', student.classResponse?.className ?? ''),
-                      itemTextStudent('School Year:',
+                          context.l10n.classTitle, student.classResponse?.className ?? ''),
+                      itemTextStudent('${context.l10n.schoolY}:',
                           student.classResponse?.schoolYear ?? ''),
                     ],
                   ),
@@ -242,7 +239,7 @@ class ProfilePageState extends State<ProfilePage> {
             title,
             style: const TextStyle(
               fontSize: 16,
-              color: AppColors.primaryColor,
+              color: AppColors.primaryColor
             ),
           ),
           Expanded(
@@ -276,7 +273,7 @@ class ProfilePageState extends State<ProfilePage> {
             title,
             style: const TextStyle(
               fontSize: 14,
-              color: AppColors.primaryColor,
+              color: AppColors.primaryColor
             ),
           ),
           Expanded(

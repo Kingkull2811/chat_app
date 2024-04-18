@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -16,20 +17,12 @@ class TermPolicyPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context);
           },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            size: 24,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: const Text(
-          'Terms & Policies',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Text(
+          context.l10n.terms,
+          style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       body: Container(
@@ -55,11 +48,7 @@ class TermPolicyPage extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             child: Text(
               '${item.index}. ${item.title}',
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
             ),
           ),
           Text(

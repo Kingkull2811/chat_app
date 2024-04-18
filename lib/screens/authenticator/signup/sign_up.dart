@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_bloc.dart';
 import 'package:chat_app/screens/authenticator/signup/sign_up_event.dart';
@@ -74,8 +75,7 @@ class _SignUpPageState extends State<SignUpPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(context, 'Error!',
-              content: 'Internal_server_error');
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -135,51 +135,51 @@ class _SignUpPageState extends State<SignUpPage> {
                                 width: 200,
                                 fit: BoxFit.cover,
                               ),
-                              const Padding(
-                                padding: EdgeInsets.only(top: 10),
-                                child: Text(
-                                  'Welcome sign up to \'app name\'',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
+                              // const Padding(
+                              //   padding: EdgeInsets.only(top: 10),
+                              //   child: Text(
+                              //     'Welcome sign up to \'app name\'',
+                              //     style: TextStyle(
+                              //       fontSize: 22,
+                              //       fontWeight: FontWeight.w900,
+                              //       color: Colors.black,
+                              //     ),
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
                         _inputTextField(
-                          labelText: 'Username',
-                          hintText: 'Enter username',
+                          labelText: context.l10n.username,
+                          // hintText: 'Enter username',
                           controller: _userNameController,
                           onSubmit: (_) => focusNode.requestFocus(),
                           prefixIcon: Icons.person_outline,
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter username';
+                              return context.l10n.enter_username;
                             }
                             return null;
                           },
                         ),
                         _inputTextField(
-                          labelText: 'Email',
-                          hintText: 'Enter email',
+                          labelText: context.l10n.email,
+                          // hintText: 'Enter email',
                           controller: _emailController,
                           prefixIcon: Icons.mail_outline,
                           onSubmit: (value) {},
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter email';
+                              return context.l10n.enter_email;
                             } else if (!AppConstants.emailExp.hasMatch(value)) {
-                              return 'Please enter valid email';
+                              return context.l10n.valid_email;
                             }
                             return null;
                           },
                         ),
                         _inputPasswordField(
-                          labelText: 'Password',
-                          hintText: 'Enter password',
+                          labelText: context.l10n.password,
+                          // hintText: 'Enter password',
                           controller: _passwordController,
                           obscureText: !_isShowPassword,
                           onSubmitted: (_) => focusNode.requestFocus(),
@@ -190,39 +190,38 @@ class _SignUpPageState extends State<SignUpPage> {
                           },
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter password';
+                              return context.l10n.enterPassword;
                             }
                             if (value.isNotEmpty && value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return context.l10n.passwordLeast;
                             } else if (value.length > 40) {
-                              return 'Password must be less than 40 characters';
+                              return context.l10n.passwordLess;
                             }
                             return null;
                           },
                         ),
                         _inputPasswordField(
-                          labelText: 'Confirm password',
-                          hintText: 'Enter confirm password',
+                          labelText: context.l10n.confirmPass,
+                          // hintText: 'Enter confirm password',
                           controller: _confirmPasswordController,
                           obscureText: !_isShowConfirmPassword,
                           onTapSuffixIcon: () {
                             setState(
                               () {
-                                _isShowConfirmPassword =
-                                    !_isShowConfirmPassword;
+                                _isShowConfirmPassword = !_isShowConfirmPassword;
                               },
                             );
                           },
                           onSubmitted: (_) {},
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter confirm password';
+                              return context.l10n.enterConPass;
                             } else if (value.length < 6) {
-                              return 'Confirm password must be at least 6 characters';
+                              return context.l10n.passwordLeast;
                             } else if (value.length > 40) {
-                              return 'Confirm new password must be less than 40 characters';
+                              return context.l10n.passwordLess;
                             } else if (value != _passwordController.text) {
-                              return 'Password and confirm password do not match';
+                              return context.l10n.passwordMatch;
                             }
                             return null;
                           },
@@ -230,7 +229,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                           child: ButtonSwitchIcon(
-                            title: "You are teacher?",
+                            title: context.l10n.isTeacher,
                             onToggle: (value) {
                               setState(() {
                                 isTeacher = value;
@@ -259,7 +258,7 @@ class _SignUpPageState extends State<SignUpPage> {
       child: Column(
         children: [
           PrimaryButton(
-            text: 'Sign Up',
+            text: context.l10n.signUp,
             onTap: () async {
               if (_formKey.currentState!.validate()) {
                 final Map<String, dynamic> data = {
@@ -275,18 +274,18 @@ class _SignUpPageState extends State<SignUpPage> {
                 if (connectivity == ConnectivityResult.none) {
                 } else {
                   final response = await AuthRepository().signUp(data: data);
-                  if (response.isOK()) {
+                  if (response.isOK() && context.mounted) {
                     showSuccessBottomSheet(
                       this.context,
-                      titleMessage: 'Sign Up Successfully!',
-                      contentMessage: 'Please login!',
-                      buttonLabel: 'Login',
+                      titleMessage: context.l10n.successfully,
+                      contentMessage: context.l10n.plsLogin,
+                      buttonLabel: context.l10n.login,
                       onTap: () => _navigateToLogin(),
                     );
                   } else {
                     showCupertinoMessageDialog(
                       this.context,
-                      'Error!',
+                      context.l10n.error,
                       content: response.errors?.first.errorMessage,
                     );
                   }
@@ -357,11 +356,9 @@ class _SignUpPageState extends State<SignUpPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Already have an account? ',
-            style: TextStyle(
-              fontSize: 14,
-            ),
+          Text(
+            context.l10n.alreadyAcc,
+            style: const TextStyle(fontSize: 14),
           ),
           GestureDetector(
             onTap: () {
@@ -376,12 +373,8 @@ class _SignUpPageState extends State<SignUpPage> {
               );
             },
             child: Text(
-              'Login',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-              ),
+              context.l10n.login,
+              style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic),
             ),
           )
         ],

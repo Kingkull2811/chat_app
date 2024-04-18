@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/network/response/base_response.dart';
 import 'package:chat_app/theme.dart';
@@ -53,20 +54,12 @@ class _SecurityPageState extends State<SecurityPage> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: const Icon(
-              Icons.arrow_back_ios_outlined,
-              size: 24,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.arrow_back_ios_outlined, size: 24, color: Colors.white),
           ),
           centerTitle: true,
-          title: const Text(
-            'Security',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          title: Text(
+            context.l10n.security,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
         body: SingleChildScrollView(
@@ -79,7 +72,7 @@ class _SecurityPageState extends State<SecurityPage> {
               children: [
                 _item(
                   icons: Icons.password,
-                  title: 'Change password',
+                  title: context.l10n.changePassword,
                   onTap: () {
                     setState(() {
                       _isShow = !_isShow;
@@ -94,8 +87,7 @@ class _SecurityPageState extends State<SecurityPage> {
                       color: Colors.grey.withOpacity(0.1),
                     ),
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 16, top: 16, right: 16),
+                      padding: const EdgeInsets.only(left: 16, top: 16, right: 16),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -109,16 +101,16 @@ class _SecurityPageState extends State<SecurityPage> {
                                   _isShowOld = !_isShowOld;
                                 });
                               },
-                              hintText: 'Enter old password',
-                              labelText: 'Old password',
+                              // hintText: 'Enter old password',
+                              labelText: context.l10n.oldPassword,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Please enter old password';
+                                  return context.l10n.enterOldPassword;
                                 }
                                 if (value.isNotEmpty && value.length < 6) {
-                                  return 'Old password  must be at least 6 characters';
+                                  return context.l10n.passwordLeast;
                                 } else if (value.length > 40) {
-                                  return 'Old password must be more than 40 characters';
+                                  return context.l10n.passwordLess;
                                 }
                                 return null;
                               },
@@ -131,16 +123,16 @@ class _SecurityPageState extends State<SecurityPage> {
                                   _isShowNew = !_isShowNew;
                                 });
                               },
-                              hintText: 'Enter new password',
-                              labelText: 'New password',
+                              // hintText: 'Enter new password',
+                              labelText: context.l10n.newPassword,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Please enter new password';
+                                  return context.l10n.enterNewPassword;
                                 }
                                 if (value.isNotEmpty && value.length < 6) {
-                                  return 'New password  must be at least 6 characters';
+                                  return context.l10n.passwordLeast;
                                 } else if (value.length > 40) {
-                                  return 'New password must be more than 40 characters';
+                                  return context.l10n.passwordLess;
                                 }
                                 return null;
                               },
@@ -153,27 +145,26 @@ class _SecurityPageState extends State<SecurityPage> {
                                   _isShowConf = !_isShowConf;
                                 });
                               },
-                              hintText: 'Enter confirm new password',
-                              labelText: 'Confirm new password',
+                              // hintText: 'Enter confirm new password',
+                              labelText: context.l10n.confirmNewPass,
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return 'Please enter new password';
+                                  return context.l10n.enterNewPassword;
                                 }
                                 if (value.isNotEmpty && value.length < 6) {
-                                  return 'New password  must be at least 6 characters';
+                                  return context.l10n.passwordLeast;
                                 } else if (value.length > 40) {
-                                  return 'Confirm new password must be less than 40 characters';
+                                  return context.l10n.passwordLess;
                                 } else if (value != _newPassController.text) {
-                                  return 'New password and confirm new password do not match';
+                                  return context.l10n.passwordNotMatch;
                                 }
                                 return null;
                               },
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 20, bottom: 16),
+                              padding: const EdgeInsets.only(top: 20, bottom: 16),
                               child: PrimaryButton(
-                                text: 'Change password',
+                                text: context.l10n.changePassword,
                                 onTap: () async {
                                   await handleButton(context);
                                 },
@@ -196,7 +187,7 @@ class _SecurityPageState extends State<SecurityPage> {
     final connectivityResult = await Connectivity().checkConnectivity();
 
     if (_formKey.currentState!.validate()) {
-      if (connectivityResult == ConnectivityResult.none) {
+      if (connectivityResult == ConnectivityResult.none && context.mounted) {
         showMessageNoInternetDialog(this.context);
       } else {
         final response = await AuthRepository().changePassword(
@@ -205,10 +196,10 @@ class _SecurityPageState extends State<SecurityPage> {
           confPass: _confPassController.text.trim(),
         );
         if (response is BaseResponse) {
-          if (response.httpStatus == 200) {
+          if (response.httpStatus == 200 && context.mounted) {
             showCupertinoMessageDialog(
               this.context,
-              'Change password successfully',
+              context.l10n.successfully,
               onClose: () {
                 _oldPassController.clear();
                 _newPassController.clear();
@@ -216,21 +207,17 @@ class _SecurityPageState extends State<SecurityPage> {
                 Navigator.pop(context);
               },
             );
-          } else if (response is ExpiredTokenResponse) {
+          } else if (response is ExpiredTokenResponse && context.mounted) {
             logoutIfNeed(this.context);
           } else {
             showCupertinoMessageDialog(
               this.context,
-              'Error!',
+              context.l10n.error,
               content: response.message,
             );
           }
         } else {
-          showCupertinoMessageDialog(
-            this.context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
       }
     }
@@ -277,35 +264,21 @@ class _SecurityPageState extends State<SecurityPage> {
             Container(
               height: 40,
               width: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.grey.withOpacity(0.1),
-              ),
-              child: Icon(
-                icons,
-                size: 30,
-                color: Theme.of(context).primaryColor,
-              ),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey.withOpacity(0.1)),
+              child: Icon(icons, size: 30, color: Theme.of(context).primaryColor),
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 16),
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 10),
-              child: Icon(
-                isShow ? Icons.expand_more : Icons.navigate_next,
-                size: 24,
-                color: Colors.grey,
-              ),
+              child: Icon(isShow ? Icons.expand_more : Icons.navigate_next, size: 24, color: Colors.grey),
             ),
           ],
         ),

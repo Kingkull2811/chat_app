@@ -1,0 +1,7 @@
+{
+  "vi": [
+    "classManage",
+    "subManage",
+    "transcriptManage"
+  ]
+}

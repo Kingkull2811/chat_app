@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme.dart';
@@ -24,12 +25,12 @@ class OnBoarding2Page extends StatelessWidget {
             width: 350,
             height: 200,
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 50.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 50.0),
             child: Text(
-              'Information Exchange',
+              context.l10n.onboardingTitle2,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
@@ -37,15 +38,12 @@ class OnBoarding2Page extends StatelessWidget {
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 32.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 32.0),
             child: Text(
-              'We understand the importance of effective communication between teachers and parents. Our app facilitates seamless information exchange, enabling teachers to share important updates, homework assignments, and upcoming assessments directly with parents. Parents can stay informed about their child\'s academic progress and provide necessary support.',
+              context.l10n.onboardingContent2 + context.l10n.onboardingContent22,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.primaryColor,
-              ),
+              style: const TextStyle(fontSize: 16, color: AppColors.primaryColor),
             ),
           ),
         ],

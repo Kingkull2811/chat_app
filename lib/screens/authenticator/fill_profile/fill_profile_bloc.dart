@@ -30,7 +30,7 @@ class FillProfileBloc extends Bloc<FillProfileEvent, FillProfileState> {
         );
         if (response is UserInfoModel) {
           await _pref.setFullName(response.fullName ?? '');
-          await _pref.setImageAvartarUrl(response.fileUrl ?? '');
+          await _pref.setImageAvatarUrl(response.fileUrl ?? '');
           final List<StudentFirebase>? listStudentFireBase = response.parentOf
               ?.map(
                 (student) => StudentFirebase(

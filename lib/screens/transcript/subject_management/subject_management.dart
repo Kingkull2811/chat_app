@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/response/base_get_response.dart';
 import 'package:chat_app/screens/transcript/subject_management/subject_management_state.dart';
 import 'package:chat_app/widgets/data_not_found.dart';
@@ -41,8 +42,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
 
   @override
   void initState() {
-    _subjectBloc = BlocProvider.of<SubjectManagementBloc>(context)
-      ..add(InitSubjectEvent());
+    _subjectBloc = BlocProvider.of<SubjectManagementBloc>(context)..add(InitSubjectEvent());
     super.initState();
   }
 
@@ -62,11 +62,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -93,20 +89,12 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
           onTap: () {
             Navigator.pop(context);
           },
-          child: const Icon(
-            Icons.arrow_back_ios,
-            size: 24,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white),
         ),
         centerTitle: true,
-        title: const Text(
-          'Subject Management',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Text(
+          context.l10n.subManage,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
           IconButton(
@@ -132,11 +120,8 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                           });
                         },
                         child: Text(
-                          'Add new subject',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          context.l10n.addSub,
+                          style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
                         ),
                       ),
                     ],
@@ -145,11 +130,8 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black.withOpacity(0.7),
-                        ),
+                        context.l10n.cancel,
+                        style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7)),
                       ),
                     ),
                   );
@@ -165,7 +147,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
         ],
       ),
       body: isNullOrEmpty(listSubject)
-          ? const DataNotFoundPage(title: 'Subject data not found')
+          ? DataNotFoundPage(title: context.l10n.noSubject)
           : RefreshIndicator(
               onRefresh: () async => await _reloadPage(),
               child: SingleChildScrollView(
@@ -177,11 +159,8 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
                       child: Text(
-                        'List subject:',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        context.l10n.subjects,
+                        style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
                       ),
                     ),
                     SizedBox(
@@ -190,8 +169,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                         physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.zero,
                         itemCount: listSubject.length,
-                        itemBuilder: (context, index) =>
-                            itemSubject(listSubject[index]),
+                        itemBuilder: (context, index) => itemSubject(listSubject[index]),
                       ),
                     ),
                   ],
@@ -209,10 +187,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: Colors.grey.withOpacity(0.1),
-          border: Border.all(
-            width: 0.5,
-            color: Colors.grey.withOpacity(0.4),
-          ),
+          border: Border.all(width: 0.5, color: Colors.grey.withOpacity(0.4)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -225,18 +200,12 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      'Subject code: ${data.code}',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
+                      '${context.l10n.subCode}: ${data.code}',
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
                     ),
                     Text(
-                      'Subject Name: ${data.subjectName}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
+                      '${context.l10n.subName}: ${data.subjectName}',
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
                     ),
                   ],
                 ),
@@ -250,25 +219,14 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => _formSubjectInfo(
-                      context,
-                      isEdit: true,
-                      subjectData: data,
-                    ),
+                    builder: (context) => _formSubjectInfo(context, isEdit: true, subjectData: data),
                   );
                 },
                 child: Container(
                   height: 34,
                   width: 34,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(17),
-                    color: Colors.grey.withOpacity(0.3),
-                  ),
-                  child: Icon(
-                    Icons.edit_note,
-                    size: 24,
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(17), color: Colors.grey.withOpacity(0.3)),
+                  child: Icon(Icons.edit_note, size: 24, color: Theme.of(context).primaryColor),
                 ),
               ),
             ),
@@ -278,8 +236,8 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                 onTap: () {
                   showMessageTwoOption(
                     context,
-                    'Do you want to delete this subject?',
-                    okLabel: 'Delete',
+                    context.l10n.deleteSub,
+                    okLabel: context.l10n.delete,
                     onOk: () async {
                       showLoading(context);
                       _subjectBloc.add(DeleteSubjectEvent((data.subjectId)!));
@@ -295,11 +253,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                     borderRadius: BorderRadius.circular(17),
                     color: Colors.grey.withOpacity(0.3),
                   ),
-                  child: const Icon(
-                    Icons.delete_outline,
-                    size: 24,
-                    color: Colors.red,
-                  ),
+                  child: const Icon(Icons.delete_outline, size: 24, color: Colors.red),
                 ),
               ),
             ),
@@ -331,12 +285,8 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
             ),
           ),
           title: Text(
-            isEdit ? 'Edit subject' : 'Add new subject',
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            isEdit ? context.l10n.editSub : context.l10n.addSub,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ),
         body: Padding(
@@ -353,7 +303,7 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                     readOnly: true,
                     controller: _subjectCodeController,
                     inputAction: TextInputAction.done,
-                    labelText: 'Subject Code',
+                    labelText: context.l10n.subCode,
                     initText: isEdit ? '${subjectData?.code}' : '',
                   ),
                 ),
@@ -363,41 +313,22 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
                   context,
                   controller: _subjectNameController,
                   inputAction: TextInputAction.done,
-                  labelText: 'Subject Name',
+                  labelText: context.l10n.subName,
                   initText: isEdit ? '${subjectData?.subjectName}' : '',
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 32),
                 child: PrimaryButton(
-                  text: isEdit ? 'Update' : 'Save',
+                  text: isEdit ? context.l10n.update : context.l10n.save,
                   onTap: () {
                     if (_subjectCodeController.text.isEmpty && isEdit) {
-                      showCupertinoMessageDialog(
-                          context, 'Subject Code can\'t be empty');
+                      showCupertinoMessageDialog(context, context.l10n.emptySubCode);
                     } else if (_subjectNameController.text.isEmpty) {
-                      showCupertinoMessageDialog(
-                          context, 'Subject Name can\'t be empty');
+                      showCupertinoMessageDialog(context, context.l10n.emptySubName);
                     } else {
-                      final Map<String, dynamic> data = {
-                        if (isEdit) "code": _subjectCodeController.text.trim(),
-                        "name": _subjectNameController.text.trim()
-                      };
-                      isEdit
-                          ? _updateSubject(
-                              context,
-                              (subjectData?.subjectId)!,
-                              data,
-                            )
-                          : _addSubject(context, data);
-                      // isEdit? _subjectBloc.add(
-                      //         EditSubjectEvent(
-                      //           subjectId: (subjectData?.subjectId)!,
-                      //           data: data,
-                      //         ),
-                      //       )
-                      //     : _subjectBloc.add(AddSubjectEvent(data: data));
-                      // Navigator.pop(context);
+                      final Map<String, dynamic> data = {if (isEdit) "code": _subjectCodeController.text.trim(), "name": _subjectNameController.text.trim()};
+                      isEdit ? _updateSubject(context, (subjectData?.subjectId)!, data) : _addSubject(context, data);
                     }
                   },
                 ),
@@ -411,22 +342,22 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
 
   _addSubject(BuildContext context, Map<String, dynamic> data) async {
     final response = await _classRepository.addSubject(data: data);
-    if (response is SubjectModel) {
+    if (response is SubjectModel && context.mounted) {
       showCupertinoMessageDialog(
         this.context,
-        'Add new subject successfully!',
+        context.l10n.successfully,
         onClose: () async {
           Navigator.pop(context);
 
           await _reloadPage();
         },
       );
-    } else if (response is ExpiredTokenGetResponse) {
+    } else if (response is ExpiredTokenGetResponse && context.mounted) {
       logoutIfNeed(this.context);
     } else {
       showCupertinoMessageDialog(
         this.context,
-        'Add new subject failure!',
+        context.l10n.addSubFail,
       );
     }
   }
@@ -440,22 +371,19 @@ class _SubjectManagementPageState extends State<SubjectManagementPage> {
       subjectId: subjectId,
       data: data,
     );
-    if (response is SubjectModel) {
+    if (response is SubjectModel && context.mounted) {
       showCupertinoMessageDialog(
         this.context,
-        'Update subject successfully!',
+        context.l10n.updateSubSuccess,
         onClose: () async {
           Navigator.pop(context);
           await _reloadPage();
         },
       );
-    } else if (response is ExpiredTokenGetResponse) {
+    } else if (response is ExpiredTokenGetResponse && context.mounted) {
       logoutIfNeed(this.context);
     } else {
-      showCupertinoMessageDialog(
-        this.context,
-        'Update subject failure!',
-      );
+      showCupertinoMessageDialog(this.context, context.l10n.updateSubFail);
     }
   }
 

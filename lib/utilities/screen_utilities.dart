@@ -1,6 +1,6 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/theme.dart';
-import 'package:chat_app/utilities/app_constants.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
 import 'package:chat_app/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,8 +19,7 @@ void showLoading(BuildContext context) {
         backgroundColor: Colors.transparent,
         body: Center(
           child: CircularProgressIndicator(
-            valueColor:
-                AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+            valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
           ),
         ),
       );
@@ -31,14 +30,12 @@ void showLoading(BuildContext context) {
 void logout(BuildContext? context) async {
   SharedPreferencesStorage().resetDataWhenLogout();
   if (context != null) {
-    Navigator.pushNamedAndRemoveUntil(
-        context, AppRoutes.login, (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (route) => false);
   }
 }
 
 void logoutIfNeed(BuildContext? context) async {
-  final passwordExpiredTime =
-      SharedPreferencesStorage().getRefreshTokenExpired();
+  final passwordExpiredTime = SharedPreferencesStorage().getRefreshTokenExpired();
   if (passwordExpiredTime.isEmpty) {
     logout(context);
   } else {
@@ -61,24 +58,6 @@ clearFocus(BuildContext context) {
   }
 }
 
-// AndroidAuthMessages androidLocalAuthMessage(//BuildContext context,
-//         ) =>
-//     const AndroidAuthMessages(
-//       cancelButton: 'OK',
-//       goToSettingsButton: 'Setting',
-//       goToSettingsDescription:
-//           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
-//     );
-//
-// IOSAuthMessages iosLocalAuthMessages(//BuildContext context,
-//         ) =>
-//     const IOSAuthMessages(
-//       cancelButton: 'OK',
-//       goToSettingsButton: 'Setting',
-//       goToSettingsDescription:
-//           'Biometrics is not set up on your device. Please either enable TouchId or FaceId on your phone.',
-//     );
-
 Future<void> showMessageNoInternetDialog(
   BuildContext context, {
   Function()? onClose,
@@ -89,32 +68,22 @@ Future<void> showMessageNoInternetDialog(
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          title: const Text(
-            AppConstants.noInternetTitle,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+          title: Text(
+            context.l10n.no_internet_title,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           content: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: Image.asset(
-                  'assets/images/ic_no_internet.png',
-                  height: 150,
-                  width: 150,
-                ),
+                child: Image.asset('assets/images/ic_no_internet.png', height: 150, width: 150),
               ),
               Container(
                 padding: const EdgeInsets.only(top: 16),
                 alignment: Alignment.center,
-                child: const Text(
-                  AppConstants.noInternetContent,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
+                child: Text(
+                  context.l10n.no_internet_content,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                 ),
               ),
             ],
@@ -127,7 +96,7 @@ Future<void> showMessageNoInternetDialog(
                   onClose();
                 }
               },
-              child: Text(buttonLabel ?? 'OK'),
+              child: Text(buttonLabel ?? context.l10n.ok),
             ),
           ],
         );
@@ -164,7 +133,7 @@ Future<void> showCupertinoMessageDialog(
                   onClose();
                 }
               },
-              child: Text(buttonLabel ?? 'OK')),
+              child: Text(buttonLabel ?? context.l10n.ok)),
         ],
       );
     },
@@ -203,7 +172,7 @@ Future<void> showMessageTwoOption(
                 onCancel();
               }
             },
-            child: Text(cancelLabel ?? 'Cancel'),
+            child: Text(cancelLabel ?? context.l10n.cancel),
           ),
           CupertinoDialogAction(
             onPressed: () {
@@ -213,7 +182,7 @@ Future<void> showMessageTwoOption(
               }
             },
             child: Text(
-              okLabel ?? 'OK',
+              okLabel ?? context.l10n.ok,
               style: const TextStyle(color: Colors.red),
             ),
           ),
@@ -246,10 +215,7 @@ Future<void> showSuccessBottomSheet(
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(35),
-              topRight: Radius.circular(35),
-            ),
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(35), topRight: Radius.circular(35)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -259,16 +225,12 @@ Future<void> showSuccessBottomSheet(
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(top: 16),
-                      child: Icon(
-                        Icons.verified_outlined,
-                        size: 150,
-                        color: AppColors.green600,
-                      ),
+                      child: Icon(Icons.verified_outlined, size: 150, color: AppColors.green600),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0),
                       child: Text(
-                        titleMessage ?? 'Successfully!',
+                        titleMessage ?? context.l10n.successfully,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -282,9 +244,7 @@ Future<void> showSuccessBottomSheet(
                         contentMessage ?? '',
                         //maxLines: 3,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ),
                   ],
@@ -292,10 +252,7 @@ Future<void> showSuccessBottomSheet(
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 32),
-                child: PrimaryButton(
-                  text: buttonLabel,
-                  onTap: onTap,
-                ),
+                child: PrimaryButton(text: buttonLabel, onTap: onTap),
               )
             ],
           ),
@@ -312,10 +269,7 @@ Future<String?> showTextDialog<T>(
 }) =>
     showDialog<String>(
       context: context,
-      builder: (context) => TextDialogWidget(
-        title: title,
-        value: value,
-      ),
+      builder: (context) => TextDialogWidget(title: title, value: value),
     );
 
 Future<String?> pickImage(BuildContext context) async {
@@ -331,7 +285,7 @@ Future<String?> pickImage(BuildContext context) async {
               imagePath = await pickPhoto(ImageSource.camera);
             },
             child: Text(
-              'Take a photo from camera',
+              context.l10n.photo_camera,
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).primaryColor,
@@ -344,11 +298,8 @@ Future<String?> pickImage(BuildContext context) async {
               imagePath = await pickPhoto(ImageSource.gallery);
             },
             child: Text(
-              'Choose a photo from gallery',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).primaryColor,
-              ),
+              context.l10n.photo_gallery,
+              style: TextStyle(fontSize: 16, color: Theme.of(context).primaryColor),
             ),
           ),
         ],
@@ -356,13 +307,7 @@ Future<String?> pickImage(BuildContext context) async {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text(
-            'Cancel',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black.withOpacity(0.7),
-            ),
-          ),
+          child: Text(context.l10n.cancel, style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.7))),
         ),
       );
     },

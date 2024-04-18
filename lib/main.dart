@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_app/l10n/app_localizations/app_localizations.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/services/notification_services.dart';
 import 'package:chat_app/theme.dart';
@@ -26,9 +27,6 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_backgroundHandlerMessaging);
   await SharedPreferencesStorage.init();
 
-  // Always initialize Awesome Notifications
-  // await NotificationController.initializeLocalNotifications();
-  // await NotificationController.interceptInitialCallActionRequest();
 
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -37,30 +35,7 @@ void main() async {
     ),
   );
 
-  // final navigatorKey = GlobalKey<NavigatorState>();
-
-  // await runZonedGuarded<Future<void>>(() async {
-  //   // Wait for Firebase to initialize
-  //   await Firebase.initializeApp();
-  //
-  //   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(!kDebugMode);
-  //
-  //   if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
-  //     // Pass all uncaught errors from the framework to Crashlytics.
-  //     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-  //
-  //     //To catch errors that happen outside of the Flutter context, install an error listener on the current Isolate
-  //     Isolate.current.addErrorListener(RawReceivePort((pair) async {
-  //       final List<dynamic> errorAndStacktrace = pair;
-  //       await FirebaseCrashlytics.instance.recordError(
-  //         errorAndStacktrace.first,
-  //         errorAndStacktrace.last,
-  //       );
-  //     }).sendPort);
-  //   }
-
     runApp(const MyApp());
-  // }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack));
 }
 
 _removeBadgeWhenOpenApp() async {
@@ -134,7 +109,6 @@ class _MyAppState extends State<MyApp> {
     // String initialRoute = NotificationController.initialAction == null ? AppRoutes.main : AppRoutes.callPage;
 
     return MaterialApp(
-      //theme: AppTheme().light,
       theme: theme,
       darkTheme: AppTheme().dark,
       debugShowCheckedModeBanner: false,
@@ -142,13 +116,13 @@ class _MyAppState extends State<MyApp> {
       //debugShowCheckedModeBanner: false,
       navigatorKey: MyApp.navigatorKey,
       localizationsDelegates: const [
-        //AppLocalizations.delegate,
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         DefaultCupertinoLocalizations.delegate
       ],
-      supportedLocales: const [Locale('en'), Locale('vi')],
+      supportedLocales: AppLocalizations.supportedLocales,
       routes: AppRoutes().routes(context, isLoggedIn: _isLoggedIn),
       initialRoute: AppRoutes.main,// initialRoute,
     );

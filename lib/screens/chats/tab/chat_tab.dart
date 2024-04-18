@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/chat_model.dart';
 import 'package:chat_app/screens/chats/chat_room/message_view.dart';
 import 'package:chat_app/screens/chats/tab/new_message.dart';
@@ -34,8 +35,7 @@ class _ChatTabState extends State<ChatTab> {
     super.dispose();
   }
 
-  List<ChatModel> convertListChat(
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+  List<ChatModel> convertListChat(AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
     List<ChatModel> listChat = [];
     final data = snapshot.data?.docs;
     for (var doc in data!) {
@@ -75,9 +75,7 @@ class _ChatTabState extends State<ChatTab> {
       stream: FirebaseService().getListChat(currentUserId),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
-          return const Center(
-            child: Text("Something went wrong"),
-          );
+          return Center(child: Text(context.l10n.wrong));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const AnimationLoading();
@@ -90,10 +88,7 @@ class _ChatTabState extends State<ChatTab> {
           return const Center(
             child: Text(
               'no messages yet',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppColors.primaryColor,
-              ),
+              style: TextStyle(fontSize: 16, color: AppColors.primaryColor),
             ),
           );
         }
@@ -107,18 +102,14 @@ class _ChatTabState extends State<ChatTab> {
           ? const Center(
               child: Text(
                 'no messages yet',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.primaryColor,
-                ),
+                style: TextStyle(fontSize: 16, color: AppColors.primaryColor),
               ),
             )
           : ListView.builder(
               scrollDirection: Axis.vertical,
               physics: const BouncingScrollPhysics(),
               itemCount: listChat!.length,
-              itemBuilder: (context, index) =>
-                  _itemChat(context, listChat[index]),
+              itemBuilder: (context, index) => _itemChat(context, listChat[index]),
             ),
       floatingActionButton: InkWell(
         borderRadius: BorderRadius.circular(25),

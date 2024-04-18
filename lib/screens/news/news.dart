@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/news_model.dart';
 import 'package:chat_app/network/repository/news_repository.dart';
 import 'package:chat_app/screens/news/news_bloc.dart';
@@ -29,8 +30,7 @@ class NewsPage extends StatefulWidget {
 }
 
 class NewsPageState extends State<NewsPage> {
-  final bool isAdmin = SharedPreferencesStorage().getAdminRole() ||
-      SharedPreferencesStorage().getTeacherRole();
+  final bool isAdmin = SharedPreferencesStorage().getAdminRole() || SharedPreferencesStorage().getTeacherRole();
 
   void _reloadPage() {
     BlocProvider.of<NewsBloc>(context).add(GetListNewEvent());
@@ -56,13 +56,9 @@ class NewsPageState extends State<NewsPage> {
         backgroundColor: AppColors.primaryColor,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'News',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Text(
+          context.l10n.news,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
           if (isAdmin)
@@ -70,11 +66,7 @@ class NewsPageState extends State<NewsPage> {
               onPressed: () async {
                 final bool result = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const NewsInfo(
-                      isEdit: false,
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (context) => const NewsInfo(isEdit: false)),
                 );
 
                 if (result) {
@@ -83,11 +75,7 @@ class NewsPageState extends State<NewsPage> {
                   return;
                 }
               },
-              icon: const Icon(
-                Icons.edit_outlined,
-                size: 30,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.edit_outlined, size: 30, color: Colors.white),
             ),
         ],
       ),
@@ -97,20 +85,14 @@ class NewsPageState extends State<NewsPage> {
         },
         listener: (context, curState) {
           if (curState.apiError == ApiError.internalServerError) {
-            showCupertinoMessageDialog(
-              context,
-              'Error!',
-              content: 'Internal_server_error',
-            );
+            showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
           }
           if (curState.apiError == ApiError.noInternetConnection) {
             showMessageNoInternetDialog(context);
           }
         },
         builder: (context, curState) {
-          return curState.isLoading
-              ? const AnimationLoading()
-              : _body(context, curState.listNews);
+          return curState.isLoading ? const AnimationLoading() : _body(context, curState.listNews);
         },
       ),
     );
@@ -150,21 +132,18 @@ class NewsPageState extends State<NewsPage> {
             height: 150,
             color: AppColors.primaryColor,
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 24, bottom: 16),
+          Padding(
+            padding: const EdgeInsets.only(top: 24, bottom: 16),
             child: Text(
-              'No news available',
-              style: TextStyle(
-                fontSize: 20,
-                color: AppColors.primaryColor,
-              ),
+              context.l10n.noNews,
+              style: const TextStyle(fontSize: 20, color: AppColors.primaryColor),
             ),
           ),
           PrimaryButton(
-            text: 'Reload',
+            text: context.l10n.reload,
             onTap: () {
               BlocProvider.of<NewsBloc>(context).add(GetListNewEvent());
-              setState(() {});
+              // setState(() {});
             },
           )
         ],
@@ -225,7 +204,7 @@ class NewsPageState extends State<NewsPage> {
                       title: Transform.translate(
                         offset: const Offset(-16, 0),
                         child: Text(
-                          item.createdName ?? 'Admin',
+                          item.createdName ?? '',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -253,11 +232,7 @@ class NewsPageState extends State<NewsPage> {
                         onTap: () async {
                           await _option(item);
                         },
-                        child: const Icon(
-                          Icons.more_vert,
-                          size: 24,
-                          color: Colors.grey,
-                        ),
+                        child: const Icon(Icons.more_vert, size: 24, color: Colors.grey),
                       ),
                     ),
                 ],
@@ -268,11 +243,7 @@ class NewsPageState extends State<NewsPage> {
                 padding: const EdgeInsets.only(top: 16),
                 child: Text(
                   item.title!,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
             if (isNotNullOrEmpty(item.content))
@@ -283,18 +254,10 @@ class NewsPageState extends State<NewsPage> {
                   trimLines: 3,
                   textAlign: TextAlign.left,
                   trimMode: TrimMode.Line,
-                  trimCollapsedText: ' show more',
-                  trimExpandedText: '\nshow less',
-                  lessStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: AppColors.primaryColor,
-                  ),
-                  moreStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: AppColors.primaryColor,
-                  ),
+                  trimCollapsedText: context.l10n.more,
+                  trimExpandedText: context.l10n.less,
+                  lessStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: AppColors.primaryColor),
+                  moreStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: AppColors.primaryColor),
                   style: const TextStyle(
                     fontSize: 14,
                     height: 1.5,
@@ -311,9 +274,7 @@ class NewsPageState extends State<NewsPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PhotoViewPage(
-                          imageUrl: item.mediaUrl ?? '',
-                        ),
+                        builder: (context) => PhotoViewPage(imageUrl: item.mediaUrl ?? ''),
                       ),
                     );
                   },
@@ -349,12 +310,7 @@ class NewsPageState extends State<NewsPage> {
                 Navigator.pop(context);
                 final bool result = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => NewsInfo(
-                      isEdit: true,
-                      newsInfo: item,
-                    ),
-                  ),
+                  MaterialPageRoute(builder: (context) => NewsInfo(isEdit: true, newsInfo: item)),
                 );
 
                 if (result) {
@@ -363,27 +319,23 @@ class NewsPageState extends State<NewsPage> {
                   return;
                 }
               },
-              child: _itemOption(
-                icon: Icons.edit_note,
-                title: 'Edit this news',
-              ),
+              child: _itemOption(icon: Icons.edit_note, title: context.l10n.editNews),
             ),
             CupertinoActionSheetAction(
               onPressed: () async {
-                await showMessageTwoOption(
-                    context, 'Do you want to delete this news?',
+                await showMessageTwoOption(context, context.l10n.deleteNews,
                     onCancel: () {
                       Navigator.pop(context);
                     },
-                    cancelLabel: 'Cancel',
+                    cancelLabel: context.l10n.cancel,
                     onOk: () async {
                       await _deleteNews(item.id);
                     },
-                    okLabel: 'Delete');
+                    okLabel: context.l10n.delete);
               },
               child: _itemOption(
                 icon: Icons.delete_outline,
-                title: 'Delete this news',
+                title: context.l10n.delete,
               ),
             ),
           ],
@@ -392,7 +344,7 @@ class NewsPageState extends State<NewsPage> {
               Navigator.pop(context);
             },
             child: Text(
-              'Cancel',
+              context.l10n.cancel,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black.withOpacity(0.7),
@@ -406,15 +358,15 @@ class NewsPageState extends State<NewsPage> {
 
   Future<void> _deleteNews(int? newsId) async {
     if (newsId == null) {
-      showCupertinoMessageDialog(context, 'Did not find the news');
+      showCupertinoMessageDialog(context, context.l10n.notFindNews);
     }
     await NewsRepository().deleteNews(newsId: newsId!);
-    if (mounted) {}
-    await showCupertinoMessageDialog(context, 'The news has been deleted',
-        onClose: () {
-      _reloadPage();
-      Navigator.pop(context);
-    });
+    if (mounted) {
+      await showCupertinoMessageDialog(context, context.l10n.deletedNews, onClose: () {
+        _reloadPage();
+        Navigator.pop(context);
+      });
+    }
   }
 
   Widget _itemOption({
@@ -430,10 +382,7 @@ class NewsPageState extends State<NewsPage> {
           padding: const EdgeInsets.only(left: 16),
           child: Text(
             title,
-            style: const TextStyle(
-              fontSize: 18,
-              color: AppColors.primaryColor,
-            ),
+            style: const TextStyle(fontSize: 18, color: AppColors.primaryColor),
           ),
         ),
       ],

@@ -35,8 +35,8 @@ class ClassManagementBloc
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,

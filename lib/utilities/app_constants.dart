@@ -1,13 +1,7 @@
 class AppConstants {
-  ///for flutter web
-  static const apiKey = 'AIzaSyDGD4HfInR7ybpXD7sYguYP-5j-U2vDQ80';
-  static const appId = '1:103251286025:web:03d480e7b5bdae42f840d8';
-  static const messagingSenderId = '103251286025';
-  static const projectId = 'chatapp-97dbc';
 
   static RegExp emailExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]');
-  static RegExp passwordExp =
-      RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
+  static RegExp passwordExp = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
 
   static const int maxConnectionPerHost = 16;
 
@@ -25,7 +19,7 @@ class AppConstants {
   static const String isAdminRoleKey = 'IS_ADMIN_ROLE';
   static const String isTeacherRoleKey = 'IS_TEACHER_ROLE';
   static const String rolesKey = 'ROLES';
-  static const String imageAvartarUrlKey = 'IMAGE_AVARTAR_URL_KEY';
+  static const String imageAvatarUrlKey = 'IMAGE_AVATAR_URL_KEY';
 
   static const String isFillProfileKey = 'IS_FILL_PROFILE_STATUS';
 
@@ -38,24 +32,6 @@ class AppConstants {
   static const String agreedWithTermsKey = 'AGREED_WITH_TERMS';
 
   static const double defaultLoadingNetworkImageSize = 25;
-
-  static const String noInternetTitle = 'No Internet Connection';
-  static const String noInternetContent =
-      'Please check your internet connection again or connect to Wi-fi';
-
-  static const String emailNotMatch = 'Please enter a valid email address.';
-  static const String passwordNotMatch =
-      'Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, and one number.';
-  static const String emailPasswordNotMatch =
-      'Please enter a valid email address.\nPassword must contain at least 6 characters, including one uppercase letter, one lowercase letter, and one number.';
-  static const String passwordNotValid =
-      'Password must has Minimum 1 Upper case, Minimum 1 lowercase, Minimum 1 Numeric Number, Minimum 1 Special Character, Common Allow Character ( ! @ # \$ & * ~ )';
-
-  static const String calculateFinalPoint = 'How to calculate final point?';
-  static const String finalPoint =
-      'final_point = 0.6 x final_exam_point + 0.4 x process_point';
-  static const String processPoint =
-      'process_point = (first_point + second_point)/2';
 
   static const List<String> listSemesterYear = [
     'semester 1 2021-2022',
@@ -89,4 +65,7 @@ class AppConstants {
   static const String imageNewsChild = 'news';
   static const String imageStudentsChild = 'students';
   static const String imageProfilesChild = 'profiles';
+
+  ///app name
+  static const String appName= "App Name";
 }

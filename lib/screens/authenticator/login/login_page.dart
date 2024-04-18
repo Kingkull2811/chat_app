@@ -5,6 +5,7 @@ import 'package:chat_app/screens/authenticator/login/login_form/login_form_bloc.
 import 'package:chat_app/screens/authenticator/login/login_state.dart';
 import 'package:chat_app/services/database.dart';
 import 'package:chat_app/utilities/shared_preferences_storage.dart';
+import 'package:chat_app/widgets/animation_loading.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,15 +47,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         }
-        return Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        );
+        return const Scaffold(body: AnimationLoading());
       },
     );
   }
@@ -63,8 +56,7 @@ class _LoginPageState extends State<LoginPage> {
     bool rememberInfo = SharedPreferencesStorage().getRememberInfo();
     bool isLoggedOut = SharedPreferencesStorage().getLoggedOutStatus();
     bool isExpired = true;
-    String passwordExpireTime =
-        SharedPreferencesStorage().getAccessTokenExpired();
+    String passwordExpireTime = SharedPreferencesStorage().getAccessTokenExpired();
 
     if (passwordExpireTime.isNotEmpty) {
       try {

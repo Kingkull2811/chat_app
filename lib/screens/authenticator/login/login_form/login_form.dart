@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/user_info_model.dart';
 import 'package:chat_app/network/repository/auth_repository.dart';
 import 'package:chat_app/screens/authenticator/forgot_password/forgot_password.dart';
@@ -78,7 +79,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
         return currState.isSuccessAuthenticateBiometric;
       },
       listener: (context, state) {
-        _goToTermPolicy(context);
+        _goToTermPolicy();
       },
       builder: (context, state) {
         if (state.isLoading) {
@@ -140,17 +141,17 @@ class _LoginFormPageState extends State<LoginFormPage> {
                     width: 200,
                     fit: BoxFit.cover,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: Text(
-                      'Welcome to \'app name\'',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
+                  // const Padding(
+                  //   padding: EdgeInsets.only(top: 20),
+                  //   child: Text(
+                  //     'Welcome to \'app name\'',
+                  //     style: TextStyle(
+                  //       fontSize: 22,
+                  //       fontWeight: FontWeight.w900,
+                  //       color: Colors.black,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -164,12 +165,12 @@ class _LoginFormPageState extends State<LoginFormPage> {
                 },
                 textInputAction: TextInputAction.next,
                 onSubmit: (_) => focusNode.requestFocus(),
-                labelText: 'Username',
-                hint: 'Enter your username',
+                labelText: context.l10n.username,
+                // hint: 'Enter your username',
                 prefixIcon: Icons.person_outline,
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter username';
+                    return context.l10n.enter_username;
                   }
                   return null;
                 },
@@ -195,17 +196,17 @@ class _LoginFormPageState extends State<LoginFormPage> {
                     await _handleButtonLogin(context);
                   }
                 },
-                labelText: 'Password',
-                hint: 'Enter your password',
+                labelText: context.l10n.password,
+                // hint: 'Enter your password',
                 prefixIcon: Icons.lock_outline,
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter password';
+                    return context.l10n.enterPassword;
                   }
                   if (value.isNotEmpty && value.length < 6) {
-                    return 'Password must be at least 6 characters';
+                    return context.l10n.passwordLeast;
                   } else if (value.length > 40) {
-                    return 'Password must be less than 40 characters';
+                    return context.l10n.passwordLess;
                   }
                   return null;
                 },
@@ -218,7 +219,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
     );
   }
 
-  Future<void> _goToTermPolicy(BuildContext context) async {
+  Future<void> _goToTermPolicy() async {
     _pref.setLoggedOutStatus(false);
     bool agreedWithTerms = _pref.getAgreedWithTerms();
     if (mounted) {
@@ -231,30 +232,21 @@ class _LoginFormPageState extends State<LoginFormPage> {
 
         if (userInfo is UserInfoModel) {
           await _pref.setFullName(userInfo.fullName ?? '');
-          await _pref.setImageAvartarUrl(
-            userInfo.fileUrl ?? '',
-          );
+          await _pref.setImageAvatarUrl(userInfo.fileUrl ?? '');
 
           //navigate
-          userInfo.isFillProfileKey
-              ? await _navigateToMainPage()
-              : await _navigateToFillProfilePage(userInfo);
-        } else if (userInfo is ExpiredTokenGetResponse) {
-          logoutIfNeed(this.context);
+          userInfo.isFillProfileKey ? await _navigateToMainPage() : await _navigateToFillProfilePage(userInfo);
+        } else if (userInfo is ExpiredTokenGetResponse && context.mounted) {
+          logoutIfNeed(context);
         } else {
           //show log
-          showCupertinoMessageDialog(
-            this.context,
-            'ERROR!',
-            content: 'Can\'t get user info',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.noUserInfor);
         }
       }
     }
   }
 
-  _navigateToFillProfilePage(UserInfoModel userInfo) =>
-      Navigator.pushReplacement(
+  _navigateToFillProfilePage(UserInfoModel userInfo) => Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => BlocProvider<FillProfileBloc>(
@@ -264,11 +256,9 @@ class _LoginFormPageState extends State<LoginFormPage> {
         ),
       );
 
-  _navigateToTerm() => Navigator.pushReplacement(
-      context, MaterialPageRoute(builder: (context) => const TermPolicyPage()));
+  _navigateToTerm() => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const TermPolicyPage()));
 
-  _navigateToMainPage() async => await Navigator.pushReplacement(
-      context, MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)));
+  _navigateToMainPage() async => await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainApp(currentTab: 0)));
 
   // _buildBiometricsButton(LoginFormState currentState) {
   //   if (currentState.buttonStatus != HighlightStatus.notAvailable) {
@@ -299,15 +289,14 @@ class _LoginFormPageState extends State<LoginFormPage> {
   _validateForm() {
     setState(() {
       _loginFormBloc.add(ValidateForm(
-        isValidate: (_inputUsernameController.text.isNotEmpty &&
-            _inputPasswordController.text.isNotEmpty),
+        isValidate: (_inputUsernameController.text.isNotEmpty && _inputPasswordController.text.isNotEmpty),
       ));
     });
   }
 
   Widget _buttonLogin(BuildContext context, LoginFormState state) {
     return PrimaryButton(
-      text: 'Login',
+      text: context.l10n.login,
       onTap: () async {
         if (_formKey.currentState!.validate()) {
           await _handleButtonLogin(context);
@@ -330,11 +319,11 @@ class _LoginFormPageState extends State<LoginFormPage> {
       );
 
       if (response.httpStatus == 200) {
-        if (response.data == null) {
+        if (response.data == null && context.mounted) {
           showCupertinoMessageDialog(
             this.context,
-            'Error',
-            content: 'Something is wrong, please try again later!',
+            context.l10n.error,
+            content: context.l10n.wrong,
             onClose: () {
               _loginFormBloc.add(ValidateForm());
             },
@@ -342,12 +331,12 @@ class _LoginFormPageState extends State<LoginFormPage> {
         }
         await _pref.setRememberInfo(true);
         await _pref.setSaveUserInfo(response.data);
-        await _goToTermPolicy(this.context);
+        await _goToTermPolicy();
       } else {
         showCupertinoMessageDialog(
           this.context,
-          'Error',
-          content: 'Wrong username or password',
+          context.l10n.error,
+          content: context.l10n.wrongU,
           onClose: () {
             _loginFormBloc.add(ValidateForm());
           },
@@ -362,12 +351,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Don\'t have an account? ',
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
+          Text(context.l10n.noAccount, style: const TextStyle(fontSize: 14)),
           GestureDetector(
             onTap: () => Navigator.push(
               context,
@@ -379,12 +363,8 @@ class _LoginFormPageState extends State<LoginFormPage> {
               ),
             ),
             child: Text(
-              'Sign up',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-              ),
+              context.l10n.signUp,
+              style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 14, fontStyle: FontStyle.italic),
             ),
           )
         ],
@@ -419,15 +399,12 @@ class _LoginFormPageState extends State<LoginFormPage> {
                       },
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 10),
+                      padding: const EdgeInsets.only(left: 10),
                       child: Text(
-                        'Remember password',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        context.l10n.remember,
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                       ),
                     ),
                   ),
@@ -450,7 +427,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                 );
               },
               child: Text(
-                'Forgot password?',
+                context.l10n.forgotPassword,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,

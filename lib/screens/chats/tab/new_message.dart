@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/student_firebase.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/cupertino.dart';
@@ -51,15 +52,11 @@ class _NewMessageState extends State<NewMessage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                size: 24,
-                color: Colors.white,
-              )),
+              icon: const Icon(Icons.arrow_back_ios, size: 24, color: Colors.white)),
           centerTitle: true,
-          title: const Text(
-            'Create new message',
-            style: TextStyle(
+          title: Text(
+            context.l10n.createMessage,
+            style: const TextStyle(
               fontSize: 20,
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -80,13 +77,10 @@ class _NewMessageState extends State<NewMessage> {
 
   Widget _listView(List<UserFirebaseData>? listUserData) {
     if (isNullOrEmpty(listUserData)) {
-      return const Center(
+      return Center(
         child: Text(
-          'No contact',
-          style: TextStyle(
-            fontSize: 16,
-            color: AppColors.primaryColor,
-          ),
+          context.l10n.noContact,
+          style: const TextStyle(fontSize: 16, color: AppColors.primaryColor),
         ),
       );
     }
@@ -119,10 +113,7 @@ class _NewMessageState extends State<NewMessage> {
                         width: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            width: 1,
-                            color: AppColors.primaryColor,
-                          ),
+                          border: Border.all(width: 1, color: AppColors.primaryColor),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(25),
@@ -208,10 +199,7 @@ class _NewMessageState extends State<NewMessage> {
                                   width: 150,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(75),
-                                    border: Border.all(
-                                      width: 1,
-                                      color: AppColors.primaryColor,
-                                    ),
+                                    border: Border.all(width: 1, color: AppColors.primaryColor),
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(75),
@@ -231,10 +219,10 @@ class _NewMessageState extends State<NewMessage> {
                               content: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Name: ${item.fullName}'),
-                                  Text('Email: ${item.email}'),
-                                  Text('Phone: ${item.phone}'),
-                                  const Text('parent of:'),
+                                  Text('${context.l10n.name} ${item.fullName}'),
+                                  Text('${context.l10n.email}: ${item.email}'),
+                                  Text('${context.l10n.tel} ${item.phone}'),
+                                  Text(context.l10n.parentOf),
                                   _userInfoDialog(item.parentOf),
                                 ],
                               ),
@@ -243,27 +231,20 @@ class _NewMessageState extends State<NewMessage> {
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Text('OK'),
+                                  child: Text(context.l10n.ok),
                                 ),
                               ],
                             ),
                           );
                         },
-                        child: const Icon(
-                          CupertinoIcons.ellipsis_vertical,
-                          size: 24,
-                          color: AppColors.primaryColor,
-                        ),
+                        child: const Icon(CupertinoIcons.ellipsis_vertical, size: 24, color: AppColors.primaryColor),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            Divider(
-              height: 1,
-              color: Colors.grey.withOpacity(0.3),
-            ),
+            Divider(height: 1, color: Colors.grey.withOpacity(0.3)),
           ],
         ),
       ),
@@ -284,12 +265,7 @@ class _NewMessageState extends State<NewMessage> {
             child: Container(
               height: 80,
               alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    width: 1,
-                    color: AppColors.primaryColor,
-                  )),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(width: 1, color: AppColors.primaryColor)),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(6, 2, 0, 2),
                 child: Column(
@@ -301,17 +277,17 @@ class _NewMessageState extends State<NewMessage> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Name: ${student[index].studentName}',
+                      '${context.l10n.name} ${student[index].studentName}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Date of birth: ${student[index].dob}',
+                      '${context.l10n.dob}: ${student[index].dob}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Class: ${student[index].className}',
+                      '${context.l10n.classTitle} ${student[index].className}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -337,21 +313,13 @@ class _NewMessageState extends State<NewMessage> {
             _search(value);
           },
           decoration: InputDecoration(
-            hintText: 'Search',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(24.0),
-            ),
-            prefixIcon: const Icon(
-              Icons.search,
-              color: AppColors.primaryColor,
-            ),
+            hintText: context.l10n.search,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(24.0)),
+            prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor),
             contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
-              borderSide: const BorderSide(
-                width: 1,
-                color: AppColors.primaryColor,
-              ),
+              borderSide: const BorderSide(width: 1, color: AppColors.primaryColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
@@ -373,27 +341,12 @@ class _NewMessageState extends State<NewMessage> {
       });
     }
     List<UserFirebaseData> suggestion = widget.listUser?.where((user) {
-          bool matchesFullName = user.fullName
-                  ?.toLowerCase()
-                  .contains(searchQuery.toLowerCase()) ??
-              false;
-          bool matchesEmail =
-              user.email?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-                  false;
-          bool matchesPhone =
-              user.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ??
-                  false;
-          bool matchesParentClassName = user.parentOf?.any((student) =>
-                  student.className
-                      ?.toLowerCase()
-                      .contains(searchQuery.toLowerCase()) ??
-                  false) ??
-              false;
+          bool matchesFullName = user.fullName?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false;
+          bool matchesEmail = user.email?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false;
+          bool matchesPhone = user.phone?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false;
+          bool matchesParentClassName = user.parentOf?.any((student) => student.className?.toLowerCase().contains(searchQuery.toLowerCase()) ?? false) ?? false;
 
-          return matchesFullName ||
-              matchesEmail ||
-              matchesPhone ||
-              matchesParentClassName;
+          return matchesFullName || matchesEmail || matchesPhone || matchesParentClassName;
         }).toList() ??
         [];
     setState(() {

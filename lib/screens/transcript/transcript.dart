@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/screens/transcript/class_management/class_management.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management.dart';
 import 'package:chat_app/screens/transcript/students_management/students_management_bloc.dart';
@@ -66,11 +67,11 @@ class TranscriptPageState extends State<TranscriptPage> {
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: Text(
-          _isUser ? 'Transcript' : 'Manage',
+          _isUser ? context.l10n.transcript : context.l10n.manage,
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.white
           ),
         ),
         actions: [
@@ -80,7 +81,7 @@ class TranscriptPageState extends State<TranscriptPage> {
               icon: const Icon(
                 Icons.info_outline,
                 size: 24,
-                color: Colors.white,
+                color: Colors.white
               ),
             ),
         ],
@@ -96,11 +97,7 @@ class TranscriptPageState extends State<TranscriptPage> {
       },
       listener: (context, curState) {
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'error',
-            content: 'internal_server_error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
         if (curState.apiError == ApiError.noInternetConnection) {
           showMessageNoInternetDialog(context);
@@ -125,25 +122,25 @@ class TranscriptPageState extends State<TranscriptPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             _itemManage(
-              title: 'Class Management',
+              title: context.l10n.classManage,
               onTap: () {
                 _navToClassManagement();
               },
             ),
             _itemManage(
-              title: 'Subjects Management',
+              title: context.l10n.subManage,
               onTap: () {
                 _navToSubjectManagement();
               },
             ),
             _itemManage(
-              title: 'Students Management',
+              title: context.l10n.stuManage,
               onTap: () {
                 _navToStudentManagement();
               },
             ),
             _itemManage(
-              title: 'Transcript Management',
+              title: context.l10n.transcriptManage,
               onTap: () {
                 _navToTranscriptManagement();
               },
@@ -156,8 +153,8 @@ class TranscriptPageState extends State<TranscriptPage> {
 
   Widget _listTranscript(TranscriptState state) {
     if (isNullOrEmpty(state.listStudent)) {
-      return const DataNotFoundPage(
-        title: 'There is no data on students who are children of this parent',
+      return  DataNotFoundPage(
+        title: context.l10n.noStudent
       );
     }
 
@@ -166,7 +163,7 @@ class TranscriptPageState extends State<TranscriptPage> {
       itemCount: state.listStudent!.length,
       itemBuilder: (context, index) => _itemTranScript(
         state,
-        state.listStudent![index],
+        state.listStudent![index]
       ),
     );
   }
@@ -184,7 +181,7 @@ class TranscriptPageState extends State<TranscriptPage> {
               color: Colors.grey.withOpacity(0.1),
               border: Border.all(
                 width: 0.5,
-                color: AppColors.greyLight,
+                color: AppColors.greyLight
               ),
             ),
             child: Padding(
@@ -208,7 +205,7 @@ class TranscriptPageState extends State<TranscriptPage> {
                         errorWidget: Icon(
                           Icons.person,
                           size: 70,
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withOpacity(0.3)
                         ),
                       ),
                     ),
@@ -221,11 +218,11 @@ class TranscriptPageState extends State<TranscriptPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _itemText('SSID:', student.code ?? '-'),
-                          _itemText('Name:', student.name ?? '-'),
+                          _itemText(context.l10n.name, student.name ?? '-'),
                           _itemText(
-                              'D.O.B:', formatDate('${student.dateOfBirth}')),
-                          _itemText('Class:', student.className ?? '-'),
-                          _itemText('School year:',
+                              context.l10n.dOB, formatDate('${student.dateOfBirth}')),
+                          _itemText(context.l10n.classTitle, student.className ?? '-'),
+                          _itemText('${context.l10n.schoolY}:',
                               student.classResponse?.schoolYear ?? '-'),
                         ],
                       ),
@@ -277,17 +274,17 @@ class TranscriptPageState extends State<TranscriptPage> {
               textAlign: TextAlign.center,
               readOnly: true,
               showSuffix: true,
-              labelText: 'Semester',
-              hintText: 'Select Semester',
+              labelText: context.l10n.semester,
+              // hintText: 'Select Semester',
               onTap: () {
                 final listSemester = [
                   SemesterYear(
                     semester: 1,
-                    title: 'Semester 1 ${student.classResponse?.schoolYear}',
+                    title: '${context.l10n.semester} 1 ${student.classResponse?.schoolYear}',
                   ),
                   SemesterYear(
                     semester: 2,
-                    title: 'Semester 2 ${student.classResponse?.schoolYear}',
+                    title: '${context.l10n.semester} 2 ${student.classResponse?.schoolYear}',
                   ),
                 ];
                 _dialogSelectSemester(
@@ -309,12 +306,12 @@ class TranscriptPageState extends State<TranscriptPage> {
 
   Widget _transcript(List<LearningResultInfo> listLearningInfo) {
     final columns = [
-      'Subject name',
-      'Oral Test',
-      '15m Test',
-      '45m Test',
-      'Final Exam',
-      'Semester GPA',
+      context.l10n.subjectName,
+      context.l10n.tOral,
+      context.l10n.t15,
+    context.l10n.t45,
+    context.l10n.tFinal,
+    context.l10n.sGPA,
     ];
 
     List<DataColumn> getColumns(List<String> columns) =>
@@ -388,7 +385,7 @@ class TranscriptPageState extends State<TranscriptPage> {
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            'Select semester',
+            context.l10n.selectSemester,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,

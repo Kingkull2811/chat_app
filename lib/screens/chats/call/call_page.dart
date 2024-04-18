@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -71,7 +72,7 @@ class _CallPageState extends State<CallPage> {
         fit: StackFit.expand,
         children: [
           // Image
-           Image.network(
+          Image.network(
             '',
             fit: BoxFit.cover,
           ),
@@ -94,7 +95,7 @@ class _CallPageState extends State<CallPage> {
                     ),
                   ),
                   Text(
-                    _timer == null ? 'Incoming call' : 'Call in progress: ${printDuration(_secondsElapsed)}',
+                    _timer == null ? context.l10n.incomeCall : '${context.l10n.inProcessCall}: ${printDuration(_secondsElapsed)}',
                     style: themeData.textTheme.titleLarge?.copyWith(
                       color: Colors.white54,
                       fontSize: _timer == null ? 20 : 12,
@@ -108,9 +109,7 @@ class _CallPageState extends State<CallPage> {
                             TextButton(
                               onPressed: () {},
                               style: ButtonStyle(
-                                overlayColor: MaterialStateProperty.all<Color>(
-                                  Colors.white12,
-                                ),
+                                overlayColor: MaterialStateProperty.all<Color>(Colors.white12),
                               ),
                               child: Column(
                                 children: [
@@ -119,7 +118,7 @@ class _CallPageState extends State<CallPage> {
                                     color: Colors.white54,
                                   ),
                                   Text(
-                                    'Reminder me',
+                                    context.l10n.remindMe,
                                     style: themeData.textTheme.titleLarge?.copyWith(
                                       color: Colors.white54,
                                       fontSize: 12,
@@ -133,9 +132,7 @@ class _CallPageState extends State<CallPage> {
                             TextButton(
                               onPressed: () {},
                               style: ButtonStyle(
-                                overlayColor: MaterialStateProperty.all<Color>(
-                                  Colors.white12,
-                                ),
+                                overlayColor: MaterialStateProperty.all<Color>(Colors.white12),
                               ),
                               child: Column(
                                 children: [
@@ -144,7 +141,7 @@ class _CallPageState extends State<CallPage> {
                                     color: Colors.white54,
                                   ),
                                   Text(
-                                    'Message',
+                                    context.l10n.message,
                                     style: themeData.textTheme.titleLarge?.copyWith(
                                       color: Colors.white54,
                                       fontSize: 12,
@@ -183,7 +180,7 @@ class _CallPageState extends State<CallPage> {
                                 },
                                 width: mediaQueryData.size.width * 0.55,
                                 backgroundColor: Colors.white60,
-                                text: 'Slide to Talk',
+                                text: context.l10n.slideTalk,
                                 stickToEnd: true,
                                 textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                                       color: Colors.white,
@@ -192,10 +189,7 @@ class _CallPageState extends State<CallPage> {
                                 sliderButtonContent: RoundedButton(
                                   press: () {},
                                   color: Colors.white,
-                                  icon: const Icon(
-                                    FontAwesomeIcons.phoneAlt,
-                                    color: Colors.green,
-                                  ),
+                                  icon: const Icon(FontAwesomeIcons.phoneAlt, color: Colors.green),
                                 ),
                               ),
                             ]
@@ -203,26 +197,17 @@ class _CallPageState extends State<CallPage> {
                               RoundedButton(
                                 press: () {},
                                 color: Colors.white,
-                                icon: const Icon(
-                                  FontAwesomeIcons.microphone,
-                                  color: Colors.black,
-                                ),
+                                icon: const Icon(FontAwesomeIcons.microphone, color: Colors.black),
                               ),
                               RoundedButton(
                                 press: finishCall,
                                 color: Colors.red,
-                                icon: const Icon(
-                                  FontAwesomeIcons.phoneAlt,
-                                  color: Colors.white,
-                                ),
+                                icon: const Icon(FontAwesomeIcons.phoneAlt, color: Colors.white),
                               ),
                               RoundedButton(
                                 press: () {},
                                 color: Colors.white,
-                                icon: const Icon(
-                                  FontAwesomeIcons.volumeUp,
-                                  color: Colors.black,
-                                ),
+                                icon: const Icon(FontAwesomeIcons.volumeUp, color: Colors.black),
                               ),
                             ],
                     ),
@@ -262,9 +247,7 @@ class RoundedButton extends StatelessWidget {
           backgroundColor: color,
           padding: EdgeInsets.all(15 / 64 * size),
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(100),
-            ),
+            borderRadius: BorderRadius.all(Radius.circular(100)),
           ),
         ),
         onPressed: press,

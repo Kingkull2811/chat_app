@@ -41,8 +41,8 @@ class StudentsManagementBloc
               apiError: ApiError.noError,
               listClass: responseC.listClass,
             ));
-          } else if (responseC is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (responseC is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -65,8 +65,8 @@ class StudentsManagementBloc
               apiError: ApiError.noError,
               listStudent: response.listStudent,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse  && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -93,8 +93,8 @@ class StudentsManagementBloc
             apiError: ApiError.noError,
             listStudent: response.listStudent,
           ));
-        } else if (response is ExpiredTokenGetResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenGetResponse && context.mounted) {
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(
             isLoading: false,
@@ -111,8 +111,8 @@ class StudentsManagementBloc
             isLoading: false,
             apiError: ApiError.noError,
           ));
-        } else if (response is ExpiredTokenGetResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenGetResponse  && context.mounted) {
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(
             isLoading: false,
@@ -130,9 +130,9 @@ class StudentsManagementBloc
             isLoading: false,
             apiError: ApiError.noError,
           ));
-        } else if (response is ExpiredTokenGetResponse) {
-          Navigator.pop(this.context);
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenGetResponse && context.mounted) {
+          Navigator.pop(context);
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(
             isLoading: false,

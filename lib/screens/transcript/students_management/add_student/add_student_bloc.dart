@@ -38,8 +38,8 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
               apiError: ApiError.noError,
               listClass: response.listClass,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -60,8 +60,8 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
             isAddSuccess: true,
             message: 'Add new student success',
           ));
-        } else if (response is ExpiredTokenResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenResponse && context.mounted) {
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(
             isLoading: false,
@@ -85,8 +85,8 @@ class AddStudentBloc extends Bloc<AddStudentEvent, AddStudentState> {
             isEditSuccess: true,
             message: 'Update student success',
           ));
-        } else if (response is ExpiredTokenGetResponse) {
-          logoutIfNeed(this.context);
+        } else if (response is ExpiredTokenGetResponse  && context.mounted) {
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(
             isLoading: false,

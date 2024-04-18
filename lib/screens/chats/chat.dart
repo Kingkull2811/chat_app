@@ -1,3 +1,4 @@
+import 'package:chat_app/l10n/l10n.dart';
 import 'package:chat_app/network/model/user_from_firebase.dart';
 import 'package:chat_app/routes.dart';
 import 'package:chat_app/screens/chats/chat_bloc.dart';
@@ -24,14 +25,12 @@ class ChatsPage extends StatefulWidget {
   State<ChatsPage> createState() => ChatsPageState();
 }
 
-class ChatsPageState extends State<ChatsPage>
-    with SingleTickerProviderStateMixin {
+class ChatsPageState extends State<ChatsPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final _searchNewMessageController = TextEditingController();
 
-  final bool isAdmin = SharedPreferencesStorage().getAdminRole() ||
-      SharedPreferencesStorage().getTeacherRole();
+  final bool isAdmin = SharedPreferencesStorage().getAdminRole() || SharedPreferencesStorage().getTeacherRole();
 
   late ChatsBloc _chatsBloc;
 
@@ -65,21 +64,11 @@ class ChatsPageState extends State<ChatsPage>
           showMessageNoInternetDialog(context);
         }
         if (curState.apiError == ApiError.internalServerError) {
-          showCupertinoMessageDialog(
-            context,
-            'Error!',
-            content: 'Internal Server Error',
-          );
+          showCupertinoMessageDialog(context, context.l10n.error, content: context.l10n.internal_server_error);
         }
       },
       builder: (context, state) {
-        Widget body = const SizedBox.shrink();
-        if (state.isLoading) {
-          body = const AnimationLoading();
-        } else {
-          body = _body(context, state);
-        }
-        return body;
+        return state.isLoading ? const AnimationLoading() : _body(context, state);
       },
     );
   }
@@ -115,10 +104,7 @@ class ChatsPageState extends State<ChatsPage>
             width: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                width: 1,
-                color: AppColors.primaryColor,
-              ),
+              border: Border.all(width: 1, color: AppColors.primaryColor),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
@@ -144,28 +130,21 @@ class ChatsPageState extends State<ChatsPage>
       title: Container(
         height: 40,
         width: 250,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.grey[50],
-            border: Border.all(
-              width: 1,
-              color: AppColors.primaryColor,
-            )),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey[50], border: Border.all(width: 1, color: AppColors.primaryColor)),
         child: TabBar(
           controller: _tabController,
           unselectedLabelColor: Colors.grey,
           labelColor: Colors.white,
-          labelStyle:
-              const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          labelStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           indicatorWeight: 0,
           indicatorColor: Colors.black,
           indicator: BoxDecoration(
             color: AppColors.primaryColor,
             borderRadius: BorderRadius.circular(20),
           ),
-          tabs: const [
-            Tab(text: 'Chats'),
-            Tab(text: 'Contact'),
+          tabs: [
+            Tab(text: context.l10n.chats),
+            Tab(text: context.l10n.contacts),
           ],
         ),
       ),

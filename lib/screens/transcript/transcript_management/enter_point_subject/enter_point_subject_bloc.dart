@@ -50,8 +50,8 @@ class EnterPointSubjectBloc
               apiError: ApiError.noError,
               listLearningInfo: response.listResult,
             ));
-          } else if (response is ExpiredTokenGetResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenGetResponse && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -82,8 +82,8 @@ class EnterPointSubjectBloc
               apiError: ApiError.noError,
               updateDone: true,
             ));
-          } else if (response is ExpiredTokenResponse) {
-            logoutIfNeed(this.context);
+          } else if (response is ExpiredTokenResponse  && context.mounted) {
+            logoutIfNeed(context);
           } else {
             emit(state.copyWith(
               isLoading: false,
@@ -101,8 +101,8 @@ class EnterPointSubjectBloc
 
         if (mathResponse.isOK()) {
           emit(state.copyWith(isLoading: false));
-        } else if (mathResponse is ExpiredTokenResponse) {
-          logoutIfNeed(this.context);
+        } else if (mathResponse is ExpiredTokenResponse && context.mounted) {
+          logoutIfNeed(context);
         } else {
           emit(state.copyWith(isLoading: false));
         }
