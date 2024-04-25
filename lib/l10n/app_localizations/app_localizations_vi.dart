@@ -497,7 +497,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get subName => 'Tên chủ đề';
 
   @override
-  String get classManage => 'Class Management';
+  String get classManage => 'Quản lý lớp';
 
   @override
   String get addStu => 'Thêm một học sinh mới';
@@ -566,7 +566,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get selClass => 'Chọn Lớp';
 
   @override
-  String get subManage => 'Subjects Management';
+  String get subManage => 'Quản lý chủ đề';
 
   @override
   String get subjects => 'Danh sách chủ đề:';
@@ -635,7 +635,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get saveChangeContent => 'Bản ghi đã bị thay đổi, bạn có muốn lưu thay đổi này không?';
 
   @override
-  String get transcriptManage => 'Transcript Management';
+  String get transcriptManage => 'Quản lý bản ghi';
 
   @override
   String get oneGPA => 'Điểm trung bình học kỳ 1:';

@@ -34,7 +34,7 @@ class UserInfoResponse {
         email: json['email'] as String,
         phone: json['phone'] == null ? '' : (json['phone'] as String),
         fullName: json['fullName'] == null ? '' : json['fullName'] as String,
-        roles: List<String>.from(json['roles']),
+        roles:json['roles'] == null? null: List<String>.from(json['roles']),
         expiredAccessToken: json['expiredAccessDate'] as String,
         expiredRefreshToken: json['expiredRefreshDate'] as String,
         isFillProfileKey: json['isFillProfileKey'] ?? false,
